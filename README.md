@@ -1,13 +1,13 @@
 Rudeltippen [![Build Status](https://secure.travis-ci.org/svenkubiak/Rudeltippen.png?branch=master)](http://travis-ci.org/svenkubiak/Rudeltippen)
 ------------------
 
-A football betting game based on the Play Framework and Twitter Bootstrap.
+A football betting game based on the [Ninja web Framework][19] and [Twitter Bootstrap][20] and [MongoDB][21].
 
 If you like Rudeltippen, [Flattr it][5]. Thanks!
 
 Available tournaments
 ------------------
-- 2014 FIFA World Cup
+- 1. Bundesliga 2014/2015
 
 Features in a Nutshell
 ------------------
@@ -17,7 +17,6 @@ Features in a Nutshell
 - Automatic playing schedule updates
 - User and Tournament statistics
 - Gravatar support
-- Multilingual
 - ...and a lot more
 
 Screenshots
@@ -33,13 +32,12 @@ Requirements
 - [Java SDK 1.7+][1]
 - Nginx, Apache, Lighttpd or any other HTTP-Server with Proxy-Support
 - SMTP-Account (with SSL/non-SSL, e.g. [Gmail][12])
-- MySQL 5+
+- MongoDB 2.6.0+
 
 Available Languages
 ------------------
 
 - German
-- English
 
 
 Installation guide
@@ -235,3 +233,6 @@ Rudeltippen is distributed under [Apache 2 licence][11]
 [14]: https://github.com/svenkubiak/Rudeltippen/tags
 [17]: http://www.playframework.com/documentation/1.2.7/install
 [18]: http://pastebin.com/Aqby1atw 
+[19]: http://www.ninjaframework.org/
+[20]: http://getbootstrap.com/
+[21]: https://www.mongodb.org/
