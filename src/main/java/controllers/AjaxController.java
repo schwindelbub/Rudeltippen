@@ -7,81 +7,94 @@ import models.Bracket;
 import models.Game;
 import models.Team;
 import ninja.Result;
+import ninja.Results;
 
 import org.apache.commons.lang.StringUtils;
 
+import services.DataService;
+
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
 public class AjaxController {
 
+    @Inject
+    private DataService dataService;
+
+    //TODO Refactoring
     public Result webserviceid(final long gameid) {
-        Game game = Game.findById(gameid);
+        Game game = dataService.findGameById(gameid);
         if (game != null) {
-            final String webserviceID = params.get("value");
+            final String webserviceID = null;//params.get("value");
             if (StringUtils.isNotBlank(webserviceID)) {
                 game.setWebserviceID(webserviceID);
-                game._save();
-                ok();
+                dataService.save(game);
+
+                return Results.ok();
             }
         }
-        badRequest();
+        return Results.badRequest();
     }
 
+    //TODO Refactoring
     public Result kickoff(final long gameid) {
-        Game game = Game.findById(gameid);
+        Game game = dataService.findGameById(gameid);
         if (game != null) {
-            final String kickoff = params.get("value");
+            final String kickoff = null;//params.get("value");
             if (StringUtils.isNotBlank(kickoff)) {
                 try {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy - HH:mm", Locale.ENGLISH);
                     game.setKickoff(simpleDateFormat.parse(kickoff));
                     game.setUpdateble(false);
-                    game._save();
+                    dataService.save(game);
                 } catch (Exception e) {
-                    badRequest();
+                    return Results.badRequest();
                 }
-                ok();
+                return Results.ok();
             }
         }
-        badRequest();
+        return Results.badRequest();
     }
 
+    //TODO Refactoring
     public Result place(final long teamid) {
-        Team team = Team.findById(teamid);
+        Team team = dataService.findTeamById(teamid);
         if (team != null) {
-            final String place = params.get("value");
+            final String place = null;//params.get("value");
             if (StringUtils.isNotBlank(place)) {
                 team.setPlace(Integer.valueOf(place));
-                team._save();
+                dataService.save(team);
 
                 Bracket bracket = team.getBracket();
                 bracket.setUpdateble(false);
-                bracket._save();
+                dataService.save(bracket);
 
-                ok();
+                return Results.ok();
             }
         }
-        badRequest();
+        return Results.badRequest();
     }
 
     public Result updateblegame(final long gameid) {
-        Game game = Game.findById(gameid);
+        Game game = dataService.findGameById(gameid);
         if (game != null) {
             game.setUpdateble(!game.isUpdateble());
-            game._save();
-            ok();
+            dataService.save(game);
+
+            return Results.ok();
         }
-        badRequest();
+        return Results.badRequest();
     }
 
     public Result updateblebracket(final long bracketid) {
-        Bracket bracket = Bracket.findById(bracketid);
+        Bracket bracket = dataService.findBracketById(bracketid);
         if (bracket != null) {
             bracket.setUpdateble(!bracket.isUpdateble());
-            bracket._save();
-            ok();
+            dataService.save(bracket);
+
+            return Results.ok();
         }
-        badRequest();
+        return Results.badRequest();
     }
 }

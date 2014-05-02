@@ -7,6 +7,7 @@ import java.util.Map;
 import models.AbstractJob;
 import models.Bracket;
 import models.Confirmation;
+import models.ConfirmationType;
 import models.Constants;
 import models.Extra;
 import models.ExtraTip;
@@ -596,5 +597,67 @@ public class DataService {
         // TODO Refactoring
         // Game.find("SELECT g FROM Game g WHERE homeReference LIKE ? OR awayReference LIKE ?", bracketString, bracketString).fetch();
         return null;
+    }
+
+    public List<Game> findAllNonPlayoffGames() {
+        return this.datastore.find(Game.class).field("playoff").equal(false).asList();
+    }
+
+    public List<Game> findAllPlayoffGames() {
+        return this.datastore.find(Game.class).field("playoff").equal(true).asList();
+    }
+
+    public long getUsersCount() {
+        return this.datastore.find(User.class).countAll();
+    }
+
+    public List<User> findActiveUsers(int limit) {
+        return this.datastore.find(User.class).field("active").equal(true).order("place").limit(limit).asList();
+    }
+
+    public List<User> findAllActiveUsersOrderedByPlace() {
+        return this.datastore.find(User.class).field("active").equal(true).order("place").asList();
+    }
+
+    public Team findTeamById(long teamid) {
+        // TODO Refactoring
+        return null;
+    }
+
+    public Bracket findBracketById(long bracketid) {
+        // TODO Refactoring
+        return null;
+    }
+
+    public Extra findExtaById(Long bonusTippId) {
+        // TODO Refactoring
+        return null;
+    }
+
+    public long getExtrasCount() {
+        return this.datastore.find(Extra.class).countAll();
+    }
+
+    public long getGameCount() {
+        return this.datastore.find(Game.class).countAll();
+    }
+
+    public List<User> findUsersOrderByUsername() {
+        return this.datastore.find(User.class).field("active").equal(true).order("username").asList();
+    }
+
+    public User findUserById(long userid) {
+        // TODO Refactoring
+        return null;
+    }
+
+    public Confirmation findConfirmationByTypeAndUser(ConfirmationType confirmationType, User user) {
+        // TODO refactoring
+        // Confirmation.find("byConfirmTypeAndUser", , user).first();
+        return null;
+    }
+
+    public List<Game> findAllGames() {
+        return this.datastore.find(Game.class).asList();
     }
 }

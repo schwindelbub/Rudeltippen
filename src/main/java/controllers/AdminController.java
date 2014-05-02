@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import jobs.GameTipJob;
-import models.AbstractJob;
 import models.Bracket;
 import models.Confirmation;
 import models.ConfirmationType;
@@ -24,14 +22,13 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
+import services.CalculationService;
 import services.DataService;
 import services.MailService;
-import services.ValidationService;
 import utils.AppUtils;
-import utils.ViewUtils;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 public class AdminController {
@@ -40,20 +37,27 @@ public class AdminController {
     @Inject
     private DataService dataService;
 
+    @Inject
+    private CalculationService calculationService;
+
+    @Inject
+    private MailService mailService;
+
     public Result results(final long number) {
-        final Pagination pagination = ViewUtils.getPagination(number, "/admin/results/");
-        final Playday playday = Playday.find("byNumber", pagination.getNumberAsInt()).first();
+        final Pagination pagination = AppUtils.getPagination(number, "/admin/results/", dataService.findAllPlaydaysOrderByNumber().size());
+        final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
 
         return Results.html().render(playday).render(pagination);
     }
 
     public Result users() {
-        final List<User> users = User.find("SELECT u FROM User u ORDER BY username ASC").fetch();
-        render(users);
+        final List<User> users = dataService.findUsersOrderByUsername();
+        return Results.html().render(users);
     }
 
     public Result storeresults() {
-        final Map<String, String> map = params.allSimple();
+        //TODO Refactoring
+        final Map<String, String> map = null;//params.allSimple();
         final Set<String> keys = new HashSet<String>();
         for (final Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();
@@ -76,37 +80,37 @@ public class AdminController {
             final String extratime = map.get("extratime_" + key);
             final String homeScoreExtratime = map.get("game_" + key + "_homeScore_et");
             final String awayScoreExtratime = map.get("game_" + key + "_awayScore_et");
-            AppUtils.setGameScore(key, homeScore, awayScore, extratime, homeScoreExtratime, awayScoreExtratime);
+            calculationService.setGameScore(key, homeScore, awayScore, extratime, homeScoreExtratime, awayScoreExtratime);
         }
 
-        AppUtils.calculations();
+        calculationService.calculations();
 
-        flash.put("infomessage", Messages.get("controller.games.tippsstored"));
-        flash.keep();
+        //TODO Refactoring
+        //flash.put("infomessage", Messages.get("controller.games.tippsstored"));
+        //flash.keep();
 
         int playday = 1;
         if ((keys != null) && (keys.size() >= 1)) {
             if (StringUtils.isNotBlank(gamekey)) {
                 gamekey = gamekey.replace("_et", "");
-                final Game game = Game.findById(new Long(gamekey));
+                final Game game = dataService.findGameById(new Long(gamekey));
                 if ((game != null) && (game.getPlayday() != null)) {
                     playday = game.getPlayday().getNumber();
                 }
             }
         }
 
-        redirect("/admin/results/" + playday);
+        return Results.redirect("/admin/results/" + playday);
     }
 
     public Result updatesettings (final String name, final int pointsTip, final int pointsTipDiff, final int pointsTipTrend, final int minutesBeforeTip, final boolean countFinalResult, final boolean informOnNewTipper, final boolean enableRegistration, final String trackingcode) {
-        if (ValidationService.verifyAuthenticity()) { checkAuthenticity(); }
+        //        validation.range(pointsTip, 0, 99);
+        //        validation.range(pointsTipDiff, 0, 99);
+        //        validation.range(pointsTipTrend, 0, 99);
 
-        validation.range(pointsTip, 0, 99);
-        validation.range(pointsTipDiff, 0, 99);
-        validation.range(pointsTipTrend, 0, 99);
-
-        if (!validation.hasErrors()) {
-            final Settings settings = Settings.find("byAppName", APPNAME).first();
+        //TODO Refactoring - was !validation.hasErrors()
+        if (true) {
+            final Settings settings = dataService.findSettings();
             settings.setGameName(name);
             settings.setPointsTip(pointsTip);
             settings.setPointsTipDiff(pointsTipDiff);
@@ -115,35 +119,37 @@ public class AdminController {
             settings.setInformOnNewTipper(informOnNewTipper);
             settings.setCountFinalResult(countFinalResult);
             settings.setEnableRegistration(enableRegistration);
-            settings._save();
+            dataService.save(settings);
 
-            flash.put("infomessage", Messages.get("setup.saved"));
-            flash.keep();
+            //flash.put("infomessage", Messages.get("setup.saved"));
+            //flash.keep();
         }
-        params.flash();
-        validation.keep();
+        //params.flash();
+        //validation.keep();
 
-        settings();
+        return Results.redirect("/settings");
     }
 
     public Result settings() {
-        final Settings settings = AppUtils.findSettings();
+        final Settings settings = dataService.findSettings();
 
-        flash.put("name", settings.getGameName());
-        flash.put("pointsTip", settings.getPointsTip());
-        flash.put("pointsTipDiff", settings.getPointsTipDiff());
-        flash.put("pointsTipTrend", settings.getPointsTipTrend());
-        flash.put("minutesBeforeTip", settings.getMinutesBeforeTip());
-        flash.put("informOnNewTipper", settings.isInformOnNewTipper());
-        flash.put("countFinalResult", settings.isCountFinalResult());
-        flash.put("enableRegistration", settings.isEnableRegistration());
+        //TODO Refactoring
+        //        flash.put("name", settings.getGameName());
+        //        flash.put("pointsTip", settings.getPointsTip());
+        //        flash.put("pointsTipDiff", settings.getPointsTipDiff());
+        //        flash.put("pointsTipTrend", settings.getPointsTipTrend());
+        //        flash.put("minutesBeforeTip", settings.getMinutesBeforeTip());
+        //        flash.put("informOnNewTipper", settings.isInformOnNewTipper());
+        //        flash.put("countFinalResult", settings.isCountFinalResult());
+        //        flash.put("enableRegistration", settings.isEnableRegistration());
 
-        render(settings);
+        return Results.html().render(settings);
     }
 
+    //TODO Refactoring
     public Result changeactive(final long userid) {
-        final User connectedUser = AppUtils.getConnectedUser();
-        final User user = User.findById(userid);
+        final User connectedUser = null;//AppUtils.getConnectedUser();
+        final User user = dataService.findUserById(userid);
 
         if (user != null) {
             if (!connectedUser.equals(user)) {
@@ -152,99 +158,105 @@ public class AdminController {
                 if (user.isActive()) {
                     user.setActive(false);
                     activate = "deactivated";
-                    message = Messages.get("info.change.deactivate", user.getEmail());
+                    message = null;//Messages.get("info.change.deactivate", user.getEmail());
                 } else {
-                    final Confirmation confirmation = Confirmation.find("byConfirmTypeAndUser", ConfirmationType.ACTIVATION, user).first();
+                    final Confirmation confirmation = dataService.findConfirmationByTypeAndUser(ConfirmationType.ACTIVATION, user);
                     if (confirmation != null) {
-                        confirmation._delete();
+                        dataService.delete(confirmation);
                     }
                     user.setActive(true);
                     activate = "activated";
-                    message = Messages.get("info.change.activate", user.getEmail());
+                    message = null;//Messages.get("info.change.activate", user.getEmail());
                 }
-                user._save();
-                flash.put("infomessage", message);
+                dataService.save(user);
+                //flash.put("infomessage", message);
                 LOG.info("User " + user.getEmail() + " has been " + activate + " - by " + connectedUser.getEmail());
             } else {
-                flash.put("warningmessage", Messages.get("warning.change.active"));
+                //flash.put("warningmessage", Messages.get("warning.change.active"));
             }
         } else {
-            flash.put("errormessage", Messages.get("error.loading.user"));
+            //flash.put("errormessage", Messages.get("error.loading.user"));
         }
 
-        flash.keep();
-        redirect("/admin/users");
+        //flash.keep();
+        return Results.redirect("/admin/users");
     }
 
+    //TODO Refactoring
     public Result changeadmin(final long userid) {
-        final User connectedUser = AppUtils.getConnectedUser();
-        final User user = User.findById(userid);
+        final User connectedUser = null;//AppUtils.getConnectedUser();
+        final User user = dataService.findUserById(userid);
 
         if (user != null) {
             if (!connectedUser.equals(user)) {
                 String message;
                 String admin;
                 if (user.isAdmin()) {
-                    message = Messages.get("info.change.deadmin", user.getEmail());
+                    message = null;//Messages.get("info.change.deadmin", user.getEmail());
                     admin = "is now admin";
                     user.setAdmin(false);
                 } else {
-                    message = Messages.get("info.change.admin", user.getEmail());
+                    message = null;//Messages.get("info.change.admin", user.getEmail());
                     admin = "is not admin anymore";
                     user.setAdmin(true);
                 }
-                user._save();
-                flash.put("infomessage", message);
+                dataService.save(user);
+                //flash.put("infomessage", message);
                 LOG.info("User " + user.getEmail() + " " + admin + " - by " + connectedUser.getEmail());
             } else {
-                flash.put("warningmessage", Messages.get("warning.change.admin"));
+                //flash.put("warningmessage", Messages.get("warning.change.admin"));
             }
         } else {
-            flash.put("errormessage", Messages.get("error.loading.user"));
+            //flash.put("errormessage", Messages.get("error.loading.user"));
         }
 
-        flash.keep();
-        redirect("/admin/users");
+        //flash.keep();
+        return Results.redirect("/admin/users");
     }
 
     public Result deleteuser(final long userid) {
-        final User connectedUser = AppUtils.getConnectedUser();
-        final User user = User.findById(userid);
+        final User connectedUser = null;//AppUtils.getConnectedUser();
+        final User user = dataService.findUserById(userid);
 
         if (user != null) {
             if (!connectedUser.equals(user)) {
                 final String username = user.getEmail();
-                user._delete();
-                flash.put("infomessage", Messages.get("info.delete.user", username));
+                dataService.delete(user);
+                //flash.put("infomessage", Messages.get("info.delete.user", username));
                 LOG.info("User " + username + " has been deleted - by " + connectedUser.getEmail());
 
-                AppUtils.calculations();
+                calculationService.calculations();
             } else {
-                flash.put("warningmessage", Messages.get("warning.delete.user"));
+                //flash.put("warningmessage", Messages.get("warning.delete.user"));
             }
         } else {
-            flash.put("errormessage", Messages.get("error.loading.user"));
+            //flash.put("errormessage", Messages.get("error.loading.user"));
         }
 
-        flash.keep();
-        redirect("/admin/users");
+        //flash.keep();
+
+        return Results.redirect("/admin/users");
     }
 
     public Result jobs() {
-        final List<Job> jobs = JobsPlugin.scheduledJobs;
-        render(jobs);
+        //TODO Refactoring
+        //        final List<Job> jobs = JobsPlugin.scheduledJobs;
+        //        render(jobs);
+        return Results.html();
     }
 
+    //TODO Refactoring
     public Result runjob(final String name) {
-        if (StringUtils.isNotBlank(name)) {
-            final List<Job> jobs = JobsPlugin.scheduledJobs;
-            for (final Job job : jobs) {
-                if (name.equalsIgnoreCase(job.getClass().getSimpleName())) {
-                    job.now();
-                }
-            }
-        }
-        jobs();
+        //        if (StringUtils.isNotBlank(name)) {
+        //            final List<Job> jobs = JobsPlugin.scheduledJobs;
+        //            for (final Job job : jobs) {
+        //                if (name.equalsIgnoreCase(job.getClass().getSimpleName())) {
+        //                    job.now();
+        //                }
+        //            }
+        //        }
+        //        jobs();
+        return Results.html();
     }
 
     public Result rudelmail() {
@@ -252,46 +264,51 @@ public class AdminController {
     }
 
     public Result tournament() {
-        List<Bracket> brackets = Bracket.findAll();
-        List<Game> games = Game.findAll();
+        List<Bracket> brackets = dataService.findAllBrackets();
+        List<Game> games = dataService.findAllGames();
 
-        render(brackets, games);
+        return Results.html().render(brackets).render(games);
     }
 
     public Result send(final String subject, final String message) {
-        validation.required(subject);
-        validation.required(message);
+        //        validation.required(subject);
+        //        validation.required(message);
 
-        if (!validation.hasErrors()) {
+        //TODO Refactoring - was !validation.hasErrors()
+        if (true) {
             final List<String> recipients = new ArrayList<String>();
-            final List<User> users = AppUtils.getAllActiveUsers();
+            final List<User> users = dataService.getAllActiveUsers();
             for (final User user : users) {
                 recipients.add(user.getEmail());
             }
 
-            MailService.rudelmail(subject, message, recipients.toArray(), AppUtils.getConnectedUser().getEmail());
-            flash.put("infomessage", Messages.get("info.rudelmail.send"));
+            mailService.rudelmail(subject, message, recipients.toArray(), null/*AppUtils.getConnectedUser().getEmail()*/);
+            //flash.put("infomessage", Messages.get("info.rudelmail.send"));
         } else {
-            flash.put("errormessage", Messages.get("error.rudelmail.send"));
-            params.flash();
-            validation.keep();
+            //flash.put("errormessage", Messages.get("error.rudelmail.send"));
+            //params.flash();
+            //validation.keep();
         }
-        flash.keep();
+        //flash.keep();
 
-        rudelmail();
+        return Results.redirect("/rudelmail");
     }
 
     public Result jobstatus(final String name) {
-        if (StringUtils.isNotBlank(name)) {
-            AbstractJob abstractJob = AbstractJob.find("byName", name).first();
-            abstractJob.setActive(!abstractJob.isActive());
-            abstractJob._save();
-        }
-        jobs();
+        //TODO Refactoring
+        //        if (StringUtils.isNotBlank(name)) {
+        //            AbstractJob abstractJob = AbstractJob.find("byName", name).first();
+        //            abstractJob.setActive(!abstractJob.isActive());
+        //            abstractJob._save();
+        //        }
+        //        jobs();
+
+        return Results.html();
     }
 
     public Result calculations() {
-        AppUtils.calculations();
-        tournament();
+        calculationService.calculations();
+
+        return Results.redirect("/tournament");
     }
 }

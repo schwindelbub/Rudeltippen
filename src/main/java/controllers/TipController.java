@@ -11,35 +11,40 @@ import models.Pagination;
 import models.Playday;
 import models.Team;
 import models.User;
+import ninja.Result;
+import ninja.Results;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.google.inject.Singleton;
-
-import services.ValidationService;
+import services.DataService;
 import utils.AppUtils;
-import utils.ViewUtils;
+import utils.ValidationUtils;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 public class TipController {
 
-    public Result playday(final int number) {
-        final Pagination pagination = ViewUtils.getPagination(number, "/tips/playday/");
-        final Playday playday = Playday.find("byNumber", pagination.getNumberAsInt()).first();
+    @Inject
+    private DataService dataService;
 
-        final List<Extra> extras = Extra.findAll();
+    public Result playday(final int number) {
+        final Pagination pagination = AppUtils.getPagination(number, "/tips/playday/", dataService.findAllPlaydaysOrderByNumber().size());
+        final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
+
+        final List<Extra> extras = dataService.findAllExtras();
         final boolean tippable = AppUtils.extrasTipable(extras);
 
-        render(playday, number,pagination, extras, tippable);
+        return Results.html().render(playday).render(number).render(pagination).render(extras).render(tippable);
     }
 
+    //TODO Refactoring
     public Result storetips() {
-        if (ValidationService.verifyAuthenticity()) { checkAuthenticity(); }
-
         int tipped = 0;
         int playday = 1;
         final List<String> keys = new ArrayList<String>();
-        final Map<String, String> map = params.allSimple();
+        final Map<String, String> map = null;//params.allSimple();
         for (final Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();
             if (StringUtils.isNotBlank(key) && key.contains("game_") && (key.contains("_homeScore") || key.contains("_awayScore"))) {
@@ -55,41 +60,41 @@ public class TipController {
                 final String homeScore = map.get("game_" + key + "_homeScore");
                 final String awayScore = map.get("game_" + key + "_awayScore");
 
-                if (!ValidationService.isValidScore(homeScore, awayScore)) {
+                if (!ValidationUtils.isValidScore(homeScore, awayScore)) {
                     continue;
                 }
 
-                final Game game = Game.findById(Long.parseLong(key));
+                final Game game = dataService.findGameById(Long.parseLong(key));
                 if (game == null) {
                     continue;
                 }
 
-                AppUtils.placeTip(game, Integer.parseInt(homeScore), Integer.parseInt(awayScore));
+                dataService.placeTip(game, Integer.parseInt(homeScore), Integer.parseInt(awayScore));
                 keys.add(key);
                 tipped++;
 
                 playday = game.getPlayday().getNumber();
             }
         }
+        //TODO Refactoring
         if (tipped > 0) {
-            flash.put("infomessage", Messages.get("controller.tipps.tippsstored"));
+            //flash.put("infomessage", Messages.get("controller.tipps.tippsstored"));
         } else {
-            flash.put("warningmessage", Messages.get("controller.tipps.novalidtipps"));
+            //flash.put("warningmessage", Messages.get("controller.tipps.novalidtipps"));
         }
-        flash.keep();
+        //flash.keep();
 
-        redirect("/tips/playday/" + playday);
+        return Results.redirect("/tips/playday/" + playday);
     }
 
+    //TODO Refactroing
     public Result storeextratips() {
-        if (ValidationService.verifyAuthenticity()) { checkAuthenticity(); }
-
-        final Map<String, String> map = params.allSimple();
+        final Map<String, String> map = null;//params.allSimple();
         for (final Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();
 
             if (StringUtils.isNotBlank(key) && key.contains("bonus_") && key.contains("_teamId")) {
-                final String teamdId = params.get(key);
+                final String teamdId = null;//params.get(key);
                 key = key.replace("bonus_", "");
                 key = key.replace("_teamId", "");
                 key = key.trim();
@@ -103,23 +108,25 @@ public class TipController {
                     bonusTippId = Long.parseLong(bId);
                     teamId = Long.parseLong(tId);
                 } else {
-                    playday(AppUtils.getCurrentPlayday().getNumber());
+                    playday(dataService.getCurrentPlayday().getNumber());
                 }
 
-                final Extra extra = Extra.findById(bonusTippId);
+                final Extra extra = dataService.findExtaById(bonusTippId);
                 if (extra.isTipable()) {
-                    final Team team = Team.findById(teamId);
-                    AppUtils.placeExtraTip(extra, team);
-                    flash.put("infomessage", Messages.get("controller.tipps.bonussaved"));
-                    flash.keep();
+                    final Team team = dataService.findTeamById(teamId);
+                    dataService.placeExtraTip(extra, team);
+                    //flash.put("infomessage", Messages.get("controller.tipps.bonussaved"));
+                    //flash.keep();
                 }
             }
         }
-        playday(AppUtils.getCurrentPlayday().getNumber());
+
+        return Results.redirect("/tips/playday/" + dataService.getCurrentPlayday().getNumber());
     }
 
     public Result standings() {
-        final List<User> users = User.find("SELECT u FROM User u WHERE active = true ORDER BY place ASC").fetch();
-        render(users);
+        final List<User> users = dataService.findAllActiveUsersOrderedByPlace();
+
+        return Results.html().render(users);
     }
 }
