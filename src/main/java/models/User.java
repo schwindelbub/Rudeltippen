@@ -5,13 +5,13 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import models.statistic.ResultStatistic;
+import models.statistic.UserStatistic;
+
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
-
-import models.statistic.ResultStatistic;
-import models.statistic.UserStatistic;
 
 @Entity(value = "users", noClassnameStored = true)
 public class User {

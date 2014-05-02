@@ -660,4 +660,12 @@ public class DataService {
     public List<Game> findAllGames() {
         return this.datastore.find(Game.class).asList();
     }
+
+    public Confirmation findConfirmationByToken(String token) {
+        return this.datastore.find(Confirmation.class).field("token").equal(token).get();
+    }
+
+    public User findUserByEmailAndActive(String email) {
+        return this.datastore.find(User.class).field("active").equal(true).field("email").equal(email).get();
+    }
 }

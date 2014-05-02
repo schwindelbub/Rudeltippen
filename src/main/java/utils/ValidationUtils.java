@@ -58,7 +58,6 @@ public class ValidationUtils {
         return valid;
     }
 
-
     /**
      * Checks if a given email is matching defined EMAILPATTERN
      * 
@@ -81,6 +80,13 @@ public class ValidationUtils {
     public static boolean isValidUsername(final String username) {
         final Pattern p = Pattern.compile(Constants.USERNAMEPATTERN.value());
         final Matcher m = p.matcher(username);
+
+        return m.matches();
+    }
+
+    public static boolean isValidConfirmationToken(String token) {
+        final Pattern p = Pattern.compile(Constants.CONFIRMATIONPATTERN.value());
+        final Matcher m = p.matcher(token);
 
         return m.matches();
     }

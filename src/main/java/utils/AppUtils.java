@@ -83,7 +83,7 @@ public class AppUtils {
      * @param d Return a default image if no email is available
      * @return Base64 encoded Image, null if no image on gravatar exists
      */
-    public String getGravatarImage(final String email, final String d, int size) {
+    public static String getGravatarImage(final String email, final String d, int size) {
         String image = null;
 
         if (ValidationUtils.isValidEmail(email)) {
