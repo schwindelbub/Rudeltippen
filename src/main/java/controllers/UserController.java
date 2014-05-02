@@ -8,7 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import ninja.Result;
+import ninja.Results;
 import models.Confirmation;
 import models.ConfirmationType;
 import models.Extra;
@@ -18,11 +22,16 @@ import models.GameTip;
 import models.Settings;
 import models.User;
 import models.statistic.UserStatistic;
+import services.DataService;
 import services.MailService;
 import services.ValidationService;
 import utils.AppUtils;
 
+@Singleton
 public class UserController {
+
+    @Inject
+    private DataService dataService;
 
     public Result show(final String username) {
         final User user = User.find("byUsername", username).first();
@@ -75,10 +84,9 @@ public class UserController {
         }
     }
 
-    @Transactional(readOnly=true)
     public Result profile() {
         final User user = AppUtils.getConnectedUser();
-        final Settings settings = AppUtils.getSettings();
+        final Settings settings = AppUtils.findSettings();
         render(user, settings);
     }
 
@@ -235,11 +243,11 @@ public class UserController {
         final User user = AppUtils.getConnectedUser();
         user.setPicture(null);
         user.setPictureLarge(null);
-        user._save();
+        dataService.save(user);
 
         flash.put("infomessage", Messages.get("controller.profile.deletedpicture"));
         flash.keep();
 
-        redirect("/users/profile#picture");
+        return Results.redirect("/users/profile#picture");
     }
 }

@@ -10,6 +10,9 @@ import ninja.Result;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.google.inject.Singleton;
+
+@Singleton
 public class AjaxController {
 
     public Result webserviceid(final long gameid) {

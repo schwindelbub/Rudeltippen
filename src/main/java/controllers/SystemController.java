@@ -3,6 +3,8 @@ package controllers;
 import java.util.Date;
 import java.util.List;
 
+import com.google.inject.Singleton;
+
 import ninja.Result;
 import models.Game;
 import models.Settings;
@@ -10,14 +12,16 @@ import models.User;
 import services.SetupService;
 import utils.AppUtils;
 
+@Singleton
 public class SystemController {
 
-    @Before()
-    protected static void before() {
-        AppUtils.setAppLanguage();
-    }
+    //TODO Refactoring
+    //    @Before()
+    //    protected static void before() {
+    //        AppUtils.setAppLanguage();
+    //    }
 
-    public static void setup() {
+    public Result setup() {
         if (AppUtils.appIsInizialized()) {
             redirect("/");
         }
@@ -46,8 +50,8 @@ public class SystemController {
                 hasPlayoffs = true;
             }
 
-            Settings settings = AppUtils.getSettings();
-            settings = AppUtils.getSettings();
+            Settings settings = AppUtils.findSettings();
+            settings = AppUtils.findSettings();
             settings.setAppSalt(Codec.hexSHA1(Codec.UUID()));
             settings.setGameName("Rudeltippen");
             settings.setPointsTip(4);

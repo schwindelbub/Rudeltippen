@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import services.DataService;
 import services.ResultService;
-import utils.AppUtils;
 
 import com.google.inject.Inject;
 
@@ -35,7 +34,7 @@ public class ResultsJob implements Job {
 
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
-        if (AppUtils.isJobInstance()) {
+        if (dataService.isJobInstance()) {
             AbstractJob job = dataService.findAbstractJobByName("ResultsJob");
             if (job != null && job.isActive()) {
                 LOG.info("Started Job: ResultsJob");
@@ -43,7 +42,7 @@ public class ResultsJob implements Job {
                 for (final Game game : games) {
                     final WSResults wsResults = resultService.getResultsFromWebService(game);
                     if ((wsResults != null) && wsResults.isUpdated()) {
-                        AppUtils.setGameScoreFromWebService(game, wsResults);
+                        dataService.setGameScoreFromWebService(game, wsResults);
                     }
                 }
                 LOG.info("Finished Job: ResultsJob");

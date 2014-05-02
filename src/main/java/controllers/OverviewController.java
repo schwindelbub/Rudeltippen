@@ -3,7 +3,10 @@ package controllers;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Singleton;
+
 import ninja.Result;
+import ninja.Results;
 import models.Extra;
 import models.ExtraTip;
 import models.GameTip;
@@ -13,6 +16,7 @@ import models.User;
 import utils.AppUtils;
 import utils.ViewUtils;
 
+@Singleton
 public class OverviewController {
     public Result playday(final long number) {
         final Pagination pagination = ViewUtils.getPagination(number, "/overview/playday/");
@@ -22,7 +26,7 @@ public class OverviewController {
         final List<Map<User, List<GameTip>>> tips = AppUtils.getPlaydayTips(playday, users);
         final long usersCount = User.count();
 
-        render(playday, tips, pagination, usersCount);
+        return Results.html().render(tips).render(playday).render(pagination).render(userCount);
     }
 
     public Result extras() {
@@ -30,7 +34,7 @@ public class OverviewController {
         final List<Extra> extras = Extra.findAll();
         final List<Map<User, List<ExtraTip>>> tips =  AppUtils.getExtraTips(users, extras);
 
-        render(tips, extras);
+        return Results.html().render(tips).render(extras);
     }
 
     public Result lazy(final int number, final int start) {
@@ -38,6 +42,6 @@ public class OverviewController {
         final List<User> users = User.find("SELECT u FROM User u WHERE active = true ORDER BY place ASC").from(start).fetch(15);
         final List<Map<User, List<GameTip>>> tips = AppUtils.getPlaydayTips(playday, users);
 
-        render(tips);
+        return Results.html().render(tips);
     }
 }

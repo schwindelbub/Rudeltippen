@@ -23,9 +23,6 @@ import utils.AppUtils;
 
 public class SetupService {
     private static final Logger LOG = LoggerFactory.getLogger(ResultService.class);
-    private static final String WS_ENCODING = "UTF-8";
-    private static final String WS_CONTENT_TYPE = "application/soap+xml";
-    private static final String WS_URL = "http://www.openligadb.de/Webservices/Sportsdata.asmx";
 
     @Inject
     private DataService dataService;

@@ -2,20 +2,20 @@ package jobs;
 
 import java.util.List;
 
+import models.AbstractJob;
+import models.Game;
+import models.User;
+
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.Inject;
-
-import models.AbstractJob;
-import models.Game;
-import models.User;
 import services.DataService;
 import services.MailService;
-import utils.AppUtils;
+
+import com.google.inject.Inject;
 
 public class GameTipJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(GameTipJob.class);
@@ -34,7 +34,7 @@ public class GameTipJob implements Job {
 
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
-        if (AppUtils.isJobInstance()) {
+        if (dataService.isJobInstance()) {
             AbstractJob job = dataService.findAbstractJobByName("GameTipJob");
             if (job != null && job.isActive()) {
                 LOG.info("Started Job: GameTipJob");

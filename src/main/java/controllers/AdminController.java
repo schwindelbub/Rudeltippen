@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import jobs.GameTipJob;
 import models.AbstractJob;
 import models.Bracket;
 import models.Confirmation;
@@ -17,21 +18,33 @@ import models.Playday;
 import models.Settings;
 import models.User;
 import ninja.Result;
+import ninja.Results;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+import services.DataService;
 import services.MailService;
 import services.ValidationService;
 import utils.AppUtils;
 import utils.ViewUtils;
 
+@Singleton
 public class AdminController {
+    private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
+
+    @Inject
+    private DataService dataService;
 
     public Result results(final long number) {
         final Pagination pagination = ViewUtils.getPagination(number, "/admin/results/");
         final Playday playday = Playday.find("byNumber", pagination.getNumberAsInt()).first();
 
-        render(playday, pagination);
+        return Results.html().render(playday).render(pagination);
     }
 
     public Result users() {
@@ -114,7 +127,7 @@ public class AdminController {
     }
 
     public Result settings() {
-        final Settings settings = AppUtils.getSettings();
+        final Settings settings = AppUtils.findSettings();
 
         flash.put("name", settings.getGameName());
         flash.put("pointsTip", settings.getPointsTip());
@@ -151,7 +164,7 @@ public class AdminController {
                 }
                 user._save();
                 flash.put("infomessage", message);
-                Logger.info("User " + user.getEmail() + " has been " + activate + " - by " + connectedUser.getEmail());
+                LOG.info("User " + user.getEmail() + " has been " + activate + " - by " + connectedUser.getEmail());
             } else {
                 flash.put("warningmessage", Messages.get("warning.change.active"));
             }
@@ -182,7 +195,7 @@ public class AdminController {
                 }
                 user._save();
                 flash.put("infomessage", message);
-                Logger.info("User " + user.getEmail() + " " + admin + " - by " + connectedUser.getEmail());
+                LOG.info("User " + user.getEmail() + " " + admin + " - by " + connectedUser.getEmail());
             } else {
                 flash.put("warningmessage", Messages.get("warning.change.admin"));
             }
@@ -203,7 +216,7 @@ public class AdminController {
                 final String username = user.getEmail();
                 user._delete();
                 flash.put("infomessage", Messages.get("info.delete.user", username));
-                Logger.info("User " + username + " has been deleted - by " + connectedUser.getEmail());
+                LOG.info("User " + username + " has been deleted - by " + connectedUser.getEmail());
 
                 AppUtils.calculations();
             } else {
@@ -235,7 +248,7 @@ public class AdminController {
     }
 
     public Result rudelmail() {
-        render();
+        return Results.html();
     }
 
     public Result tournament() {

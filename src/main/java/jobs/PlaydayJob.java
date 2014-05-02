@@ -18,9 +18,9 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import services.DataService;
+import services.I18nService;
 import services.ResultService;
 import services.SetupService;
-import utils.AppUtils;
 
 import com.google.inject.Inject;
 
@@ -36,6 +36,9 @@ public class PlaydayJob implements Job {
     @Inject
     private SetupService setupService;
 
+    @Inject
+    private I18nService i18nService;
+
     public PlaydayJob() {
         //TODO Refactoring
         //        this.setDescription(Messages.get("job.playdayjob.description"));
@@ -44,11 +47,11 @@ public class PlaydayJob implements Job {
 
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
-        if (AppUtils.isJobInstance()) {
+        if (dataService.isJobInstance()) {
             AbstractJob job = dataService.findAbstractJobByName("GameTipJob");
             if (job != null && job.isActive()) {
                 LOG.info("Started Job: PlaydayJob");
-                int number = AppUtils.getCurrentPlayday().getNumber();
+                int number = dataService.getCurrentPlayday().getNumber();
                 for (int i=0; i <= 3; i++) {
                     final Playday playday = dataService.findPlaydaybByNumber(number);
                     if (playday != null) {
@@ -59,7 +62,7 @@ public class PlaydayJob implements Job {
                                 final Document document = resultService.getDocumentFromWebService(matchID);
                                 final Date kickoff = setupService.getKickoffFromDocument(document);
                                 final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
-                                df.setTimeZone(TimeZone.getTimeZone(AppUtils.getCurrentTimeZone()));
+                                df.setTimeZone(TimeZone.getTimeZone(i18nService.getCurrentTimeZone()));
 
                                 game.setKickoff(kickoff);
                                 dataService.save(game);

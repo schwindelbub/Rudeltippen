@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import services.DataService;
-import utils.AppUtils;
 
 import com.google.inject.Inject;
 
@@ -33,7 +32,7 @@ public class CleanupJob implements Job {
 
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
-        if (AppUtils.isJobInstance()) {
+        if (dataService.isJobInstance()) {
             AbstractJob job = dataService.findAbstractJobByName("CleanupJob");
             if (job != null && job.isActive()) {
                 LOG.info("Started Job: CleanupJob");

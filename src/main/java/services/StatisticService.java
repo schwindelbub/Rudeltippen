@@ -28,7 +28,7 @@ public class StatisticService {
         //TODO Refactoring
         //ResultStatistic.delete("user = ?", user);
 
-        final Settings settings = AppUtils.getSettings();
+        final Settings settings = dataService.findSettings();
         final List<GameTip> gameTips = dataService.findGameTipByUser(user);
         for (final GameTip gameTip : gameTips) {
             final Game game = gameTip.getGame();
@@ -89,7 +89,7 @@ public class StatisticService {
             gameTipStatistic.setPlayday(playday);
         }
 
-        final Object [] statistics = dataService.getPlaydayStatistics(playday);
+        final Object [] statistics = getPlaydayStatistics(playday);
         if ((statistics != null) && (statistics.length == 5)) {
             gameTipStatistic.setPoints(((Long) statistics [0]).intValue());
             gameTipStatistic.setCorrectTips(((Long) statistics [1]).intValue());
@@ -104,7 +104,7 @@ public class StatisticService {
     public void setAscendingPlaydayPoints(final Playday playday, final User user) {
         final UserStatistic userStatistic = dataService.findUserStatisticByPlaydayAndUser(playday, user);
 
-        final Object [] statistics = dataService.getAscendingStatistics(playday, user);
+        final Object [] statistics = getAscendingStatistics(playday, user);
         if ((statistics != null) && (statistics.length == 4)) {
             userStatistic.setPoints(((Long) statistics [0]).intValue());
             userStatistic.setCorrectTips(((Long) statistics [1]).intValue());
@@ -138,7 +138,7 @@ public class StatisticService {
         int correctDiffs = 0;
         int correctTrends = 0;
 
-        final Settings settings = AppUtils.getSettings();
+        final Settings settings = dataService.findSettings();
         final List<Game> games = playday.getGames();
         for (final Game game : games) {
             final GameTip gameTip = dataService.findGameTipByGameAndUser(user, game);
@@ -169,24 +169,6 @@ public class StatisticService {
         dataService.save(userStatistic);
     }
 
-    public Map<String, Integer> getScores(final Playday playday) {
-        final Map<String, Integer> scores = new HashMap<String, Integer>();
-
-        final List<Game> games = playday.getGames();
-        for (final Game game : games) {
-            final List<GameTip> gameTips = dataService.findGameTipByGame(game);
-            for (final GameTip gameTip : gameTips) {
-                final String score = gameTip.getHomeScore() + ":" + gameTip.getAwayScore();
-                if (!scores.containsKey(score)) {
-                    scores.put(score, 1);
-                } else {
-                    scores.put(score, scores.get(score) + 1);
-                }
-            }
-        }
-        return scores;
-    }
-
     public void setPlaydayStatistics(final Playday playday, final Map<String, Integer> scores) {
         for (final Entry entry : scores.entrySet()) {
             PlaydayStatistic playdayStatistic = dataService.findPlaydayStatisticByPlaydayAndResult(playday, entry.getKey());
@@ -198,5 +180,90 @@ public class StatisticService {
             playdayStatistic.setResultCount((Integer) entry.getValue());
             dataService.save(playdayStatistic);
         }
+    }
+
+    public List<Object[]> getGameStatistics() {
+        //TODO Refactoring
+        //        List<Object []> results = JPA.em()
+        //                .createQuery(
+        //                        "SELECT " +
+        //                                "SUM(resultCount) AS counts, " +
+        //                                "gameResult AS result " +
+        //                                "FROM GameStatistic g " +
+        //                                "GROUP BY gameResult " +
+        //                        "ORDER BY counts DESC").getResultList();
+        //
+        //        return results;
+        return null;
+    }
+
+
+    public Object [] getPlaydayStatistics(Playday playday) {
+        //TODO Refactoring
+        //        Object result = null;
+        //        Object [] values = null;
+        //
+        //        result = JPA.em()
+        //                .createQuery("SELECT " +
+        //                        "SUM(playdayPoints) AS points, " +
+        //                        "SUM(playdayCorrectTips) AS tips, " +
+        //                        "SUM(playdayCorrectDiffs) AS diffs," +
+        //                        "SUM(playdayCorrectTrends) AS trends, " +
+        //                        "ROUND(AVG(playdayPoints)) AS avgPoints " +
+        //                        "FROM UserStatistic u WHERE u.playday.id = :playdayID")
+        //                        .setParameter("playdayID", playday.getId())
+        //                        .getSingleResult();
+        //
+        //        if (result != null) {
+        //            values = (Object[]) result;
+        //        }
+        //
+        //        return values;
+        return null;
+    }
+
+    public Object []  getAscendingStatistics(final Playday playday, final User user) {
+        //TODO Refactoring
+        //        Object result = null;
+        //        Object [] values = null;
+        //
+        //        result = JPA.em()
+        //                .createQuery(
+        //                        "SELECT " +
+        //                                "SUM(playdayPoints) AS points, " +
+        //                                "SUM(playdayCorrectTips) AS correctTips, " +
+        //                                "SUM(playdayCorrectDiffs) AS correctDiffs, " +
+        //                                "SUM(playdayCorrectTrends) AS correctTrends " +
+        //                                "FROM UserStatistic u " +
+        //                        "WHERE u.playday.id <= :playdayID AND u.user.id = :userID")
+        //                        .setParameter("playdayID", playday.getId())
+        //                        .setParameter("userID", user.getId())
+        //                        .getSingleResult();
+        //
+        //        if (result != null) {
+        //            values = (Object[]) result;
+        //        }
+        //
+        //        return values;
+        return null;
+    }
+
+    public List<Object[]> getResultsStatistic() {
+        //TODO Refactoring
+        //        List<Object []> results = JPA.em()
+        //                .createQuery("SELECT " +
+        //                        "SUM(resultCount) AS counts, " +
+        //                        "gameResult AS result " +
+        //                        "FROM PlaydayStatistic p " +
+        //                        "GROUP BY gameResult " +
+        //                        "ORDER BY counts DESC").getResultList();
+        //
+        //        return results;
+        return null;
+    }
+
+    public List<GameTipStatistic> getGamTipStatisticsOrderByPlayday() {
+        //TODO Refactoring
+        return null;
     }
 }

@@ -160,10 +160,12 @@ public class Game {
     }
 
     public Date getTippEnding() {
-        final long time = this.kickoff.getTime();
-        final int offset = AppUtils.getSettings().getMinutesBeforeTip() * 60000 ;
-
-        return new Date (time - offset);
+        //TODO Refactoring
+        //        final long time = this.kickoff.getTime();
+        //        final int offset = AppUtils.findSettings().getMinutesBeforeTip() * 60000 ;
+        //
+        //        return new Date (time - offset);
+        return null;
     }
 
     public int getHomePoints() {
@@ -286,15 +288,16 @@ public class Game {
     }
 
     public boolean isTippable() {
-        final Date now = new Date();
-        final Settings settings = AppUtils.getSettings();
-        final int secondsBefore = settings.getMinutesBeforeTip() * 60000;
-
-        if (this.ended) {
-            return false;
-        } else if (((this.kickoff.getTime() - secondsBefore) > now.getTime()) && (this.homeTeam != null) && (this.awayTeam != null)) {
-            return true;
-        }
+        //TODO Refactoring
+        //        final Date now = new Date();
+        //        final Settings settings = AppUtils.findSettings();
+        //        final int secondsBefore = settings.getMinutesBeforeTip() * 60000;
+        //
+        //        if (this.ended) {
+        //            return false;
+        //        } else if (((this.kickoff.getTime() - secondsBefore) > now.getTime()) && (this.homeTeam != null) && (this.awayTeam != null)) {
+        //            return true;
+        //        }
 
         return false;
     }

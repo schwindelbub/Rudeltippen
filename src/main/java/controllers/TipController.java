@@ -14,10 +14,13 @@ import models.User;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.google.inject.Singleton;
+
 import services.ValidationService;
 import utils.AppUtils;
 import utils.ViewUtils;
 
+@Singleton
 public class TipController {
 
     public Result playday(final int number) {

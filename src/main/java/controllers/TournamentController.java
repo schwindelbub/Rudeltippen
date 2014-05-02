@@ -2,25 +2,37 @@ package controllers;
 
 import java.util.List;
 
+import services.DataService;
+import utils.AppUtils;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import ninja.Result;
+import ninja.Results;
 import models.Bracket;
 import models.Pagination;
 import models.Playday;
 
+@Singleton
 public class TournamentController {
+
+    @Inject
+    private DataService dataService;
+
     public Result brackets() {
-        final List<Bracket> brackets = Bracket.findAll();
-        render(brackets);
+        final List<Bracket> brackets = dataService.findAllBrackets();
+        return Results.html().render(brackets);
     }
 
     public Result playday(final long number) {
-        final Pagination pagination = ViewUtils.getPagination(number, "/tournament/playday/");
-        final Playday playday = Playday.find("byNumber", pagination.getNumberAsInt()).first();
+        final Pagination pagination = AppUtils.getPagination(number, "/tournament/playday/", dataService.findAllPlaydaysOrderByNumber().size());
+        final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
 
-        render(playday, pagination);
+        return Results.html().render(playday).render(pagination);
     }
 
     public Result bracket() {
-        render();
+        return Results.html();
     }
 }

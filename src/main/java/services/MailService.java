@@ -16,7 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import utils.AppUtils;
+import utils.ValidationUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -39,13 +39,13 @@ public class MailService {
     private I18nService i18nService;
 
     @Inject
-    private ValidationService validationService;
+    private DataService dataService;
 
     public void reminder(final User user, final List<Game> games, final List<Extra> extras) {
-        final Settings settings = AppUtils.getSettings();
+        final Settings settings = dataService.findSettings();
         final String recipient = user.getEmail();
 
-        if (validationService.isValidEmail(recipient)) {
+        if (ValidationUtils.isValidEmail(recipient)) {
             Mail mail = getMailInstance(settings, recipient, StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + i18nService.get("mails.subject.reminder")));
 
             //TODO Refactoring
@@ -63,9 +63,9 @@ public class MailService {
     }
 
     public void confirm(final User user, final String token, final ConfirmationType confirmationType) {
-        final Settings settings = AppUtils.getSettings();
+        final Settings settings = dataService.findSettings();
 
-        if ((user != null) && validationService.isValidEmail(user.getEmail()) && StringUtils.isNotBlank(token) && (confirmationType != null)) {
+        if ((user != null) && ValidationUtils.isValidEmail(user.getEmail()) && StringUtils.isNotBlank(token) && (confirmationType != null)) {
             String subject = "";
             String message = "";
 
@@ -101,8 +101,8 @@ public class MailService {
     }
 
     public void newuser(final User user, final User admin) {
-        final Settings settings = AppUtils.getSettings();
-        if (validationService.isValidEmail(admin.getEmail()) && (user != null)) {
+        final Settings settings = dataService.findSettings();
+        if (ValidationUtils.isValidEmail(admin.getEmail()) && (user != null)) {
             Mail mail = getMailInstance(settings, user.getEmail(), StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + i18nService.get("mails.subject.newuser")));
 
             //TODO Refactoring
@@ -120,9 +120,9 @@ public class MailService {
     }
 
     public void error(final String response, final String recipient) {
-        final Settings settings = AppUtils.getSettings();
+        final Settings settings = dataService.findSettings();
 
-        if (validationService.isValidEmail(recipient) && StringUtils.isNotBlank(response)) {
+        if (ValidationUtils.isValidEmail(recipient) && StringUtils.isNotBlank(response)) {
             Mail mail = getMailInstance(settings, recipient, StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + i18nService.get("mails.subject.updatefailed")));
 
             //TODO Refactoring
@@ -140,10 +140,10 @@ public class MailService {
     }
 
     public void notifications(final String subject, String notification, final User user) {
-        final Settings settings = AppUtils.getSettings();
+        final Settings settings = dataService.findSettings();
         notification = StringEscapeUtils.unescapeHtml(notification);
 
-        if (validationService.isValidEmail(user.getEmail()) && StringUtils.isNotEmpty(notification)) {
+        if (ValidationUtils.isValidEmail(user.getEmail()) && StringUtils.isNotEmpty(notification)) {
             Mail mail = getMailInstance(settings, user.getEmail(), StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + subject));
 
             //TODO Refactoring
@@ -161,9 +161,9 @@ public class MailService {
     }
 
     public void gametips(final User user, final List<Game> games) {
-        final Settings settings = AppUtils.getSettings();
+        final Settings settings = dataService.findSettings();
 
-        if (validationService.isValidEmail(user.getEmail()) && (games.size() > 0)) {
+        if (ValidationUtils.isValidEmail(user.getEmail()) && (games.size() > 0)) {
             Mail mail = getMailInstance(settings, user.getEmail(), StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + i18nService.get("overview")));
 
             //TODO Refactoring
@@ -181,7 +181,7 @@ public class MailService {
     }
 
     public void rudelmail(final String subject, final String message, final Object [] bbcRecipients, String recipient) {
-        final Settings settings = AppUtils.getSettings();
+        final Settings settings = dataService.findSettings();
 
         if (StringUtils.isNotBlank(subject) && StringUtils.isNotBlank(message) && (bbcRecipients != null)) {
             Mail mail = getMailInstance(settings, recipient, StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + subject));
