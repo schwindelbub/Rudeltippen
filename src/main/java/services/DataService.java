@@ -27,6 +27,7 @@ import ninja.cache.NinjaCache;
 
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
+import org.mongodb.morphia.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -667,5 +668,15 @@ public class DataService {
 
     public User findUserByEmailAndActive(String email) {
         return this.datastore.find(User.class).field("active").equal(true).field("email").equal(email).get();
+    }
+
+    public User findUserByUsernameOrEmail(String username) {
+        Query<User> query = this.datastore.find(User.class);
+        query.or(
+                query.criteria("username").equal(username),
+                query.criteria("email").equal(username)
+                );
+
+        return query.get();
     }
 }

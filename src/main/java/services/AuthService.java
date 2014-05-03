@@ -1,6 +1,7 @@
 package services;
 
 import javax.crypto.Cipher;
+import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import models.Confirmation;
@@ -28,6 +29,7 @@ import com.mchange.v1.util.UnexpectedException;
 @Singleton
 public class AuthService {
     private static final Logger LOG = LoggerFactory.getLogger(AuthService.class);
+    static final char[] HEX_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
     @Inject
     private NinjaProperties ninjaProperties;
@@ -141,6 +143,58 @@ public class AuthService {
             dataService.delete(confirmation);
 
             LOG.info(user.getEmail() + " changed his password");
+        }
+    }
+
+    public boolean authenticate(String username, String userpass) {
+        boolean authenticated = false;
+        User user = dataService.findUserByUsernameOrEmail(username);
+        if (user != null) {
+            if (user.getUserpass().equals(AppUtils.hashPassword(username, user.getSalt()))) {
+                authenticated = true;
+            }
+        }
+
+        return authenticated;
+    }
+
+    /**
+     * Sign a message using the application secret key (HMAC-SHA1)
+     */
+    public String sign(String message) {
+        return sign(message, ninjaProperties.get("application.secret").getBytes());
+    }
+
+    /**
+     * Sign a message with a key
+     * @param message The message to sign
+     * @param key The key to use
+     * @return The signed message (in hexadecimal)
+     * @throws java.lang.Exception
+     */
+    public String sign(String message, byte[] key) {
+        if (key.length == 0) {
+            return message;
+        }
+
+        try {
+            Mac mac = Mac.getInstance("HmacSHA1");
+            SecretKeySpec signingKey = new SecretKeySpec(key, "HmacSHA1");
+            mac.init(signingKey);
+            byte[] messageBytes = message.getBytes("utf-8");
+            byte[] result = mac.doFinal(messageBytes);
+            int len = result.length;
+            char[] hexChars = new char[len * 2];
+
+
+            for (int charIndex = 0, startIndex = 0; charIndex < hexChars.length;) {
+                int bite = result[startIndex++] & 0xff;
+                hexChars[charIndex++] = HEX_CHARS[bite >> 4];
+                hexChars[charIndex++] = HEX_CHARS[bite & 0xf];
+            }
+            return new String(hexChars);
+        } catch (Exception ex) {
+            throw new UnexpectedException(ex);
         }
     }
 }

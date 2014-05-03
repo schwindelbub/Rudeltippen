@@ -11,7 +11,8 @@ public enum Constants {
     CONFIRMATIONPATTERN("\\w{8,8}-\\w{4,4}-\\w{4,4}-\\w{4,4}-\\w{12,12}"),
     EMAILPATTERN(".+@.+\\.[a-z]+"),
     USERNAMEPATTERN("[a-zA-Z0-9-_]+"),
-    USERNAME("username");
+    USERNAME("username"),
+    REMEMBERME("rudelremember");
 
     private String value;
 

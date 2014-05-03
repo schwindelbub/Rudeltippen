@@ -9,6 +9,7 @@ import models.ConfirmationType;
 import models.Constants;
 import models.Settings;
 import models.User;
+import ninja.Cookie;
 import ninja.Result;
 import ninja.Results;
 import ninja.params.PathParam;
@@ -18,7 +19,6 @@ import ninja.validation.JSR303Validation;
 import ninja.validation.Validation;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.validator.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +31,10 @@ import utils.ValidationUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
+import dtos.LoginDTO;
+import dtos.PasswordDTO;
+import dtos.UserDTO;
 
 @Singleton
 public class AuthController {
@@ -122,36 +126,20 @@ public class AuthController {
         return Results.html();
     }
 
-    public Result create(final String username, final String email, final String emailConfirmation, final String userpass, final String userpassConfirmation) {
+    public Result create(@JSR303Validation UserDTO userDTO, Validation validation) {
         final Settings settings = dataService.findSettings();
         if (!settings.isEnableRegistration()) {
             return Results.redirect("/");
         }
 
-        //        validation.required(userpass);
-        //        validation.required(username);
-        //        validation.email(email);
-        //        validation.equals(email, emailConfirmation);
-        //        validation.equals(userpass, userpassConfirmation);
-        //        validation.minSize(userpass, 8);
-        //        validation.maxSize(userpass, 32);
-        //        validation.minSize(username, 3);
-        //        validation.maxSize(username, 20);
-        //        validation.isTrue(ValidationService.isValidUsername(username)).key("username").message(Messages.get("controller.users.invalidusername"));
-        //        validation.isTrue(!ValidationService.usernameExists(username)).key("username").message(Messages.get("controller.users.usernamexists"));
-        //        validation.isTrue(!ValidationService.emailExists(email)).key("email").message(Messages.get("controller.users.emailexists"));
-
-        //TODO Refactoring - was validation.hasErrors()
-        if (true) {
-            //            params.flash();
-            //            validation.keep();
-            return Results.redirect("/auth/register");
+        if (validation.hasBeanViolations()) {
+            return Results.html().render("user", userDTO).render("validation", validation).template("/views/AuthController/regsiter.ftl.html");
         } else {
             final String salt = DigestUtils.sha512Hex(UUID.randomUUID().toString());
             final User user = new User();
             user.setRegistered(new Date());
-            user.setUsername(username);
-            user.setEmail(email);
+            user.setUsername(userDTO.username);
+            user.setEmail(userDTO.email);
             user.setActive(false);
             user.setReminder(true);
             user.setSendStandings(true);
@@ -159,7 +147,7 @@ public class AuthController {
             user.setNotification(true);
             user.setAdmin(false);
             user.setSalt(salt);
-            user.setUserpass(AppUtils.hashPassword(userpass, salt));
+            user.setUserpass(AppUtils.hashPassword(userDTO.userpass, salt));
             user.setPoints(0);
             dataService.save(user);
 
@@ -186,99 +174,53 @@ public class AuthController {
         return Results.html().render(settings);
     }
 
-    public Result login(Session session) {
-        if (session.get(Constants.USERNAME.value()) != null) {
-            return Results.redirect("/");
-        }
-
-        //        final Http.Cookie remember = request.cookies.get("rememberme");
-        //        if ((remember != null) && (remember.value.indexOf("-") > 0)) {
-        //            final String sign = remember.value.substring(0, remember.value.indexOf("-"));
-        //            final String username = remember.value.substring(remember.value.indexOf("-") + 1);
-        //            if ((sign != null) && (username != null) && Crypto.sign(username).equals(sign)) {
-        //                session.put("username", username);
-        //                redirectToOriginalURL();
-        //            }
-        //        }
-        //        flash.keep("url");
-
-        return Results.html();
-    }
-
     public Result forgotten() {
         return Results.html();
     }
 
-    public Result renew(final String token, final String userpass, final String userpassConfirmation) {
-        //        validation.required(token);
-        //        validation.match(token, CONFIRMATIONPATTERN);
-        //        validation.required(userpass);
-        //        validation.equals(userpass, userpassConfirmation);
-        //        validation.minSize(userpass, 8);
-        //        validation.maxSize(userpass, 32);
+    public Result renew(@JSR303Validation PasswordDTO passwordDTO, Validation validation, FlashScope flashScope) {
+        if (validation.hasBeanViolations()) {
+            return Results.html().render("passwordDTO", passwordDTO).render("validation", validation).template("/views/AuthController/rendew.ftl.html");
+        }
 
-        final Confirmation confirmation = dataService.findConfirmationByToken(token);
+        final Confirmation confirmation = dataService.findConfirmationByToken(passwordDTO.token);
         if (confirmation == null) {
-            //flash.put("warningmessage", Messages.get("controller.users.invalidtoken"));
-            //flash.keep();
-
+            flashScope.put("warningmessage", i18nService.get("controller.users.invalidtoken"));
             return Results.redirect("/auth/login");
         }
 
-        //Refactoring - was validation.hasErrors()
-        if (true) {
-            //Validation.keep();
-            return Results.redirect("/auth/password/" + token);
-        } else {
-            final User user = confirmation.getUser();
-            final String password = AppUtils.hashPassword(userpass, user.getSalt());
-            user.setUserpass(password);
-            dataService.delete(user);
+        final User user = confirmation.getUser();
+        final String password = AppUtils.hashPassword(passwordDTO.userpass, user.getSalt());
+        user.setUserpass(password);
+        dataService.delete(user);
 
-            dataService.delete(confirmation);
-            //flash.put("infomessage", Messages.get("controller.auth.passwordreset"));
-            //flash.keep();
+        dataService.delete(confirmation);
+        flashScope.put("infomessage", i18nService.get("controller.auth.passwordreset"));
 
-            return Results.redirect("/auth/login");
-        }
+        return Results.redirect("/auth/login");
     }
 
-    public Result authenticate(Session session, final String username, final String userpass, final boolean remember) {
-        Boolean allowed = false;
-        try {
-            //            allowed = (Boolean) Security.invoke("authenticate", username, userpass);
-            //            validation.isTrue(allowed);
-            //            validation.required(username);
-            //            validation.required(userpass);
-        } catch (final UnsupportedOperationException e) {
-            LOG.error("UnsupportedOperationException while authenticating", e);
-        } catch (final Throwable e) {
-            LOG.error("Authentication exception", e);
-        }
-
-        //TODO Refactoring - was validation.hasErrors()
-        if (!allowed) {
-            //            flash.keep("url");
-            //            flash.put("errormessage", Messages.get("validation.invalidLogin"));
-            //            params.flash();
-            //            Validation.keep();
-
-            return Results.redirect("/auth/login");
+    public Result authenticate(Session session, @JSR303Validation LoginDTO loginDTO, Validation validation, FlashScope flashScope) {
+        if (validation.hasBeanViolations()) {
+            return Results.html().render("login", loginDTO).render("validation", validation).template("/views/AuthController/regsiter.ftl.html");
         } else {
-            session.put(Constants.USERNAME.value(), username);
-            if (remember) {
-                //response.setCookie("rememberme", Crypto.sign(username) + "-" + username, "7d");
+            if (authService.authenticate(loginDTO.username, loginDTO.userpass)) {
+                session.put(Constants.USERNAME.value(), loginDTO.username);
+                if (loginDTO.remember) {
+                    String signedUsername = authService.sign(loginDTO.username) + "-" + loginDTO.username;
+                    Cookie.builder("rememberme", signedUsername).setSecure(true).setHttpOnly(true).build();
+                }
+
+                return Results.redirect("/");
             }
         }
 
-        return Results.redirect("/");
+        return Results.redirect("/auth/login");
     }
 
-    public Result logout(Session session){
+    public Result logout(Session session, FlashScope flashScope){
         session.clear();
-
-        //flash.put("infomessage", Messages.get("controller.auth.logout"));
-        //flash.keep();
+        flashScope.put("infomessage", i18nService.get("controller.auth.logout"));
 
         return Results.redirect("/auth/login");
     }

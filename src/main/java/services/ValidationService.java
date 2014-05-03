@@ -1,11 +1,8 @@
 package services;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import models.Confirmation;
-import models.Constants;
 import models.User;
 
 import com.google.inject.Inject;
@@ -14,6 +11,9 @@ public class ValidationService {
 
     @Inject
     private DataService dataService;
+
+    @Inject
+    private AuthService authService;
 
     /**
      * Checks in the database and pending confirmations if a given email already exists
@@ -26,8 +26,7 @@ public class ValidationService {
         final List<Confirmation> confirmations = dataService.findAllConfirmation();
         for (final Confirmation confirmation : confirmations) {
             String value = confirmation.getConfirmValue();
-            //TODO Refactoring
-            value = "";//Crypto.decryptAES(value);
+            value = authService.decryptAES(value);
 
             if (value.equalsIgnoreCase(email)) {
                 exists = true;
