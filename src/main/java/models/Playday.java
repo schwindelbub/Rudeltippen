@@ -14,6 +14,11 @@ import models.statistic.GameStatistic;
 import models.statistic.GameTipStatistic;
 import models.statistic.UserStatistic;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Entity(value = "playdays", noClassnameStored = true)
 public class Playday {
     @Id

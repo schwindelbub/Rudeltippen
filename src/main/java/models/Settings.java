@@ -1,23 +1,25 @@
 package models;
 
-import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
-@Entity(value = "users", noClassnameStored = true)
-public class Settings {
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
+@Entity(value = "settings", noClassnameStored = true)
+public class Settings implements Serializable {
+    private static final long serialVersionUID = 864836696835606862L;
+
     @Id
     private ObjectId id;
 
-    @NotNull
     private String appSalt;
-
-    @NotNull
     private String appName;
-
-    @NotNull
     private String gameName;
 
     private int pointsGameWin;

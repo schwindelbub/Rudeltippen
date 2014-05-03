@@ -7,6 +7,11 @@ import org.quartz.spi.JobFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Singleton
 public class Module extends AbstractModule {
     @Override

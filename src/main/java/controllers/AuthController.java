@@ -36,6 +36,11 @@ import dtos.LoginDTO;
 import dtos.PasswordDTO;
 import dtos.UserDTO;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Singleton
 public class AuthController {
     private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
@@ -60,6 +65,11 @@ public class AuthController {
         }
 
         return Results.html().render(token);
+    }
+
+    public Result login() {
+        Settings settings = dataService.findSettings();
+        return Results.html().render(settings);
     }
 
     public Result reset(@PathParam("email") String email, FlashScope flashScope) {
@@ -133,7 +143,7 @@ public class AuthController {
         }
 
         if (validation.hasBeanViolations()) {
-            return Results.html().render("user", userDTO).render("validation", validation).template("/views/AuthController/regsiter.ftl.html");
+            return Results.html().render("user", userDTO).render("validation", validation).template("/views/AuthController/register.ftl.html");
         } else {
             final String salt = DigestUtils.sha512Hex(UUID.randomUUID().toString());
             final User user = new User();
@@ -202,7 +212,7 @@ public class AuthController {
 
     public Result authenticate(Session session, @JSR303Validation LoginDTO loginDTO, Validation validation, FlashScope flashScope) {
         if (validation.hasBeanViolations()) {
-            return Results.html().render("login", loginDTO).render("validation", validation).template("/views/AuthController/regsiter.ftl.html");
+            return Results.html().render("login", loginDTO).render("validation", validation).template("/views/AuthController/login.ftl.html");
         } else {
             if (authService.authenticate(loginDTO.username, loginDTO.userpass)) {
                 session.put(Constants.USERNAME.value(), loginDTO.username);

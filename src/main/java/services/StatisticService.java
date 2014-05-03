@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.inject.Inject;
-
-import utils.AppUtils;
 import models.Game;
 import models.GameTip;
 import models.Playday;
@@ -19,6 +16,15 @@ import models.statistic.PlaydayStatistic;
 import models.statistic.ResultStatistic;
 import models.statistic.UserStatistic;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
+@Singleton
 public class StatisticService {
 
     @Inject

@@ -1,5 +1,10 @@
 package models;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 import java.util.Date;
 import java.util.List;
 

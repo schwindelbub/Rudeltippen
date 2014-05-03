@@ -1,6 +1,7 @@
 package controllers;
 
 import java.text.SimpleDateFormat;
+
 import java.util.Locale;
 
 import models.Bracket;
@@ -16,6 +17,11 @@ import services.DataService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Singleton
 public class AjaxController {
 

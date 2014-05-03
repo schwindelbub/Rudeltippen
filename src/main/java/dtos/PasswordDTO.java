@@ -4,11 +4,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import validators.annotations.FieldMatch;
-
-@FieldMatch.List({
-    @FieldMatch(first = "userpass", second = "userpassConfirmation", message = "The password fields must match"),
-})
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 public class PasswordDTO {
     @NotNull
     @Pattern(regexp = "\\w{8,8}-\\w{4,4}-\\w{4,4}-\\w{4,4}-\\w{12,12}")

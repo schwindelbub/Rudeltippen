@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import models.Bracket;
 import models.Extra;
@@ -18,6 +19,12 @@ import models.User;
 import utils.AppUtils;
 import utils.ValidationUtils;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
+@Singleton
 public class CalculationService {
 
     @Inject

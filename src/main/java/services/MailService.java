@@ -22,6 +22,11 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Singleton
 public class MailService {
     private static final Logger LOG = LoggerFactory.getLogger(MailService.class);

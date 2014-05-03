@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="rudeltippen" default="zip" basedir=".">
+<project name="rudeltippen" default="build" basedir=".">
 	<property name="PROJECT_NAME" value="${ant.project.name}" description="Name of the project"/>
 	<property name="CSS_DIR" value="public/stylesheets" />
 	<property name="JS_DIR" value="public/javascripts" />
@@ -12,8 +12,7 @@
 		<delete file="${JS}" />
 	</target>
 
-	<target name="zip" depends="clean, css, js" description="Creates a deployable ZIP file">
-		<zip destfile="${PROJECT_NAME}.zip" basedir="." includes="conf/**,app/**,public/**" />
+	<target name="build" depends="clean, css, js">
 	</target>
 
 	<target name="css" depends="clean" description="Concatenate CSS source files">

@@ -30,6 +30,11 @@ import utils.AppUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Singleton
 public class AdminController {
     private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);

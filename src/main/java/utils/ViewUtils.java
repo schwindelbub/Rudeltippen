@@ -18,6 +18,14 @@ import models.User;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
+import com.google.inject.Singleton;
+
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
+@Singleton
 public class ViewUtils {
     //
     //    public static String difference (final Date date) {

@@ -23,6 +23,11 @@ import utils.ValidationUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Singleton
 public class TipController {
 

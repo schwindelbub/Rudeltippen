@@ -35,6 +35,11 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mongodb.MongoClient;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Singleton
 public class DataService {
     private static final Logger LOG = LoggerFactory.getLogger(DataService.class);
@@ -678,5 +683,13 @@ public class DataService {
                 );
 
         return query.get();
+    }
+
+    public void dropDatabase() {
+        this.datastore.getDB().dropDatabase();
+    }
+
+    public void loadInitialData(String file) {
+        //TODO Refactoring
     }
 }

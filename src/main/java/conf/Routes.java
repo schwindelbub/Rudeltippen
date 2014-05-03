@@ -4,26 +4,32 @@ import ninja.AssetsController;
 import ninja.Router;
 import ninja.application.ApplicationRoutes;
 import controllers.ApplicationController;
+import controllers.AuthController;
+import controllers.SystemController;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 public class Routes implements ApplicationRoutes {
 
     @Override
     public void init(Router router) {
-
         router.GET().route("/").with(ApplicationController.class, "index");
-        router.GET().route("/hello_world.json").with(ApplicationController.class, "helloWorldJson");
-
-
-        ///////////////////////////////////////////////////////////////////////
-        // Assets (pictures / javascript)
-        ///////////////////////////////////////////////////////////////////////
-        router.GET().route("/assets/webjars/{fileName: .*}").with(AssetsController.class, "serveWebJars");
+        router.GET().route("/auth/login").with(AuthController.class, "login");
+        router.GET().route("/auth/logout").with(AuthController.class, "logout");
+        router.GET().route("/auth/register").with(AuthController.class, "register");
+        router.GET().route("/auth/forgotten").with(AuthController.class, "forgotten");
+        router.GET().route("/rules").with(ApplicationController.class, "rules");
+        router.POST().route("/auth/renew").with(AuthController.class, "renew");
+        router.POST().route("/auth/reset").with(AuthController.class, "reset");
+        router.POST().route("/auth/authenticate").with(AuthController.class, "authenticate");
+        router.POST().route("/auth/create").with(AuthController.class, "create");
+        router.GET().route("/setup").with(SystemController.class, "setup");
+        router.GET().route("/system/init").with(SystemController.class, "init");
         router.GET().route("/assets/{fileName: .*}").with(AssetsController.class, "serveStatic");
-
-        ///////////////////////////////////////////////////////////////////////
-        // Index / Catchall shows index page
-        ///////////////////////////////////////////////////////////////////////
-        router.GET().route("/.*").with(ApplicationController.class, "index");
+        //router.GET().route("/.*").with(ApplicationController.class, "index");
 
         /**
         # Home page

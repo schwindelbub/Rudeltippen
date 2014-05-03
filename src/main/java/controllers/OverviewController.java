@@ -17,6 +17,11 @@ import utils.AppUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Singleton
 public class OverviewController {
 

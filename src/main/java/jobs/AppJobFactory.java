@@ -9,12 +9,17 @@ import org.quartz.spi.TriggerFiredBundle;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 public class AppJobFactory implements JobFactory {
-    @Inject  
-    private Injector injector;  
-    
-    @Override  
-    public Job newJob(final TriggerFiredBundle bundle, final Scheduler scheduler) throws SchedulerException {  
-        return injector.getInstance(bundle.getJobDetail().getJobClass());  
-    }  
+    @Inject
+    private Injector injector;
+
+    @Override
+    public Job newJob(final TriggerFiredBundle bundle, final Scheduler scheduler) throws SchedulerException {
+        return injector.getInstance(bundle.getJobDetail().getJobClass());
+    }
 }

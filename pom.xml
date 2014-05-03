@@ -184,5 +184,19 @@
 			<version>1.43</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>[2.1_3,3.0)</version>
+			<type>jar</type>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.proxytoys</groupId>
+			<artifactId>proxytoys</artifactId>
+			<version>1.0</version>
+			<type>jar</type>
+			<optional>true</optional>
+		</dependency>
 	</dependencies>
 </project>

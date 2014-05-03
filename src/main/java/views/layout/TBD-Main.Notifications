@@ -1,0 +1,47 @@
+	#{ifErrors}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="alert alert-danger">
+	                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	                <span class="glyphicon glyphicon-hand-right"></span> <strong>&{'app.error'}</strong>
+	                <hr class="message-inner-separator">
+					#{if flash.errormessage != null}
+			    		<p>${flash.errormessage.raw()}</p>
+					#{/if}
+					#{else}
+			    		<p>&{'erroroccured'}</p>
+					#{/else}
+	            </div>
+	    	</div>
+		</div>
+	</div>
+	#{/ifErrors}
+	#{if flash.warningmessage != null}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+	            <div class="alert alert-warning">
+	                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	                <span class="glyphicon glyphicon-record"></span> <strong>&{'app.warning'}</strong>
+	                <hr class="message-inner-separator">
+					<p>${flash.warningmessage.raw()}</p>
+	            </div>
+	        </div>		
+		</div>
+	</div>
+	#{/if}
+	#{if flash.infomessage != null}
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+	            <div class="alert alert-success">
+	                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+	               <span class="glyphicon glyphicon-ok"></span> <strong>&{'app.success'}</strong>
+	                <hr class="message-inner-separator">
+	                <p>${flash.infomessage.raw()}</p>
+	            </div>
+	        </div>
+		</div>
+	</div>
+	#{/if}

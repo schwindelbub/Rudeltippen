@@ -16,7 +16,14 @@ import services.DataService;
 import services.ResultService;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
+@Singleton
 public class ResultsJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(GameTipJob.class);
 

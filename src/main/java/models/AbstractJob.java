@@ -2,10 +2,20 @@ package models;
 
 import javax.validation.constraints.NotNull;
 
+import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Entity(value = "jobs", noClassnameStored = true)
 public class AbstractJob {
+    @Id
+    private ObjectId id;
+
     @NotNull
     private String name;
 

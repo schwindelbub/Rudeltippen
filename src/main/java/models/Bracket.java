@@ -10,6 +10,11 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Entity(value = "brackets", noClassnameStored = true)
 public class Bracket {
     @Id

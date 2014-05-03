@@ -6,7 +6,14 @@ import models.Confirmation;
 import models.User;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
+@Singleton
 public class ValidationService {
 
     @Inject

@@ -31,6 +31,11 @@ import services.DataService;
 
 import com.google.inject.Inject;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Singleton
 public class StartupActions {
     private static final Logger LOG = LoggerFactory.getLogger(StartupActions.class);

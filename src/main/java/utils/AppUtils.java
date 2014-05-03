@@ -19,6 +19,13 @@ import org.apache.http.client.fluent.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Singleton;
+
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 public class AppUtils {
     private static final Logger LOG = LoggerFactory.getLogger(AppUtils.class);
 

@@ -6,6 +6,7 @@ import models.Playday;
 import models.Settings;
 import models.User;
 import models.statistic.GameTipStatistic;
+import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 import services.DataService;
@@ -15,7 +16,16 @@ import services.StatisticService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import filters.AuthenticationFilter;
+import filters.SetupFilter;
+
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Singleton
+@FilterWith({SetupFilter.class, AuthenticationFilter.class})
 public class ApplicationController {
 
     @Inject

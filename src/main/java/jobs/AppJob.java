@@ -1,5 +1,10 @@
 package jobs;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 public class AppJob {
     private String description;
     private String executed;

@@ -4,9 +4,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import models.Constants;
 import models.Game;
 import models.Settings;
 import models.User;
+import ninja.Context;
 import ninja.Result;
 import ninja.Results;
 import ninja.session.Session;
@@ -21,19 +23,17 @@ import utils.AppUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Singleton
 public class SystemController {
     private static final Logger LOG = LoggerFactory.getLogger(SystemController.class);
 
     @Inject
     private DataService dataService;
-
-
-    //TODO Refactoring
-    //    @Before()
-    //    protected static void before() {
-    //        AppUtils.setAppLanguage();
-    //    }
 
     public Result setup() {
         if (dataService.appIsInizialized()) {
@@ -43,21 +43,18 @@ public class SystemController {
         return Results.html();
     }
 
-    public Result init(Session session) {
+    public Result init(Session session, Context context) {
         if (!dataService.appIsInizialized()) {
             session.clear();
-            //TODO Refactoring
-            //response.removeCookie("rememberme");
 
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 LOG.error("Failed while trying to sleep in system/init", e);
             }
-            //TODO Refactoring
-            //            Fixtures.deleteAllModels();
-            //            Fixtures.deleteDatabase();
-            //            Fixtures.loadModels(YAMLFILE);
+
+            dataService.dropDatabase();
+            dataService.loadInitialData(Constants.YAMLFILE.value());
 
             final List<Game> prePlayoffGames = dataService.findAllNonPlayoffGames();
             final List<Game> playoffGames = dataService.findAllPlayoffGames();
@@ -66,8 +63,10 @@ public class SystemController {
                 hasPlayoffs = true;
             }
 
-            Settings settings = dataService.findSettings();
-            settings = dataService.findSettings();
+            Settings settings = new Settings();
+            settings.setAppName(Constants.APPNAME.value());
+            settings.setPointsGameWin(3);
+            settings.setPointsGameDraw(1);
             settings.setAppSalt(DigestUtils.sha512Hex(UUID.randomUUID().toString()));
             settings.setGameName("Rudeltippen");
             settings.setPointsTip(4);
@@ -99,7 +98,7 @@ public class SystemController {
             user.setCorrectExtraTips(0);
             dataService.save(user);
 
-            return Results.ok();
+            return Results.ok().render(Result.NO_HTTP_BODY);
         }
 
         return Results.redirect("/");

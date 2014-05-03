@@ -13,6 +13,11 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Entity(value = "users", noClassnameStored = true)
 public class User {
     @Id

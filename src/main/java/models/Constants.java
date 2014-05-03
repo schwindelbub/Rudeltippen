@@ -1,5 +1,10 @@
 package models;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 public enum Constants {
     APPNAME("rudeltippen"),
     DEFAULT_DATEFORMAT("dd.MM.yyyy"),
@@ -12,7 +17,8 @@ public enum Constants {
     EMAILPATTERN(".+@.+\\.[a-z]+"),
     USERNAMEPATTERN("[a-zA-Z0-9-_]+"),
     USERNAME("username"),
-    REMEMBERME("rudelremember");
+    REMEMBERME("rudelremember"),
+    YAMLFILE("data.js");
 
     private String value;
 

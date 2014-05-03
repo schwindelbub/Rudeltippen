@@ -18,9 +18,16 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import utils.AppUtils;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
+@Singleton
 public class SetupService {
     private static final Logger LOG = LoggerFactory.getLogger(ResultService.class);
 

@@ -14,6 +14,11 @@ import models.Bracket;
 import models.Pagination;
 import models.Playday;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Singleton
 public class TournamentController {
 

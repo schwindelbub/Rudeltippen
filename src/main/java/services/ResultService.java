@@ -17,7 +17,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
+@Singleton
 public class ResultService {
     private static final Logger LOG = LoggerFactory.getLogger(ResultService.class);
     private static final String WS_ENCODING = "UTF-8";

@@ -28,6 +28,11 @@ import services.MailService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Singleton
 public class UserController {
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
