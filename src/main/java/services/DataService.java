@@ -2,7 +2,6 @@ package services;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -655,6 +654,14 @@ public class DataService {
         return query.get();
     }
 
+    public long countAllGames() {
+        return this.datastore.find(Game.class).countAll();
+    }
+
+    public long countAllExtras() {
+        return this.datastore.find(Extra.class).countAll();
+    }
+
     public void dropDatabase() {
         this.datastore.getDB().dropDatabase();
     }
@@ -662,16 +669,27 @@ public class DataService {
     public void loadInitialData() {
         loadBrackets();
         loadPlaydays();
+        loadTeams();
+        loadGames();
+    }
+
+    private void loadGames() {
+        List<String> lines = readLines("games.json");
+
+        for (String line : lines) {
+            BasicDBObject basicDBObject = (BasicDBObject) JSON.parse(line);
+            Game game = new Game();
+            game.setNumber(basicDBObject.getInt("number"));
+            game.setPlayoff(basicDBObject.getBoolean("playoff"));
+            game.setEnded(basicDBObject.getBoolean("ended"));
+            game.setUpdateble(basicDBObject.getBoolean("updateble"));
+            game.setWebserviceID(basicDBObject.getString("webserviceID"));
+            save(game);
+        }
     }
 
     private void loadBrackets() {
-        URL url = Resources.getResource("brackets.json");
-        List<String> lines = null;
-        try {
-            lines = IOUtils.readLines(new FileInputStream(new File(url.getPath())), "UTF-8");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<String> lines = readLines("brackets.json");
 
         for (String line : lines) {
             BasicDBObject basicDBObject = (BasicDBObject) JSON.parse(line);
@@ -684,13 +702,7 @@ public class DataService {
     }
 
     private void loadPlaydays() {
-        URL url = Resources.getResource("playdays.json");
-        List<String> lines = null;
-        try {
-            lines = IOUtils.readLines(new FileInputStream(new File(url.getPath())), "UTF-8");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<String> lines = readLines("playday.json");
 
         for (String line : lines) {
             BasicDBObject basicDBObject = (BasicDBObject) JSON.parse(line);
@@ -703,11 +715,30 @@ public class DataService {
         }
     }
 
-    public long countAllGames() {
-        return this.datastore.find(Game.class).countAll();
+    private void loadTeams() {
+        List<String> lines = readLines("teams.json");
+
+        for (String line : lines) {
+            BasicDBObject basicDBObject = (BasicDBObject) JSON.parse(line);
+            Team team = new Team();
+            team.setName(basicDBObject.getString("name"));
+            team.setFlag(basicDBObject.getString("flag"));
+            team.setGamesPlayed(basicDBObject.getInt("gamesPlayed"));
+            team.setGamesWon(basicDBObject.getInt("gamesWon"));
+            team.setGamesDraw(basicDBObject.getInt("gamesDraw"));
+            team.setGamesLost(basicDBObject.getInt("gamesLost"));
+            save(team);
+        }
     }
 
-    public long countAllExtras() {
-        return this.datastore.find(Extra.class).countAll();
+    private List<String> readLines(String filename) {
+        URL url = Resources.getResource(filename);
+        List<String> lines = null;
+        try {
+            lines = IOUtils.readLines(new FileInputStream(new File(url.getPath())), "UTF-8");
+        } catch (IOException e) {
+            LOG.error("Failed to read lines", e);
+        }
+        return lines;
     }
 }
