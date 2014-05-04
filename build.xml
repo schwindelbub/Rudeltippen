@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="rudeltippen" default="build" basedir=".">
 	<property name="PROJECT_NAME" value="${ant.project.name}" description="Name of the project"/>
-	<property name="CSS_DIR" value="public/stylesheets" />
-	<property name="JS_DIR" value="public/javascripts" />
+	<property name="CSS_DIR" value="src/main/java/assets/stylesheets" />
+	<property name="JS_DIR" value="src/main/java/assets/javascripts" />
     <property name="CSS" value="${CSS_DIR}/combined.min.css" />
     <property name="JS" value="${JS_DIR}/combined.min.js" />
 
 	<target name="clean" description="Removes all previous builds">
-		<delete file="${PROJECT_NAME}.zip" />
 		<delete file="${CSS}" />
 		<delete file="${JS}" />
 	</target>
 
-	<target name="build" depends="clean, css, js">
-	</target>
+	<target name="build" depends="clean, css, js"></target>
 
 	<target name="css" depends="clean" description="Concatenate CSS source files">
 		<echo message="Building ${CSS}" />

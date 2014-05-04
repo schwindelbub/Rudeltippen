@@ -10,6 +10,7 @@ import models.Constants;
 import models.Settings;
 import models.User;
 import ninja.Cookie;
+import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 import ninja.params.PathParam;
@@ -26,6 +27,7 @@ import services.AuthService;
 import services.DataService;
 import services.I18nService;
 import services.MailService;
+import services.ValidationService;
 import utils.AppUtils;
 import utils.ValidationUtils;
 
@@ -35,6 +37,7 @@ import com.google.inject.Singleton;
 import dtos.LoginDTO;
 import dtos.PasswordDTO;
 import dtos.UserDTO;
+import filters.SetupFilter;
 
 /**
  * 
@@ -42,11 +45,15 @@ import dtos.UserDTO;
  *
  */
 @Singleton
+@FilterWith(SetupFilter.class)
 public class AuthController {
     private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
 
     @Inject
     private DataService dataService;
+
+    @Inject
+    private ValidationService validationService;
 
     @Inject
     private MailService mailService;
@@ -141,6 +148,8 @@ public class AuthController {
         if (!settings.isEnableRegistration()) {
             return Results.redirect("/");
         }
+
+        validationService.validateUserDTO(userDTO, validation);
 
         if (validation.hasBeanViolations()) {
             return Results.html().render("user", userDTO).render("validation", validation).template("/views/AuthController/register.ftl.html");

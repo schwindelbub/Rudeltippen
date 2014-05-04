@@ -15,6 +15,7 @@ import models.Pagination;
 import models.Playday;
 import models.Settings;
 import models.User;
+import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 
@@ -30,13 +31,16 @@ import utils.AppUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import filters.AuthorizationFilter;
+
 /**
  * 
  * @author svenkubiak
  *
  */
 @Singleton
-public class AdminController {
+@FilterWith(AuthorizationFilter.class)
+public class AdminController extends RootController {
     private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
 
     @Inject
@@ -282,7 +286,7 @@ public class AdminController {
         //TODO Refactoring - was !validation.hasErrors()
         if (true) {
             final List<String> recipients = new ArrayList<String>();
-            final List<User> users = dataService.getAllActiveUsers();
+            final List<User> users = dataService.findAllActiveUsers();
             for (final User user : users) {
                 recipients.add(user.getEmail());
             }

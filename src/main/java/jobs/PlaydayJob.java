@@ -58,7 +58,7 @@ public class PlaydayJob implements Job {
             AbstractJob job = dataService.findAbstractJobByName("GameTipJob");
             if (job != null && job.isActive()) {
                 LOG.info("Started Job: PlaydayJob");
-                int number = dataService.getCurrentPlayday().getNumber();
+                int number = dataService.findCurrentPlayday().getNumber();
                 for (int i=0; i <= 3; i++) {
                     final Playday playday = dataService.findPlaydaybByNumber(number);
                     if (playday != null) {

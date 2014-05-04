@@ -1,5 +1,10 @@
 package services;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
@@ -25,15 +30,19 @@ import models.statistic.ResultStatistic;
 import models.statistic.UserStatistic;
 import ninja.cache.NinjaCache;
 
+import org.apache.commons.io.IOUtils;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.io.Resources;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.util.JSON;
 
 /**
  * 
@@ -227,10 +236,6 @@ public class DataService {
         return this.datastore.find(Confirmation.class).asList();
     }
 
-    public List<User> getAllActiveUsers() {
-        return this.datastore.find(User.class).field("active").equal(true).asList();
-    }
-
     public Settings findSettings() {
         Settings settings = (Settings) ninjaCache.get("settings");
         if (settings == null) {
@@ -253,18 +258,6 @@ public class DataService {
         //
         //        return pointsDiff;
         return 0;
-    }
-
-    public User getConnectedUser() {
-        //TODO Refactoring
-        //        final String username = Security.connected();
-        //        User connectedUser = null;
-        //        if (StringUtils.isNotBlank(username)) {
-        //            connectedUser = User.find("SELECT u FROM User u WHERE active = true AND username = ? OR email = ?", username, username).first();
-        //        }
-        //
-        //        return connectedUser;
-        return null;
     }
 
     public boolean isJobInstance() {
@@ -467,15 +460,13 @@ public class DataService {
         return null;
     }
 
-    public Playday getCurrentPlayday () {
-        //TODO Refactoring
-        //        Playday playday = Playday.find("byCurrent", true).first();
-        //        if (playday == null) {
-        //            playday = Playday.find("byNumber", 1).first();
-        //        }
-        //
-        //        return playday;
-        return null;
+    public Playday findCurrentPlayday () {
+        Playday playday = this.datastore.find(Playday.class).field("current").equal(true).get();
+        if (playday == null) {
+            playday = this.datastore.find(Playday.class).field("number").equal(1).get();
+        }
+
+        return playday;
     }
 
     public void setGameScoreFromWebService(final Game game, final WSResults wsResults) {
@@ -529,17 +520,6 @@ public class DataService {
 
     public boolean appIsInizialized() {
         return findSettings() != null ? true : false;
-    }
-
-    public User connectUser(final String username, final String userpass) {
-        //TODO Refactoring
-        //        User user = User.find("byUsernameAndUserpassAndActive", username, userpass, true).first();
-        //        if (user == null) {
-        //            user = User.find("byEmailAndUserpassAndActive", username, userpass, true).first();
-        //        }
-        //
-        //        return user;
-        return null;
     }
 
     public List<User> findAllActiveUsers() {
@@ -613,7 +593,7 @@ public class DataService {
         return this.datastore.find(Game.class).field("playoff").equal(true).asList();
     }
 
-    public long getUsersCount() {
+    public long countAllUsers() {
         return this.datastore.find(User.class).countAll();
     }
 
@@ -638,14 +618,6 @@ public class DataService {
     public Extra findExtaById(Long bonusTippId) {
         // TODO Refactoring
         return null;
-    }
-
-    public long getExtrasCount() {
-        return this.datastore.find(Extra.class).countAll();
-    }
-
-    public long getGameCount() {
-        return this.datastore.find(Game.class).countAll();
     }
 
     public List<User> findUsersOrderByUsername() {
@@ -677,10 +649,8 @@ public class DataService {
 
     public User findUserByUsernameOrEmail(String username) {
         Query<User> query = this.datastore.find(User.class);
-        query.or(
-                query.criteria("username").equal(username),
-                query.criteria("email").equal(username)
-                );
+        query.or(query.criteria("username").equal(username), query.criteria("email").equal(username));
+        query.and(query.criteria("active").equal(true));
 
         return query.get();
     }
@@ -689,7 +659,55 @@ public class DataService {
         this.datastore.getDB().dropDatabase();
     }
 
-    public void loadInitialData(String file) {
-        //TODO Refactoring
+    public void loadInitialData() {
+        loadBrackets();
+        loadPlaydays();
+    }
+
+    private void loadBrackets() {
+        URL url = Resources.getResource("brackets.json");
+        List<String> lines = null;
+        try {
+            lines = IOUtils.readLines(new FileInputStream(new File(url.getPath())), "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (String line : lines) {
+            BasicDBObject basicDBObject = (BasicDBObject) JSON.parse(line);
+            Bracket bracket = new Bracket();
+            bracket.setName(basicDBObject.getString("name"));
+            bracket.setNumber(basicDBObject.getInt("number"));
+            bracket.setUpdateble(basicDBObject.getBoolean("updateble"));
+            save(bracket);
+        }
+    }
+
+    private void loadPlaydays() {
+        URL url = Resources.getResource("playdays.json");
+        List<String> lines = null;
+        try {
+            lines = IOUtils.readLines(new FileInputStream(new File(url.getPath())), "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        for (String line : lines) {
+            BasicDBObject basicDBObject = (BasicDBObject) JSON.parse(line);
+            Playday playday = new Playday();
+            playday.setName(basicDBObject.getString("name"));
+            playday.setCurrent(basicDBObject.getBoolean("current"));
+            playday.setCurrent(basicDBObject.getBoolean("playoff"));
+            playday.setNumber(basicDBObject.getInt("number"));
+            save(playday);
+        }
+    }
+
+    public long countAllGames() {
+        return this.datastore.find(Game.class).countAll();
+    }
+
+    public long countAllExtras() {
+        return this.datastore.find(Extra.class).countAll();
     }
 }

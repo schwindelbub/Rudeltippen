@@ -4,6 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import models.Constants;
+import ninja.validation.ConstraintViolation;
+import ninja.validation.FieldViolation;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -80,10 +82,15 @@ public class ValidationUtils {
      * @return true if username is valid, false otherwise
      */
     public static boolean isValidUsername(final String username) {
+        boolean valid = false;
         final Pattern p = Pattern.compile(Constants.USERNAMEPATTERN.value());
         final Matcher m = p.matcher(username);
 
-        return m.matches();
+        if (StringUtils.isNotBlank(username) && username.length() >= 3 && username.length() <= 32 && m.matches()) {
+            valid = true;
+        }
+
+        return valid;
     }
 
     public static boolean isValidConfirmationToken(String token) {
@@ -91,5 +98,23 @@ public class ValidationUtils {
         final Matcher m = p.matcher(token);
 
         return m.matches();
+    }
+
+    public static boolean match(String string1, String string2) {
+        boolean valid = true;
+        if (StringUtils.isNotBlank(string1) && !string1.equals(string2)) {
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    public static FieldViolation createBeanValidation(String field, String message) {
+        ConstraintViolation constraintViolation = new ConstraintViolation(message,"","");
+        return new FieldViolation(field, constraintViolation);
+    }
+
+    public static boolean isValidPassword(String userpass) {
+        return (StringUtils.isNotBlank(userpass) && userpass.length() >= 8 && userpass.length() <= 32);
     }
 }

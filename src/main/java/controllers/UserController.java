@@ -10,7 +10,9 @@ import java.util.UUID;
 
 import models.Confirmation;
 import models.ConfirmationType;
+import models.Extra;
 import models.ExtraTip;
+import models.Game;
 import models.GameTip;
 import models.Settings;
 import models.User;
@@ -34,7 +36,7 @@ import com.google.inject.Singleton;
  *
  */
 @Singleton
-public class UserController {
+public class UserController extends RootController {
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
 
     @Inject
@@ -51,14 +53,14 @@ public class UserController {
             //TODO Refactoring
             final List<ExtraTip> extraTips = null;//ExtraTip.find("SELECT e FROM ExtraTip e WHERE user = ? AND points > 0", user).fetch();
             final List<GameTip> tips = dataService.findGameTipByUser(user);
-            final long extra = dataService.getExtrasCount();
+            final long extra = dataService.countAllExtras();
             final int sumAllTipps = tips.size();
             final int correctTipps = user.getCorrectResults();
             final int correctTrend = user.getCorrectTrends();
             final int correctDifference = user.getCorrectDifferences();
             final DecimalFormat df = new DecimalFormat( "0.00" );
 
-            statistics.put("sumGames", (int) dataService.getGameCount());
+            statistics.put("sumGames", (int) dataService.countAllGames());
             statistics.put("sumTipps", sumAllTipps);
             statistics.put("correctTipps", correctTipps);
             statistics.put("correctTrend", correctTrend);
@@ -87,7 +89,7 @@ public class UserController {
 
             //TODO Refactoring
             final List<UserStatistic> userStatistics = null;//UserStatistic.find("SELECT u FROM UserStatistic u WHERE user = ? ORDER BY playday ASC", user).fetch();
-            final int users = dataService.getAllActiveUsers().size();
+            final int users = dataService.findAllActiveUsers().size();
             final int usersScale = users + 1;
 
             return Results.html().render(user).render(statistics).render(pointsPerTipp).render(tippQuote).render(tippedGames).render(userStatistics).render(user).render(usersScale);

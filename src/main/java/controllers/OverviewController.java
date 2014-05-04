@@ -23,7 +23,7 @@ import com.google.inject.Singleton;
  *
  */
 @Singleton
-public class OverviewController {
+public class OverviewController extends RootController {
 
     @Inject
     private DataService dataService;
@@ -34,7 +34,7 @@ public class OverviewController {
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
         final List<User> users = dataService.findActiveUsers(15);
         final List<Map<User, List<GameTip>>> tips = dataService.getPlaydayTips(playday, users);
-        final long usersCount = dataService.getUsersCount();
+        final long usersCount = dataService.countAllUsers();
 
         return Results.html().render(tips).render(playday).render(pagination).render(usersCount);
     }

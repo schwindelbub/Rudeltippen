@@ -254,7 +254,7 @@ public class CalculationService {
      */
     private boolean setCurrentPlayday() {
         boolean changed = false;
-        final Playday currentPlayday = dataService.getCurrentPlayday();
+        final Playday currentPlayday = dataService.findCurrentPlayday();
         final List<Playday> playdays = dataService.findAllPlaydaysOrderByNumber();
         for (final Playday playday : playdays) {
             if (playday.allGamesEnded()) {
@@ -267,7 +267,7 @@ public class CalculationService {
             }
         }
 
-        if (currentPlayday != dataService.getCurrentPlayday()) {
+        if (currentPlayday != dataService.findCurrentPlayday()) {
             changed = true;
             notificationService.sendTopThree(currentPlayday);
         }

@@ -54,7 +54,7 @@ public class SystemController {
             }
 
             dataService.dropDatabase();
-            dataService.loadInitialData(Constants.YAMLFILE.value());
+            dataService.loadInitialData();
 
             final List<Game> prePlayoffGames = dataService.findAllNonPlayoffGames();
             final List<Game> playoffGames = dataService.findAllPlayoffGames();

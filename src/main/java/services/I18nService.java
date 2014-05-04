@@ -25,7 +25,7 @@ public class I18nService {
     private NinjaProperties ninjaProperties;
 
     public String get(String key) {
-        return messages.getWithDefault(key, "Missing translation for: " + key, Optional.of("en"), null);
+        return messages.getWithDefault(key, "Missing translation for: " + key, Optional.of("de"), null);
     }
 
     /**
@@ -35,16 +35,18 @@ public class I18nService {
      * @return Message with difference or empty string
      */
     public String getDiffToTop(final int pointsDiff) {
-        //TODO Refactoring
-        //        String message = "";
-        //        if (pointsDiff == 1) {
-        //            message = get("points.to.top.one", pointsDiff);
-        //        } else if (pointsDiff > 1) {
-        //            message = get("points.to.top.many", pointsDiff);
-        //        }
-        //
-        //        return message;
-        return null;
+        String message = "";
+        if (pointsDiff == 1) {
+            message = get("points.to.top.one");
+            //TODO Refactoring
+            //message = get("points.to.top.one", pointsDiff);
+        } else if (pointsDiff > 1) {
+            //TODO Refactoring
+            //message = get("points.to.top.many", pointsDiff);
+            message = get("points.to.top.one");
+        }
+
+        return message;
     }
 
     /**

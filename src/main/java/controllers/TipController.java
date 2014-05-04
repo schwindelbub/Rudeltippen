@@ -29,7 +29,7 @@ import com.google.inject.Singleton;
  *
  */
 @Singleton
-public class TipController {
+public class TipController extends RootController {
 
     @Inject
     private DataService dataService;
@@ -113,7 +113,7 @@ public class TipController {
                     bonusTippId = Long.parseLong(bId);
                     teamId = Long.parseLong(tId);
                 } else {
-                    playday(dataService.getCurrentPlayday().getNumber());
+                    playday(dataService.findCurrentPlayday().getNumber());
                 }
 
                 final Extra extra = dataService.findExtaById(bonusTippId);
@@ -126,7 +126,7 @@ public class TipController {
             }
         }
 
-        return Results.redirect("/tips/playday/" + dataService.getCurrentPlayday().getNumber());
+        return Results.redirect("/tips/playday/" + dataService.findCurrentPlayday().getNumber());
     }
 
     public Result standings() {

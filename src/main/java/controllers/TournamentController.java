@@ -20,7 +20,7 @@ import models.Playday;
  *
  */
 @Singleton
-public class TournamentController {
+public class TournamentController extends RootController {
 
     @Inject
     private DataService dataService;

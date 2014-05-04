@@ -1,12 +1,12 @@
 package controllers;
 
 import java.text.SimpleDateFormat;
-
 import java.util.Locale;
 
 import models.Bracket;
 import models.Game;
 import models.Team;
+import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 
@@ -17,13 +17,16 @@ import services.DataService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import filters.AuthorizationFilter;
+
 /**
  * 
  * @author svenkubiak
  *
  */
 @Singleton
-public class AjaxController {
+@FilterWith(AuthorizationFilter.class)
+public class AjaxController extends RootController {
 
     @Inject
     private DataService dataService;
