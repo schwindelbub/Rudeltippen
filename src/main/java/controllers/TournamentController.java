@@ -27,7 +27,7 @@ public class TournamentController extends RootController {
 
     public Result brackets() {
         final List<Bracket> brackets = dataService.findAllBrackets();
-        return Results.html().render(brackets);
+        return Results.html().render("brackets", brackets);
     }
 
     public Result playday(final long number) {

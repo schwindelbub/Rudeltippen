@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -667,13 +668,28 @@ public class DataService {
     }
 
     public void loadInitialData() {
-        loadBrackets();
-        loadPlaydays();
-        loadTeams();
-        loadGames();
+        Map<String, Bracket> brackets = loadBrackets();
+        Map<String, Team> teams = loadTeams(brackets);
+        Map<String, Playday> playdays = loadPlaydays();
+        loadGames(playdays, teams);
+        loadExtras(teams);
     }
 
-    private void loadGames() {
+    private void loadExtras(Map<String, Team> teams) {
+        List<String> lines = readLines("extras.json");
+
+        for (String line : lines) {
+            BasicDBObject basicDBObject = (BasicDBObject) JSON.parse(line);
+            Extra extra = new Extra();
+            extra.setPoints(basicDBObject.getInt("points"));
+            extra.setQuestion(basicDBObject.getString("question"));
+            extra.setExtraReference(basicDBObject.getString("extraReference"));
+            extra.setQuestionShort(basicDBObject.getString("questionShort"));
+            save(extra);
+        }
+    }
+
+    private void loadGames(Map<String, Playday> playdays, Map<String, Team> teams) {
         List<String> lines = readLines("games.json");
 
         for (String line : lines) {
@@ -684,11 +700,17 @@ public class DataService {
             game.setEnded(basicDBObject.getBoolean("ended"));
             game.setUpdateble(basicDBObject.getBoolean("updateble"));
             game.setWebserviceID(basicDBObject.getString("webserviceID"));
+            game.setHomeTeam(teams.get(basicDBObject.getString("homeTeam")));
+            game.setHomeReference(basicDBObject.getString("homeReference"));
+            game.setAwayReference(basicDBObject.getString("awayReference"));
+            game.setAwayTeam(teams.get(basicDBObject.getString("awayTeam")));
+            game.setPlayday(playdays.get(basicDBObject.getString("playday")));
             save(game);
         }
     }
 
-    private void loadBrackets() {
+    private Map<String, Bracket> loadBrackets() {
+        Map<String, Bracket> brackets = new HashMap<String, Bracket>();
         List<String> lines = readLines("brackets.json");
 
         for (String line : lines) {
@@ -698,11 +720,16 @@ public class DataService {
             bracket.setNumber(basicDBObject.getInt("number"));
             bracket.setUpdateble(basicDBObject.getBoolean("updateble"));
             save(bracket);
+            
+            brackets.put(basicDBObject.getString("id"), bracket);
         }
+        
+        return brackets;
     }
 
-    private void loadPlaydays() {
-        List<String> lines = readLines("playday.json");
+    private Map<String, Playday> loadPlaydays() {
+        Map<String, Playday> playdays = new HashMap<String, Playday>();
+        List<String> lines = readLines("playdays.json");
 
         for (String line : lines) {
             BasicDBObject basicDBObject = (BasicDBObject) JSON.parse(line);
@@ -712,10 +739,15 @@ public class DataService {
             playday.setCurrent(basicDBObject.getBoolean("playoff"));
             playday.setNumber(basicDBObject.getInt("number"));
             save(playday);
+            
+            playdays.put(basicDBObject.getString("id"), playday);
         }
+        
+        return playdays;
     }
 
-    private void loadTeams() {
+    private Map<String, Team> loadTeams(Map<String, Bracket> brackets) {
+        Map<String, Team> teams = new HashMap<String, Team>();
         List<String> lines = readLines("teams.json");
 
         for (String line : lines) {
@@ -727,8 +759,13 @@ public class DataService {
             team.setGamesWon(basicDBObject.getInt("gamesWon"));
             team.setGamesDraw(basicDBObject.getInt("gamesDraw"));
             team.setGamesLost(basicDBObject.getInt("gamesLost"));
+            team.setBracket(brackets.get(basicDBObject.getString("bracket")));
             save(team);
+            
+            teams.put(basicDBObject.getString("id"), team);
         }
+        
+        return teams;
     }
 
     private List<String> readLines(String filename) {

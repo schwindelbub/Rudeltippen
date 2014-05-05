@@ -1,1 +1,18 @@
-{"name":"brazil","flag": "bra.png","bracket": "a","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$FCB","name":"fcbayernmunchen","flag":"fcb.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$BVB","name":"borussiadortmund","flag":"bvb.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$S04","name":"fcschalke","flag":"s04.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$BMG","name":"borussiamonchengladbach","flag":"bmg.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$B04","name":"bayerleverkusen","flag":"b04.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$VFB","name":"vfbstuttgart","flag":"vfb.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$H96","name":"hannover","flag":"h96.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$VFL","name":"vflwolfsburg","flag":"vfl.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$SWB","name":"werderbremen","flag":"swb.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$FCN","name":"fcnurnburg","flag":"fcn.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$TSG","name":"tsghoffenheim","flag":"tsg.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$SCF","name":"scfreiburg","flag":"scf.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$M05","name":"fsvmainz","flag":"m05.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$FCA","name":"fcaugsburg","flag":"fca.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$HSV","name":"hamburgsv","flag":"hsv.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$EB","name":"eintrachtbraunschweig","flag":"eb.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$EF","name":"eintrachtfrankfurt","flag":"ef.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}
+{"id":"$BSC","name":"herthabsc","flag":"bsc.png","bracket":"$B1","gamesPlayed":0,"gamesWon":0,"gamesDraw":0,"gamesLost":0}

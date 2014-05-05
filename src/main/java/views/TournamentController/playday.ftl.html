@@ -1,4 +1,5 @@
-#{extends 'main.html' /}
+<#import "../layout/main.ftl.html" as layout> 
+<@layout.main>
 <div class="row">
 	<div class="col-md-12">
 		<legend>&{playday.name}</legend>
@@ -16,14 +17,14 @@
 				<thead>
 					<tr>
 						<th>#</th>
-						<th>&{'date'} - &{'time'}</th>
-						<th>&{'hometeam'}</th>
-						<th>&{'awayteam'}</th>
-						<th>&{'result'}</th>
+						<th>${i18n('date')} - ${i18n('time')}</th>
+						<th>${i18n('hometeam')}</th>
+						<th>${i18n('awayteam')}</th>
+						<th>${i18n('result')}</th>
 					</tr>
 				</thead>
 				<tbody>
-				#{list items:playday.games, as:'game'}
+				<#list playday.games as game>
 					<tr>
 						<td>${game.number}</td>					
 						<td>${game.kickoff.formatted()}</td>
@@ -61,9 +62,10 @@
 							#{/else}
 						#{/else}
 					</tr>
-				#{/list}	
+				</#list>	
 				</tbody>
 			</table>
 		</div>
 	</div>
 </div>
+</@layout.main>

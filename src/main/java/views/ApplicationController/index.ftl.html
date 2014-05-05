@@ -1,7 +1,67 @@
 <#import "../layout/main.ftl.html" as layout> 
-<@layout.main>    
-
-
-It's alive
-
+<@layout.main> 
+<div class="row">
+	<div class="col-md-12">
+		<legend>${i18n('topthree')}</legend>
+		<div class="table-responsive">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>${i18n('tipper')}</th>
+						<th>${i18n('username')}</th>
+						<th>${i18n('points')}</th>
+						<th>${i18n('extrapoints')}</th>
+						<th>${i18n('totalpoints')}</th>
+					</tr>
+				</thead>
+				<tbody>
+				<#list topUsers as topUser>
+					<tr>
+						<td><a href="/users/show/${topUser.username}"><img src="/assets/img/user_placeholder.gif" width="54" height="54" /></a></td>
+						<td><b><a href="/users/show/${topUser.username}">${topUser.username}</a></b></td>
+						<td>${topUser.tipPoints}</td>
+						<td>${topUser.extraPoints}</td>
+						<td><b>${topUser.points}</b></td>
+					</tr>
+				</#list>
+				<tr><td colspan="5">&{'user.placandpoints.' + (connectedUser.points == 1 ? 'one' : 'many'), connectedUser.points, connectedUser.place, users}</td></tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<legend>&{playday.name}</legend>
+		<div class="table-responsive">
+			<table class="table table-striped">
+		          <thead>
+		              <tr>
+		              	  <th>#</th>
+		                  <th>${i18n('app.date.time')}</th>
+		                  <th>${i18n('hometeam')}</th>
+		                  <th>${i18n('awayteam')}</th>
+		                  <th>${i18n('result')}</th>
+		                  <th>${i18n('yourbet')}</th>
+		              </tr>
+		          </thead>
+		          <tbody>
+		              <#list playday.games as game>
+		                  <tr>
+		                      <td>${game.number}</td>
+		                      <td>${game.kickoff.formatted()}</td>
+		                      <td><img src="/assets/img/flags/${game.homeTeam.flag}" class="flag">&{game.homeTeam.name}</td>
+		                      <td><img src="/assets/img/flags/${game.awayTeam.flag}" class="flag">&{game.awayTeam.name}</td>
+		                      <td>${game.getScore()}</td>
+		                      <td>${game.getGameTipAndPoints()}</td>
+		                  </tr>
+		              </#list>
+		                  <tr>
+		                      <td colspan="6">${i18n('nogamesyet')}</td>
+		                  </tr>
+		          </tbody>
+		      </table>
+	      </div>
+	   </div>
+</div>
 </@layout.main>

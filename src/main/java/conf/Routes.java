@@ -6,6 +6,8 @@ import ninja.application.ApplicationRoutes;
 import controllers.ApplicationController;
 import controllers.AuthController;
 import controllers.SystemController;
+import controllers.TipController;
+import controllers.TournamentController;
 
 /**
  * 
@@ -22,6 +24,8 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/auth/register").with(AuthController.class, "register");
         router.GET().route("/auth/forgotten").with(AuthController.class, "forgotten");
         router.GET().route("/rules").with(ApplicationController.class, "rules");
+        router.GET().route("/tournament/brackets").with(TournamentController.class, "brackets");
+        router.GET().route("/tips/standings").with(TipController.class, "standings");
         router.POST().route("/auth/renew").with(AuthController.class, "renew");
         router.POST().route("/auth/reset").with(AuthController.class, "reset");
         router.POST().route("/auth/authenticate").with(AuthController.class, "authenticate");

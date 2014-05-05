@@ -38,8 +38,8 @@ public class ApplicationController extends RootController {
         final Playday playday = dataService.findCurrentPlayday();
         final List<User> topUsers = dataService.findTopThreeUsers();
         final long users = dataService.countAllUsers();
-
-        return Results.html().render(topUsers).render(playday).render(users).render(diffToTop);
+        
+        return Results.html().render("topUsers", topUsers).render(playday).render(users).render(diffToTop);
     }
 
     public Result rules() {
