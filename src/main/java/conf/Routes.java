@@ -3,11 +3,13 @@ package conf;
 import ninja.AssetsController;
 import ninja.Router;
 import ninja.application.ApplicationRoutes;
+import controllers.AdminController;
 import controllers.ApplicationController;
 import controllers.AuthController;
 import controllers.SystemController;
 import controllers.TipController;
 import controllers.TournamentController;
+import controllers.UserController;
 
 /**
  * 
@@ -23,8 +25,14 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/auth/logout").with(AuthController.class, "logout");
         router.GET().route("/auth/register").with(AuthController.class, "register");
         router.GET().route("/auth/forgotten").with(AuthController.class, "forgotten");
+        router.GET().route("/admin/rudelmail").with(AdminController.class, "rudelmail");
+        router.GET().route("/admin/settings").with(AdminController.class, "settings");
         router.GET().route("/rules").with(ApplicationController.class, "rules");
         router.GET().route("/tournament/brackets").with(TournamentController.class, "brackets");
+        router.GET().route("/users/profile").with(UserController.class, "profile");
+        router.GET().route("/users/show/{username}").with(UserController.class, "show");
+        router.GET().route("/tournament/playday/{number}").with(TournamentController.class, "playday");
+        router.GET().route("/tips/playday/{number}").with(TipController.class, "playday");        
         router.GET().route("/tips/standings").with(TipController.class, "standings");
         router.POST().route("/auth/renew").with(AuthController.class, "renew");
         router.POST().route("/auth/reset").with(AuthController.class, "reset");

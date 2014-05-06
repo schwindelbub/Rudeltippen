@@ -1,7 +1,5 @@
 package models.statistic;
 
-import javax.validation.constraints.NotNull;
-
 import models.Playday;
 
 import org.bson.types.ObjectId;
@@ -22,7 +20,6 @@ public class PlaydayStatistic {
     @Reference
     private Playday playday;
 
-    @NotNull
     private String gameResult;
 
     private int resultCount;

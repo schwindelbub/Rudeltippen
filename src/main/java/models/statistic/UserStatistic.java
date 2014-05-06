@@ -21,7 +21,7 @@ public class UserStatistic {
     @Reference
     private Playday playday;
 
-    @Reference("userstatistic_user")
+    @Reference
     private User user;
 
     private int place;

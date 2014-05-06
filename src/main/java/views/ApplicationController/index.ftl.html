@@ -32,7 +32,7 @@
 </div>
 <div class="row">
 	<div class="col-md-12">
-		<legend>&{playday.name}</legend>
+		<legend>${i18n(playday.name)}</legend>
 		<div class="table-responsive">
 			<table class="table table-striped">
 		          <thead>
@@ -49,11 +49,11 @@
 		              <#list playday.games as game>
 		                  <tr>
 		                      <td>${game.number}</td>
-		                      <td>${game.kickoff.formatted()}</td>
-		                      <td><img src="/assets/img/flags/${game.homeTeam.flag}" class="flag">&{game.homeTeam.name}</td>
-		                      <td><img src="/assets/img/flags/${game.awayTeam.flag}" class="flag">&{game.awayTeam.name}</td>
-		                      <td>${game.getScore()}</td>
-		                      <td>${game.getGameTipAndPoints()}</td>
+		                      <td>${game.kickoff?datetime}</td>
+		                      <td><img src="/assets/img/flags/${game.homeTeam.flag}" class="flag">${i18n(game.homeTeam.name)}</td>
+		                      <td><img src="/assets/img/flags/${game.awayTeam.flag}" class="flag">${i18n(game.awayTeam.name)}</td>
+		                      <td>${ViewUtils.getScore(game)}</td>
+		                      <td>game.getGameTipAndPoints()</td>
 		                  </tr>
 		              </#list>
 		                  <tr>

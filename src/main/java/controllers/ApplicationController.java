@@ -39,7 +39,11 @@ public class ApplicationController extends RootController {
         final List<User> topUsers = dataService.findTopThreeUsers();
         final long users = dataService.countAllUsers();
         
-        return Results.html().render("topUsers", topUsers).render(playday).render(users).render(diffToTop);
+        return Results.html()
+                .render("topUsers", topUsers)
+                .render("playday", playday)
+                .render("users", users)
+                .render("diffToTop", diffToTop);
     }
 
     public Result rules() {

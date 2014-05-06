@@ -1,7 +1,5 @@
 package models;
 
-import javax.validation.constraints.NotNull;
-
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -16,9 +14,8 @@ public class AbstractJob {
     @Id
     private ObjectId id;
 
-    @NotNull
     private String name;
-
+    
     private boolean active;
 
     public String getName() {

@@ -2,10 +2,6 @@ package models;
 
 import java.util.Date;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -27,17 +23,11 @@ public class GameTip {
     @Reference
     private Game game;
 
-    @Size(min = 0, max = 99)
     private int homeScore;
-
-    @Size(min = 0, max = 99)
     private int awayScore;
-
-    @NotNull
-    private Date placed;
-
-    @Min(value = 0)
     private int points;
+    
+    private Date placed;
 
     public User getUser() {
         return user;

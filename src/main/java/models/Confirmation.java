@@ -2,8 +2,6 @@ package models;
 
 import java.util.Date;
 
-import javax.validation.constraints.NotNull;
-
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -22,16 +20,11 @@ public class Confirmation {
     @Reference
     private User user;
 
-    @NotNull
     private String token;
-
-    @NotNull
     private String confirmValue;
-
-    @NotNull
+    
     private ConfirmationType confirmType;
-
-    @NotNull
+    
     private Date created;
 
     public User getUser() {

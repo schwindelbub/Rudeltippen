@@ -7,6 +7,7 @@ package models;
  */
 public class Pagination {
     private String url;
+    
     private long number;
     private long offsetStart;
     private long offset;

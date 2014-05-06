@@ -2,12 +2,12 @@
 <@layout.main>
 <div class="row">
 	<div class="col-md-12">
-		<legend>&{playday.name}</legend>
+		<legend>${i18n(playday.name)}</legend>
 	</div>
 </div>
 <div class="row" style="text-align:right; padding-right: 5px;">
 	<div class="col-md-12">
-		#{include '/Tags/pagination.html' /}
+		<#include "../Tags/pagination.ftl.html">
 	</div>
 </div>
 <div class="row">
@@ -27,40 +27,26 @@
 				<#list playday.games as game>
 					<tr>
 						<td>${game.number}</td>					
-						<td>${game.kickoff.formatted()}</td>
-						#{if game.homeTeam != null}
-							#{if game.homeTeam.flag != null}
-								<td><img class="flag" src="@{'/public/img/flags'}/${game.homeTeam?.flag}" alt="${game.homeTeam?.name}" />&{game.homeTeam?.name}</td>
-							#{/if}
-							#{else}
-								<td>&{game.homeTeam?.name}</td>
-							#{/else}
-						#{/if}
-						#{else}
+						<td>${game.kickoff?date}</td>
+						<#if (game.homeTeam)??>
+							<td><img class="flag" src="/assets/img/flags/${game.homeTeam.flag}" alt="${game.homeTeam.name}" />${i18n(game.homeTeam.name)}</td>
+						<#else>
 							<td>${game.homeReferenceName()}</td>
-						#{/else}
-						#{if game.awayTeam != null}
-							#{if game.awayTeam.flag != null}
-								<td><img class="flag" src="@{'/public/img/flags'}/${game.awayTeam?.flag}" alt="${game.awayTeam?.name}" />&{game.awayTeam?.name}</td>
-							#{/if}
-							#{else}
-								<td>&{game.awayTeam?.name}</td>
-							#{/else}
-						#{/if}
-						#{else}
+						</#if>
+						<#if (game.awayTeam)??>
+							<td><img class="flag" src="/assets/img/flags/${game.awayTeam.flag}" alt="${game.awayTeam.name}" />${i18n(game.awayTeam.name)}</td>
+						<#else>
 							<td>${game.awayReferenceName()}</td>
-						#{/else}
-						#{if !game.ended}
+						</#if>
+						<#if !game.ended>
 							<td>- : -</td>
-						#{/if}
-						#{else}
-							#{if game.overtime}
+						<#else>
+							<#if game.overtime>
 								<td>${game.homeScoreOT} : ${game.awayScoreOT} (&{game.overtimeType})</td>
-							#{/if}
-							#{else}
+							<#else>
 								<td>${game.homeScore} : ${game.awayScore}</td>
-							#{/else}
-						#{/else}
+							</#if>
+						</#if>
 					</tr>
 				</#list>	
 				</tbody>

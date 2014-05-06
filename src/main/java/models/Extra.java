@@ -1,21 +1,18 @@
 package models;
 
-/**
- * 
- * @author svenkubiak
- *
- */
 import java.util.Date;
 import java.util.List;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
+/**
+ * 
+ * @author svenkubiak
+ *
+ */
 @Entity(value = "extras", noClassnameStored = true)
 public class Extra {
     @Id
@@ -24,29 +21,22 @@ public class Extra {
     @Reference("extra_extratips")
     private List<ExtraTip> extraTips;
 
-    @NotNull
-    private String question;
-
-    @NotNull
-    private String questionShort;
-
-    @Min(value = 0)
-    private int points;
-
-    @NotNull
-    private Date ending;
-
     @Reference("extra_answers")
     private List<Team> answers;
-
-    @NotNull
-    private String extraReference;
 
     @Reference("extra_gamereferences")
     private List<Game> gameReferences;
 
     @Reference
     private Team answer;
+    
+    private String question;
+    private String questionShort;
+    private String extraReference;
+
+    private int points;
+    
+    private Date ending;
 
     public List<ExtraTip> getExtraTipps() {
         return extraTips;
@@ -120,10 +110,11 @@ public class Extra {
         this.answer = answer;
     }
 
+    //TODO Refactoring
     public boolean isTipable() {
-        if (new Date().getTime() >= this.ending.getTime()) {
-            return false;
-        }
+//        if (new Date().getTime() >= this.ending.getTime()) {
+//            return false;
+//        }
 
         return true;
     }

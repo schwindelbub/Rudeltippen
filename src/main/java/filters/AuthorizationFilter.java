@@ -16,8 +16,8 @@ public class AuthorizationFilter implements Filter {
 
     @Override
     public Result filter(FilterChain filterChain, Context context) {
-        User user = context.getAttribute("connectedUser", User.class);
-        if (user == null || !user.isAdmin()) {
+        User connectedUser = context.getAttribute("connectedUser", User.class);
+        if (connectedUser == null || !connectedUser.isAdmin()) {
             return Results.forbidden();
         }
 

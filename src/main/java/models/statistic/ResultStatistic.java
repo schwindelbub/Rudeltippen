@@ -1,7 +1,5 @@
 package models.statistic;
 
-import javax.validation.constraints.NotNull;
-
 import models.User;
 
 import org.bson.types.ObjectId;
@@ -22,7 +20,6 @@ public class ResultStatistic {
     @Reference
     private User user;
 
-    @NotNull
     private String result;
 
     private int correctTips;

@@ -1,6 +1,7 @@
 package filters;
 
 import models.Constants;
+import models.User;
 import ninja.Context;
 import ninja.Cookie;
 import ninja.Filter;
@@ -12,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import services.AuthService;
 import services.DataService;
+import utils.ViewUtils;
 
 import com.google.inject.Inject;
 
@@ -27,11 +29,13 @@ public class AuthenticationFilter implements Filter {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private ViewUtils viewUtils;
 
     @Override
     public Result filter(FilterChain filterChain, Context context) {
-        Result result = filterChain.next(context);
-        Cookie cookie = context.getCookie(Constants.REMEMBERME.value());
+        Cookie cookie = context.getCookie(Constants.COOKIENAME.value());
         if (cookie != null && cookie.getValue().indexOf("-") > 0) {
             final String sign = cookie.getValue().substring(0, cookie.getValue().indexOf("-"));
             final String username = cookie.getValue().substring(cookie.getValue().indexOf("-") + 1);
@@ -43,13 +47,18 @@ public class AuthenticationFilter implements Filter {
             }
         }
 
-        if (context.getSession() == null || context.getSession().get(Constants.USERNAME.value()) == null) {
-            return Results.redirect("/auth/login");
-        } else {
-            result.render("connectedUser", dataService.findUserByUsernameOrEmail(context.getSession().get(Constants.USERNAME.value())));
-            result.render("currentPlayday", dataService.findCurrentPlayday());
-        }
+        if (context.getSession() != null && context.getSession().get(Constants.USERNAME.value()) != null) {
+            User connectedUser = dataService.findUserByUsernameOrEmail(context.getSession().get(Constants.USERNAME.value()));
+            context.setAttribute("connectedUser", connectedUser);
 
-        return result;
+            Result result = filterChain.next(context);
+            result.render("connectedUser", connectedUser);
+            result.render("ViewUtils", viewUtils);
+            result.render("currentPlayday", dataService.findCurrentPlayday());
+            
+            return result;
+        }
+        
+        return Results.redirect("/auth/login");
     }
 }

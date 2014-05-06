@@ -17,13 +17,16 @@ import models.GameTip;
 import models.Settings;
 import models.User;
 import models.statistic.UserStatistic;
+import ninja.Context;
 import ninja.Result;
 import ninja.Results;
+import ninja.params.PathParam;
 import ninja.session.Session;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import services.AuthService;
 import services.DataService;
 import services.MailService;
 
@@ -45,14 +48,13 @@ public class UserController extends RootController {
     @Inject
     private MailService mailService;
 
-    public Result show(final String username) {
+    public Result show(@PathParam("username") String username) {
         final User user = dataService.findUserByUsername(username);
 
         if (user != null) {
             final Map<String, Integer> statistics = new HashMap<String, Integer>();
-            //TODO Refactoring
-            final List<ExtraTip> extraTips = null;//ExtraTip.find("SELECT e FROM ExtraTip e WHERE user = ? AND points > 0", user).fetch();
-            final List<GameTip> tips = dataService.findGameTipByUser(user);
+            final List<ExtraTip> extraTips = dataService.findExtraTipsByUser(user);
+            final List<GameTip> tips = dataService.findGameTipsByUser(user);
             final long extra = dataService.countAllExtras();
             final int sumAllTipps = tips.size();
             final int correctTipps = user.getCorrectResults();
@@ -87,23 +89,28 @@ public class UserController extends RootController {
                 pointsPerTipp = df.format( pointsTipp );
             }
 
-            //TODO Refactoring
-            final List<UserStatistic> userStatistics = null;//UserStatistic.find("SELECT u FROM UserStatistic u WHERE user = ? ORDER BY playday ASC", user).fetch();
+            final List<UserStatistic> userStatistics = dataService.findUserStatisticByUser(user);
             final int users = dataService.findAllActiveUsers().size();
             final int usersScale = users + 1;
 
-            return Results.html().render(user).render(statistics).render(pointsPerTipp).render(tippQuote).render(tippedGames).render(userStatistics).render(user).render(usersScale);
+            return Results.html()
+                    .render("statistics", statistics)
+                    .render("pointsPerTipp", pointsPerTipp)
+                    .render("tippQuote", tippQuote)
+                    .render("tippedGames", tippedGames)
+                    .render("userStatistics", userStatistics)
+                    .render("user", user)
+                    .render("usersScale", usersScale);
         } else {
             return Results.redirect("/");
         }
     }
 
-    //TODO Refactoring
-    public Result profile() {
-        final User user = null;//AppUtils.getConnectedUser();
+    public Result profile(Context context) {
+        final User user = context.getAttribute("connectedUser", User.class);
         final Settings settings = dataService.findSettings();
 
-        return Results.html().render(user).render(settings);
+        return Results.html().render("users", user).render(settings);
     }
 
     public Result updateusername(final String username, Session session) {

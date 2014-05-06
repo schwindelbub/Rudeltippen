@@ -13,6 +13,7 @@ import models.Team;
 import models.User;
 import ninja.Result;
 import ninja.Results;
+import ninja.params.PathParam;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -34,7 +35,7 @@ public class TipController extends RootController {
     @Inject
     private DataService dataService;
 
-    public Result playday(final int number) {
+    public Result playday(@PathParam("number") long number) {
         final Pagination pagination = AppUtils.getPagination(number, "/tips/playday/", dataService.findAllPlaydaysOrderByNumber().size());
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
 

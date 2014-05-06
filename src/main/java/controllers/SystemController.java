@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import services.DataService;
+import services.ImportService;
 import utils.AppUtils;
 
 import com.google.inject.Inject;
@@ -34,6 +35,9 @@ public class SystemController {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private ImportService importService;
 
     public Result setup() {
         if (dataService.appIsInizialized()) {
@@ -54,7 +58,7 @@ public class SystemController {
             }
 
             dataService.dropDatabase();
-            dataService.loadInitialData();
+            importService.loadInitialData();
 
             final List<Game> prePlayoffGames = dataService.findAllNonPlayoffGames();
             final List<Game> playoffGames = dataService.findAllPlayoffGames();

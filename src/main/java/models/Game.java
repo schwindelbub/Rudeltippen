@@ -3,8 +3,6 @@ package models;
 import java.util.Date;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
@@ -33,14 +31,10 @@ public class Game {
     @Reference
     private Playday playday;
 
-    @NotNull
-    private Date kickoff;
-
-    @NotNull
-    private int number;
-
     @Reference("game_gametips")
     private List<GameTip> gameTips;
+    
+    private Date kickoff;
 
     private String overtimeType;
     private String homeReference;
@@ -50,8 +44,11 @@ public class Game {
     private String awayScore;
     private String homeScoreOT;
     private String awayScoreOT;
+
+    private int number;
     private int homePoints;
     private int awayPoints;
+    
     private boolean overtime;
     private boolean playoff;
     private boolean ended;
@@ -162,15 +159,6 @@ public class Game {
         this.ended = ended;
     }
 
-    public Date getTippEnding() {
-        //TODO Refactoring
-        //        final long time = this.kickoff.getTime();
-        //        final int offset = AppUtils.findSettings().getMinutesBeforeTip() * 60000 ;
-        //
-        //        return new Date (time - offset);
-        return null;
-    }
-
     public int getHomePoints() {
         return this.homePoints;
     }
@@ -243,7 +231,16 @@ public class Game {
         this.updateble = updateble;
     }
 
+    public Date getTippEnding() {
+        //TODO Refactoring
+        //        final long time = this.kickoff.getTime();
+        //        final int offset = AppUtils.findSettings().getMinutesBeforeTip() * 60000 ;
+        //
+        //        return new Date (time - offset);
+        return null;
+    }
 
+    //TODO Refactoring
     public Team getWinner() {
         String home, away;
         if (this.overtime) {
@@ -267,6 +264,7 @@ public class Game {
         return null;
     }
 
+    //TODO Refactoring
     public Team getLoser() {
         String home, away;
         if (this.overtime) {

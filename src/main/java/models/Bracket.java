@@ -2,9 +2,6 @@ package models;
 
 import java.util.List;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -20,7 +17,6 @@ public class Bracket {
     @Id
     private ObjectId id;
 
-    @NotNull
     private String name;
 
     @Reference("bracket_teams")
@@ -29,9 +25,8 @@ public class Bracket {
     @Reference("bracket_games")
     private List<Game> games;
 
-    @Min(value = 1)
     private int number;
-
+    
     private boolean updateble;
 
     public String getName() {
@@ -74,6 +69,7 @@ public class Bracket {
         this.updateble = updateble;
     }
 
+    //TODO Refactoring
     public boolean allGamesEnded() {
         for (final Game game : games) {
             if (!game.isEnded()) {
@@ -84,6 +80,7 @@ public class Bracket {
         return true;
     }
 
+    //TODO Refactoring
     public Team getTeamByPlace(final int place) {
         int i = 1;
         for (final Team team : teams) {

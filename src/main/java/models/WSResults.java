@@ -9,6 +9,7 @@ import java.util.Map;
  */
 public class WSResults {
     private boolean updated;
+    
     private Map<String, WSResult> wsResult;
 
     public Map<String, WSResult> getWsResult() {

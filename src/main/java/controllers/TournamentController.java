@@ -10,6 +10,7 @@ import com.google.inject.Singleton;
 
 import ninja.Result;
 import ninja.Results;
+import ninja.params.PathParam;
 import models.Bracket;
 import models.Pagination;
 import models.Playday;
@@ -30,11 +31,11 @@ public class TournamentController extends RootController {
         return Results.html().render("brackets", brackets);
     }
 
-    public Result playday(final long number) {
+    public Result playday(@PathParam("number") long number) {
         final Pagination pagination = AppUtils.getPagination(number, "/tournament/playday/", dataService.findAllPlaydaysOrderByNumber().size());
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
 
-        return Results.html().render(playday).render(pagination);
+        return Results.html().render("playday", playday).render("pagination", pagination);
     }
 
     public Result bracket() {

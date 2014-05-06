@@ -1,7 +1,5 @@
 package models;
 
-import javax.validation.constraints.Min;
-
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -26,7 +24,6 @@ public class ExtraTip {
     @Reference
     public Team answer;
 
-    @Min(value = 0)
     private int points;
 
     public User getUser() {

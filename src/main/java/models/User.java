@@ -3,8 +3,6 @@ package models;
 import java.util.Date;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import models.statistic.ResultStatistic;
 import models.statistic.UserStatistic;
 
@@ -23,24 +21,6 @@ public class User {
     @Id
     private ObjectId id;
 
-    @NotNull
-    private String userpass;
-
-    @NotNull
-    private String username;
-
-    @NotNull
-    private String email;
-
-    @NotNull
-    private String salt;
-
-    @NotNull
-    private Date registered;
-
-    private String picture;
-    private String pictureLarge;
-
     @Reference(value = "user_gametips", lazy = true)
     private List<GameTip> gameTips;
 
@@ -55,14 +35,23 @@ public class User {
 
     @Reference(value = "user_resultstatistics", lazy = true)
     private List<ResultStatistic> resultStatistic;
+    
+    private String userpass;
+    private String username;
+    private String email;
+    private String salt;
+    private String picture;
+    private String pictureLarge;
+    
+    private Date registered;
 
-    private Date lastLogin;
     private boolean reminder;
     private boolean admin;
     private boolean active;
     private boolean notification;
     private boolean sendStandings;
     private boolean sendGameTips;
+    
     private int tipPoints;
     private int extraPoints;
     private int points;
@@ -167,14 +156,6 @@ public class User {
 
     public void setActive(final boolean active) {
         this.active = active;
-    }
-
-    public Date getLastLogin() {
-        return this.lastLogin;
-    }
-
-    public void setLastLogin(final Date lastLogin) {
-        this.lastLogin = lastLogin;
     }
 
     public String getUsername() {

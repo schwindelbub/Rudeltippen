@@ -108,7 +108,7 @@ public class CalculationService {
             int correctExtraTips = 0;
             int userTipPoints = 0;
 
-            final List<GameTip> gameTips = dataService.findGameTipByUser(user);
+            final List<GameTip> gameTips = dataService.findGameTipsByUser(user);
             for (final GameTip gameTip : gameTips) {
                 final Game game = gameTip.getGame();
 
@@ -317,7 +317,7 @@ public class CalculationService {
     private void setTeamPlaces() {
         final List<Bracket> brackets = dataService.findAllUpdatableBrackets();
         for (final Bracket bracket : brackets) {
-            final List<Team> teams = dataService.findTeamsByBracket(bracket);
+            final List<Team> teams = dataService.findTeamsByBracketOrdered(bracket);
             int place = 1;
             for (final Team team : teams) {
                 team.setPreviousPlace(team.getPlace());

@@ -1,18 +1,16 @@
 package models;
 
+import java.io.Serializable;
 import java.util.List;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import models.statistic.GameStatistic;
+import models.statistic.GameTipStatistic;
+import models.statistic.UserStatistic;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
-
-import models.statistic.GameStatistic;
-import models.statistic.GameTipStatistic;
-import models.statistic.UserStatistic;
 
 /**
  * 
@@ -20,7 +18,9 @@ import models.statistic.UserStatistic;
  *
  */
 @Entity(value = "playdays", noClassnameStored = true)
-public class Playday {
+public class Playday implements Serializable {
+    private static final long serialVersionUID = -7329808092314093714L;
+
     @Id
     private ObjectId id;
 
@@ -36,10 +36,8 @@ public class Playday {
     @Reference(value = "playday_gamestatistic", lazy = true)
     private List<GameStatistic> gameStatistic;
 
-    @NotNull
     private String name;
 
-    @Min(value = 1)
     private int number;
 
     private boolean playoff;
@@ -85,24 +83,6 @@ public class Playday {
         this.playoff = playoff;
     }
 
-    public boolean isTippable() {
-        for (final Game game : this.games){
-            if (game.isTippable()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean allGamesEnded() {
-        for (final Game game : this.games) {
-            if (!game.isEnded()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public List<UserStatistic> getUserStatistics() {
         return userStatistics;
     }
@@ -125,5 +105,25 @@ public class Playday {
 
     public void setGameStatistic(List<GameStatistic> gameStatistic) {
         this.gameStatistic = gameStatistic;
+    }
+
+    //TODO Refactoring
+    public boolean isTippable() {
+        for (final Game game : this.games){
+            if (game.isTippable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //TODO Refactoring
+    public boolean allGamesEnded() {
+        for (final Game game : this.games) {
+            if (!game.isEnded()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

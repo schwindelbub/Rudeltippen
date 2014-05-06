@@ -35,7 +35,7 @@ public class StatisticService {
         //ResultStatistic.delete("user = ?", user);
 
         final Settings settings = dataService.findSettings();
-        final List<GameTip> gameTips = dataService.findGameTipByUser(user);
+        final List<GameTip> gameTips = dataService.findGameTipsByUser(user);
         for (final GameTip gameTip : gameTips) {
             final Game game = gameTip.getGame();
             if ((game != null) && game.isEnded()) {

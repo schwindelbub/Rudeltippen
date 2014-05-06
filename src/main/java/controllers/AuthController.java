@@ -70,7 +70,7 @@ public class AuthController {
             flashScope.put("warningmessage", i18nService.get("controller.users.invalidtoken"));
             return Results.redirect("/auth/login");
         }
-
+        
         return Results.html().render(token);
     }
 

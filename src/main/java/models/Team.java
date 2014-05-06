@@ -1,9 +1,5 @@
 package models;
 
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -19,21 +15,12 @@ public class Team {
     @Id
     private ObjectId id;
 
-    @NotNull
-    private String name;
-
     @Reference
     private Bracket bracket;
 
-    @Reference(value = "team_homegames", lazy = true)
-    private List<Game> homeGames;
-
-    @Reference(value = "team_awaygames", lazy = true)
-    private List<Game> awayGames;
-
-    @NotNull
     private String flag;
-
+    private String name;
+    
     private int points;
     private int goalsFor;
     private int goalsAgainst;
@@ -59,22 +46,6 @@ public class Team {
 
     public void setBracket(final Bracket bracket) {
         this.bracket = bracket;
-    }
-
-    public List<Game> getHomeGames() {
-        return this.homeGames;
-    }
-
-    public void setHomeGames(final List<Game> homeGames) {
-        this.homeGames = homeGames;
-    }
-
-    public List<Game> getAwayGames() {
-        return this.awayGames;
-    }
-
-    public void setAwayGames(final List<Game> awayGames) {
-        this.awayGames = awayGames;
     }
 
     public String getFlag() {
