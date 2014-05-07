@@ -1,23 +1,15 @@
 package utils;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
-import models.AbstractJob;
 import models.Bracket;
-import models.Extra;
-import models.ExtraTip;
 import models.Game;
 import models.GameTip;
-import models.Pagination;
-import models.Playday;
 import models.Team;
 import models.User;
+import services.I18nService;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 /**
@@ -27,6 +19,9 @@ import com.google.inject.Singleton;
  */
 @Singleton
 public class ViewUtils {
+    
+    @Inject
+    private I18nService i18nService;
     
 //        public static String difference (final Date date) {
 //            final int MIN = 60;
@@ -87,13 +82,13 @@ public class ViewUtils {
 //            return df.format(date);
 //        }
 //    
-//        public static String homeReferenceName (final Game game) {
-//            return getReference(game.getHomeReference());
-//        }
-//    
-//        public static String awayReferenceName (final Game game) {
-//            return getReference(game.getAwayReference());
-//        }
+        public String homeReferenceName (final Game game) {
+            return getReference(game.getHomeReference());
+        }
+    
+        public String awayReferenceName (final Game game) {
+            return getReference(game.getAwayReference());
+        }
 //    
 //        public static String getGameTipAndPoints(final Game game) {
 //            String tip = "-";
@@ -158,93 +153,95 @@ public class ViewUtils {
 //            return points;
 //        }
 //    
-//        public static String getTrend(final Game game) {
-//            String trend = Messages.get("model.game.notenoughtipps");
-//            final List<GameTip> gameTips = game.getGameTips();
-//            if ((gameTips != null) && (gameTips.size() >= 4)) {
-//                int tipsHome = 0;
-//                int tipsDraw = 0;
-//                int tipsAway = 0;
-//    
-//                for (final GameTip gameTip : gameTips) {
-//                    final int homeScore = gameTip.getHomeScore();
-//                    final int awayScore = gameTip.getAwayScore();
-//    
-//                    if (homeScore == awayScore) {
-//                        tipsDraw++;
-//                    } else if (homeScore > awayScore) {
-//                        tipsHome++;
-//                    } else if (homeScore < awayScore) {
-//                        tipsAway++;
-//                    }
-//                }
-//    
-//                trend = tipsHome + " / " + tipsDraw + " / " + tipsAway;
-//            }
-//    
-//            return trend;
-//        }
-//    
-//        private static String getReference(final String reference) {
-//            final String [] references = reference.split("-");
-//            String message = "";
-//            if (("G").equals(references[0])) {
-//                if ("W".equals(references[2])) {
-//                    message = Messages.get("model.game.winnergame") + " " + references[1];
-//                } else if (("L").equals(references[2])) {
-//                    message = Messages.get("model.game.losergame") + " " + references[1];
-//                }
-//            } else if (("B").equals(references[0])) {
-//                final Bracket bracket = Bracket.find("byNumber", Integer.parseInt(references[1])).first();
-//                final String groupName = bracket.getName();
-//                final String placeName = getPlaceName(Integer.parseInt(references[2]));
-//    
-//                message = placeName + " " + Messages.get(groupName);
-//            }
-//    
-//            return message;
-//        }
-//    
-//        public static String getPlaceName(final int place) {
-//            String message = "";
-//    
-//            if (place == 1) {
-//                message = Messages.get("helper.first");
-//            } else if (place == 2){
-//                message = Messages.get("helper.second");
-//            } else if (place == 3){
-//                message = Messages.get("helper.third");
-//            } else if (place == 4){
-//                message = Messages.get("helper.fourth");
-//            } else if (place == 5){
-//                message = Messages.get("helper.fifth");
-//            } else if (place == 6){
-//                message = Messages.get("helper.six");
-//            } else if (place == 7){
-//                message = Messages.get("helper.seventh");
-//            } else if (place == 8){
-//                message = Messages.get("helper.eight");
-//            } else if (place == 9){
-//                message = Messages.get("helper.ninth");
-//            } else if (place == 10){
-//                message = Messages.get("helper.tenth");
-//            }
-//    
-//            return message;
-//        }
-//    
-//        public static String getResult(final Game game) {
-//            String result = "-";
-//            if (game.isEnded()) {
-//                if (game.isOvertime()) {
-//                    result = game.getHomeScoreOT() + " : " + game.getAwayScoreOT() + " (" + Messages.get(game.getOvertimeType()) + ")";
-//                } else {
-//                    result = game.getHomeScore() + " : " + game.getAwayScore();
-//                }
-//            }
-//    
-//            return result;
-//        }
+        public String getTrend(final Game game) {
+            String trend = i18nService.get("model.game.notenoughtipps");
+            final List<GameTip> gameTips = game.getGameTips();
+            if ((gameTips != null) && (gameTips.size() >= 4)) {
+                int tipsHome = 0;
+                int tipsDraw = 0;
+                int tipsAway = 0;
+    
+                for (final GameTip gameTip : gameTips) {
+                    final int homeScore = gameTip.getHomeScore();
+                    final int awayScore = gameTip.getAwayScore();
+    
+                    if (homeScore == awayScore) {
+                        tipsDraw++;
+                    } else if (homeScore > awayScore) {
+                        tipsHome++;
+                    } else if (homeScore < awayScore) {
+                        tipsAway++;
+                    }
+                }
+    
+                trend = tipsHome + " / " + tipsDraw + " / " + tipsAway;
+            }
+    
+            return trend;
+        }
+
+        private String getReference(final String reference) {
+            final String [] references = reference.split("-");
+            String message = "";
+            if (("G").equals(references[0])) {
+                if ("W".equals(references[2])) {
+                    message = i18nService.get("model.game.winnergame") + " " + references[1];
+                } else if (("L").equals(references[2])) {
+                    message = i18nService.get("model.game.losergame") + " " + references[1];
+                }
+            } else if (("B").equals(references[0])) {
+                //TODO Refactoring
+                final Bracket bracket = null;//Bracket.find("byNumber", Integer.parseInt(references[1])).first();
+                final String groupName = "";//bracket.getName();
+                final String placeName = getPlaceName(Integer.parseInt(references[2]));
+    
+                message = placeName + " " + i18nService.get(groupName);
+            }
+    
+            return message;
+        }
+
+        public String getPlaceName(final int place) {
+            String message = "";
+    
+            if (place == 1) {
+                message = i18nService.get("helper.first");
+            } else if (place == 2){
+                message = i18nService.get("helper.second");
+            } else if (place == 3){
+                message = i18nService.get("helper.third");
+            } else if (place == 4){
+                message = i18nService.get("helper.fourth");
+            } else if (place == 5){
+                message = i18nService.get("helper.fifth");
+            } else if (place == 6){
+                message = i18nService.get("helper.six");
+            } else if (place == 7){
+                message = i18nService.get("helper.seventh");
+            } else if (place == 8){
+                message = i18nService.get("helper.eight");
+            } else if (place == 9){
+                message = i18nService.get("helper.ninth");
+            } else if (place == 10){
+                message = i18nService.get("helper.tenth");
+            }
+    
+            return message;
+        }
+
+        public String getResult(final Game game) {
+            String result = "-";
+            if (game.isEnded()) {
+                if (game.isOvertime()) {
+                    //TODO Refactoring
+                    result = game.getHomeScoreOT() + " : " + game.getAwayScoreOT() + " (OVERTIME Translation)";
+                } else {
+                    result = game.getHomeScore() + " : " + game.getAwayScore();
+                }
+            }
+    
+            return result;
+        }
 //    
 //        public static String getGameTipAndPoints(final GameTip gameTip) {
 //            String tip = "-";
@@ -321,7 +318,7 @@ public class ViewUtils {
 //            return StringEscapeUtils.unescapeHtml(html);
 //        }
 //    
-        public static String getPlaceTrend(final User user) {
+        public String getPlaceTrend(final User user) {
             final int currentPlace = user.getPlace();
             final int previousPlace = user.getPreviousPlace();
             String trend = "";
@@ -339,7 +336,7 @@ public class ViewUtils {
             return trend;
         }
     
-        public static String getPlaceTrend(final Team team) {
+        public String getPlaceTrend(final Team team) {
             final int currentPlace = team.getPlace();
             final int previousPlace = team.getPreviousPlace();
             String trend = "";
@@ -357,7 +354,7 @@ public class ViewUtils {
             return trend;
         }
     
-        public static String getScore(final Game game) {
+        public String getScore(final Game game) {
             String score = "- : -";
             if (game.isEnded()) {
                 if (game.isOvertime()) {

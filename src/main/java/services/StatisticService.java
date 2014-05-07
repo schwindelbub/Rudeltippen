@@ -89,7 +89,7 @@ public class StatisticService {
     }
 
     public void setGameTipStatistics(final Playday playday) {
-        GameTipStatistic gameTipStatistic = dataService.findGameTipStatisticByPlayday();
+        GameTipStatistic gameTipStatistic = dataService.findGameTipStatisticByPlayday(playday);
         if (gameTipStatistic == null) {
             gameTipStatistic = new GameTipStatistic();
             gameTipStatistic.setPlayday(playday);

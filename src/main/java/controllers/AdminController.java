@@ -15,9 +15,12 @@ import models.Pagination;
 import models.Playday;
 import models.Settings;
 import models.User;
+import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
+import ninja.params.PathParam;
+import ninja.session.FlashScope;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -25,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import services.CalculationService;
 import services.DataService;
+import services.I18nService;
 import services.MailService;
 import utils.AppUtils;
 
@@ -52,7 +56,10 @@ public class AdminController extends RootController {
     @Inject
     private MailService mailService;
 
-    public Result results(final long number) {
+    @Inject
+    private I18nService i18nService;
+    
+    public Result results(@PathParam("number") long number) {
         final Pagination pagination = AppUtils.getPagination(number, "/admin/results/", dataService.findAllPlaydaysOrderByNumber().size());
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
 
@@ -61,10 +68,10 @@ public class AdminController extends RootController {
 
     public Result users() {
         final List<User> users = dataService.findUsersOrderByUsername();
-        return Results.html().render(users);
+        return Results.html().render("users", users);
     }
 
-    public Result storeresults() {
+    public Result storeresults(Context context, FlashScope flashScope) {
         //TODO Refactoring
         final Map<String, String> map = null;//params.allSimple();
         final Set<String> keys = new HashSet<String>();
@@ -93,10 +100,7 @@ public class AdminController extends RootController {
         }
 
         calculationService.calculations();
-
-        //TODO Refactoring
-        //flash.put("infomessage", Messages.get("controller.games.tippsstored"));
-        //flash.keep();
+        flashScope.put("warning", i18nService.get("controller.games.tippsstored"));
 
         int playday = 1;
         if ((keys != null) && (keys.size() >= 1)) {
@@ -112,7 +116,7 @@ public class AdminController extends RootController {
         return Results.redirect("/admin/results/" + playday);
     }
 
-    public Result updatesettings (final String name, final int pointsTip, final int pointsTipDiff, final int pointsTipTrend, final int minutesBeforeTip, final boolean countFinalResult, final boolean informOnNewTipper, final boolean enableRegistration, final String trackingcode) {
+    public Result updatesettings (FlashScope flashScope, final String name, final int pointsTip, final int pointsTipDiff, final int pointsTipTrend, final int minutesBeforeTip, final boolean countFinalResult, final boolean informOnNewTipper, final boolean enableRegistration, final String trackingcode) {
         //        validation.range(pointsTip, 0, 99);
         //        validation.range(pointsTipDiff, 0, 99);
         //        validation.range(pointsTipTrend, 0, 99);
@@ -130,11 +134,8 @@ public class AdminController extends RootController {
             settings.setEnableRegistration(enableRegistration);
             dataService.save(settings);
 
-            //flash.put("infomessage", Messages.get("setup.saved"));
-            //flash.keep();
+            flashScope.success(i18nService.get("setup.saved"));
         }
-        //params.flash();
-        //validation.keep();
 
         return Results.redirect("/settings");
     }
@@ -156,7 +157,7 @@ public class AdminController extends RootController {
     }
 
     //TODO Refactoring
-    public Result changeactive(final long userid) {
+    public Result changeactive(@PathParam("userid") long userid) {
         final User connectedUser = null;//AppUtils.getConnectedUser();
         final User user = dataService.findUserById(userid);
 
@@ -187,12 +188,11 @@ public class AdminController extends RootController {
             //flash.put("errormessage", Messages.get("error.loading.user"));
         }
 
-        //flash.keep();
         return Results.redirect("/admin/users");
     }
 
     //TODO Refactoring
-    public Result changeadmin(final long userid) {
+    public Result changeadmin(@PathParam("userid") long userid, FlashScope flashScope) {
         final User connectedUser = null;//AppUtils.getConnectedUser();
         final User user = dataService.findUserById(userid);
 
@@ -216,14 +216,13 @@ public class AdminController extends RootController {
                 //flash.put("warningmessage", Messages.get("warning.change.admin"));
             }
         } else {
-            //flash.put("errormessage", Messages.get("error.loading.user"));
+            flashScope.error(i18nService.get("error.loading.user"));
         }
 
-        //flash.keep();
         return Results.redirect("/admin/users");
     }
 
-    public Result deleteuser(final long userid) {
+    public Result deleteuser(@PathParam("userid") long userid, FlashScope flashScope) {
         final User connectedUser = null;//AppUtils.getConnectedUser();
         final User user = dataService.findUserById(userid);
 
@@ -239,10 +238,8 @@ public class AdminController extends RootController {
                 //flash.put("warningmessage", Messages.get("warning.delete.user"));
             }
         } else {
-            //flash.put("errormessage", Messages.get("error.loading.user"));
+            flashScope.error(i18nService.get("error.loading.user"));
         }
-
-        //flash.keep();
 
         return Results.redirect("/admin/users");
     }
@@ -276,10 +273,10 @@ public class AdminController extends RootController {
         List<Bracket> brackets = dataService.findAllBrackets();
         List<Game> games = dataService.findAllGames();
 
-        return Results.html().render(brackets).render(games);
+        return Results.html().render("brackets", brackets).render("games", games);
     }
 
-    public Result send(final String subject, final String message) {
+    public Result send(final String subject, final String message, FlashScope flashScope) {
         //        validation.required(subject);
         //        validation.required(message);
 
@@ -295,10 +292,8 @@ public class AdminController extends RootController {
             //flash.put("infomessage", Messages.get("info.rudelmail.send"));
         } else {
             //flash.put("errormessage", Messages.get("error.rudelmail.send"));
-            //params.flash();
-            //validation.keep();
+            flashScope.error(i18nService.get("error.rudelmail.send"));
         }
-        //flash.keep();
 
         return Results.redirect("/rudelmail");
     }

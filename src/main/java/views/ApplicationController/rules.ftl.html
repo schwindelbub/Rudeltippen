@@ -20,20 +20,19 @@
 					</tr>
 					<tr>
 						<td><b>${i18n('rules.bet.minutes')}</b></td>
-						<td>${i18n('rules.bet.minutes.value', settings.minutesBeforeTip}</td>
+						<td>i18n('rules.bet.minutes.value', settings.minutesBeforeTip</td>
 					</tr>
 					<tr>
 						<td><b>${i18n('rules.points.playoffs')}</b></td>
-						#{if settings.countFinalResult}
+						<#if settings.countFinalResult>
 							<td>${i18n('setup.finalresult')}</td>
-						#{/if}
-						#{else}
+						<#else>
 							<td>${i18n('setup.ninetyminutes')}
 								<ul>
 			                        <li>${i18n('rules.nintyminutesinfo')}</li>
 			                    </ul>
 							</td>
-						#{/else}
+						</#if>
 					</tr>
 			        <tr>
 			            <td><b>${i18n('rules.points.standings.header')}</b></td>

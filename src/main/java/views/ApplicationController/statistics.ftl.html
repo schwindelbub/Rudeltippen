@@ -1,4 +1,5 @@
-#{extends 'main.html' /}
+<#import "../layout/main.ftl.html" as layout> 
+<@layout.main>
 <div class="row">
 	<div class="col-md-12">
 		<legend>Statistik</legend>
@@ -15,7 +16,7 @@
 	                <th>&{'app.points.total'}</th>
 	                <th>&{'app.points.player'}</th>
 	            </thead>
-	            #{list items:gameTipStatistics, as:'gameTipStatistic'}
+	            <#list gameTipStatistics as gameTipStatistic>
 	            <tr>
 	                <td>${gameTipStatistic.playday.number}</td>
 	                <td>${gameTipStatistic.correctTips}</td>
@@ -24,7 +25,7 @@
 	                <td>${gameTipStatistic.points}</td>
 	                <td>${gameTipStatistic.avgPoints}</td>
 	            </tr>
-	            #{/list}
+	            </#list>
 	        </table>
 	        </div>
 		  </div>
@@ -42,13 +43,13 @@
 		                <th>&{'app.statistics.number'}</th>
 		                <th>&{'app.statistics.result'}</th>
 		            </thead>
-		            #{list items:results, as:'result'}
+		            <#list results as result>
 		                <tr>
-		                #{list items:result, as:'r'}
+		                <#list result as r>
 		                    <td>${r}</td>
-		                #{/list}
+		                </#list>
 		                </tr>
-		            #{/list}
+		            </#list>
 		        </table>
 	        </div>
 		  </div>
@@ -64,16 +65,17 @@
 		                <th>&{'app.statistics.number'}</th>
 		                <th>&{'app.statistics.result'}</th>
 		            </thead>
-		            #{list items:games, as:'game'}
+		            <#list games as game>
 		                <tr>
-		                #{list items:game, as:'g'}
+		                <#list game as g>
 		                    <td>${g}</td>
-		                #{/list}
+		                </#list>
 		                </tr>
-		            #{/list}
+		            </#list>
 		        </table>
 	        </div>
 		  </div>
 		</div>
 	</div>	
 </div>
+</@layout.main>

@@ -88,7 +88,6 @@ public class TipController extends RootController {
         } else {
             //flash.put("warningmessage", Messages.get("controller.tipps.novalidtipps"));
         }
-        //flash.keep();
 
         return Results.redirect("/tips/playday/" + playday);
     }
@@ -122,7 +121,6 @@ public class TipController extends RootController {
                     final Team team = dataService.findTeamById(teamId);
                     dataService.placeExtraTip(extra, team);
                     //flash.put("infomessage", Messages.get("controller.tipps.bonussaved"));
-                    //flash.keep();
                 }
             }
         }
@@ -132,7 +130,6 @@ public class TipController extends RootController {
 
     public Result standings() {
         final List<User> users = dataService.findAllActiveUsersOrderedByPlace();
-
-        return Results.html().render(users);
+        return Results.html().render("users", users);
     }
 }

@@ -10,9 +10,7 @@ import java.util.UUID;
 
 import models.Confirmation;
 import models.ConfirmationType;
-import models.Extra;
 import models.ExtraTip;
-import models.Game;
 import models.GameTip;
 import models.Settings;
 import models.User;
@@ -26,7 +24,6 @@ import ninja.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import services.AuthService;
 import services.DataService;
 import services.MailService;
 
@@ -138,7 +135,6 @@ public class UserController extends RootController {
             session.put("username", username);
         }
         //TODO Refactoring
-        //flash.keep();
 
         return Results.redirect("/users/profile");
     }
@@ -170,8 +166,6 @@ public class UserController extends RootController {
                 //flash.put("infomessage", Messages.get("confirm.message"));
             }
         }
-        //TODO Refactoring
-        //flash.keep();
 
         return Results.redirect("/users/profile");
     }
@@ -203,7 +197,6 @@ public class UserController extends RootController {
                 LOG.info("Password updated: " + user.getEmail());
             }
         }
-        //flash.keep();
 
         return Results.redirect("/users/profile");
     }
@@ -255,7 +248,6 @@ public class UserController extends RootController {
             LOG.info("Picture updated: " + user.getEmail());
         }
 
-        //flash.keep();
         return Results.redirect("/users/profile#picture");
     }
 
@@ -267,7 +259,6 @@ public class UserController extends RootController {
         dataService.save(user);
 
         //flash.put("infomessage", Messages.get("controller.profile.deletedpicture"));
-        //flash.keep();
 
         return Results.redirect("/users/profile#picture");
     }

@@ -1,0 +1,71 @@
+<#import "../layout/main.ftl.html" as layout> 
+<@layout.main>
+<div class="row">
+	<div class="col-md-12">
+		<legend>${i18n(playday.name)}</legend>
+	</div>
+</div>
+<div class="row" style="text-align:right; padding-right: 5px;">
+	<div class="col-md-12">
+		<#include "../Tags/pagination.ftl.html">
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="table-responsive">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<#list playday.games as game>
+						<th>
+							<div align="center">
+								<#if (game.homeTeam)?? && (game.awayTeam)??>
+									<img alt="&{game.homeTeam?.name}" title="&{game.homeTeam.name}" rel="tooltip" src="/assets/img/flags${game.homeTeam.flag}"> <br/> ${ViewUtils.getResult(game)} <br/> <img alt="&{game.awayTeam?.name}" rel="tooltip" title="&{game.awayTeam?.name}" src="/public/img/flags/${game.awayTeam.flag}">
+								<#else>
+									${game.homeReferenceName()} - ${game.awayReferenceName()}
+								</#if>
+							</div>
+						</th>
+						</#list>
+						<th></th>
+					</tr>
+					<tr>
+						<th>${i18n('tendence')}</th>
+						<th></th>
+						<#list playday.games as game>
+						<th>
+							<div align="center">
+								${ViewUtils.getTrend(game)}
+							</div>
+						</th>
+						</#list>
+						<th></th>
+					</tr>		
+				</thead>
+				<tbody>
+					<#list tips as userTips>
+					<tr>
+						<#list userTips.entrySet() as user>
+							<#if user.key.picture == null>
+								<td style="width: 60px;"><a href="@{users.show()}/${user.key.username}"><img src="/public/img/user_placeholder.gif" width="54" height="54" /></a></td>
+							<#else>
+								<td style="width: 60px;"><a href="@{users.show()}/${user.key.username}"><img src="${user.key.picture}" /></a></td>
+							</#if>
+								<td style="vertical-align: top;"><b><a href="@{users.show()}/${user.key.username}">${user.key.username}</a></b><br /><small>&{'place'} ${user.key.place}, ${user.key.points} &{'points'}</small></td>
+							points = 0
+							<#list user.value as gameTip>
+								<td style="vertical-align: middle;"><div align="center">${gameTip.getGameTipAndPoints()}</div></td>
+								points = points + gameTip.points
+							</#list>
+							<td style="vertical-align: middle;"><div align="center">out.print(points);</div></td>
+						</#list>
+					</tr>
+					</#list>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+</@layout.main>

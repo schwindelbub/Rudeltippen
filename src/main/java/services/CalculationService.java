@@ -36,15 +36,6 @@ public class CalculationService {
     @Inject
     private NotificationService notificationService;
 
-    /**
-     * All calculations are called from this method
-     * - Calculation of brackets
-     * - Calculation of team places
-     * - Calculation of user points
-     * - Calculation of user places
-     * - Calculation of playoff teams
-     * - Calculation of current playdays
-     */
     public void calculations() {
         calculateBrackets();
         setTeamPlaces();
@@ -54,9 +45,6 @@ public class CalculationService {
         calculateStatistics();
     }
 
-    /**
-     * Calculates the statistics for all playdays
-     */
     private void calculateStatistics() {
         final List<Playday> playdays = dataService.findAllPlaydaysOrderByNumber();
         final List<User> users = dataService.findAllActiveUsers();
@@ -81,9 +69,6 @@ public class CalculationService {
         }
     }
 
-    /**
-     * Calculation the points for each user based on game and extra tips
-     */
     private void calculateUserPoints() {
         final Settings settings = dataService.findSettings();
 
@@ -163,9 +148,6 @@ public class CalculationService {
         }
     }
 
-    /**
-     * Calculates the points, goals, etc. for each bracket
-     */
     private void calculateBrackets() {
         final Settings settings = dataService.findSettings();
         final int pointsWin = settings.getPointsGameWin();
@@ -235,9 +217,6 @@ public class CalculationService {
         }
     }
 
-    /**
-     * Sets the places of the user
-     */
     private void setUserPlaces() {
         int place = 1;
         final List<User> users = dataService.findAllActiveUsersOrdered();
@@ -249,9 +228,6 @@ public class CalculationService {
         }
     }
 
-    /**
-     * Sets the current playday based on all games played on a playday
-     */
     private boolean setCurrentPlayday() {
         boolean changed = false;
         final Playday currentPlayday = dataService.findCurrentPlayday();
@@ -275,9 +251,6 @@ public class CalculationService {
         return changed;
     }
 
-    /**
-     * Sets the teams to the playoff games
-     */
     public void setPlayoffTeams() {
         final Settings settings = dataService.findSettings();
         if (settings.isPlayoffs()) {
@@ -311,9 +284,6 @@ public class CalculationService {
         }
     }
 
-    /**
-     * Sets the places of the teams in all brackets
-     */
     private void setTeamPlaces() {
         final List<Bracket> brackets = dataService.findAllUpdatableBrackets();
         for (final Bracket bracket : brackets) {
@@ -328,16 +298,6 @@ public class CalculationService {
         }
     }
 
-    /**
-     * Sets the score of a game
-     *
-     * @param gameId The game id
-     * @param homeScore The score of the home team
-     * @param awayScore The score of the away team
-     * @param extratime The type of extratime if the game has extratime
-     * @param homeScoreExtratime The score of the home time in extratime
-     * @param awayScoreExtratime The score of the away time in extratime
-     */
     public void setGameScore(final String gameId, final String homeScore, final String awayScore, final String extratime, final String homeScoreExtratime, final String awayScoreExtratime) {
         if (ValidationUtils.isValidScore(homeScore, awayScore)) {
             final Game game = dataService.findGameById(Long.parseLong(gameId));

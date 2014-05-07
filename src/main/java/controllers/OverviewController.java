@@ -11,6 +11,7 @@ import models.Playday;
 import models.User;
 import ninja.Result;
 import ninja.Results;
+import ninja.params.PathParam;
 import services.DataService;
 import utils.AppUtils;
 
@@ -28,7 +29,7 @@ public class OverviewController extends RootController {
     @Inject
     private DataService dataService;
 
-    public Result playday(final long number) {
+    public Result playday(@PathParam("number") long number) {
         final Pagination pagination = AppUtils.getPagination(number, "/overview/playday/", dataService.findAllPlaydaysOrderByNumber().size());
 
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
@@ -36,7 +37,11 @@ public class OverviewController extends RootController {
         final List<Map<User, List<GameTip>>> tips = dataService.getPlaydayTips(playday, users);
         final long usersCount = dataService.countAllUsers();
 
-        return Results.html().render(tips).render(playday).render(pagination).render(usersCount);
+        return Results.html()
+                .render("tips", tips)
+                .render("playday", playday)
+                .render("pagination", pagination)
+                .render("usersCount", usersCount);
     }
 
     public Result extras() {
@@ -44,14 +49,8 @@ public class OverviewController extends RootController {
         final List<Extra> extras = dataService.findAllExtras();
         final List<Map<User, List<ExtraTip>>> tips = dataService.getExtraTips(users, extras);
 
-        return Results.html().render(tips).render(extras);
-    }
-
-    public Result lazy(final int number, final int start) {
-        final Playday playday = dataService.findPlaydaybByNumber(number);
-        final List<User> users = dataService.findActiveUsers(15);
-        final List<Map<User, List<GameTip>>> tips = dataService.getPlaydayTips(playday, users);
-
-        return Results.html().render(tips);
+        return Results.html()
+                .render("tips", tips)
+                .render("extras", extras);
     }
 }

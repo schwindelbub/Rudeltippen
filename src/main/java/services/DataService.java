@@ -1,6 +1,8 @@
 package services;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -130,15 +132,11 @@ public class DataService {
     }
 
     public GameTip findGameTipByGameAndUser(User user, Game game) {
-        //TODO Refactoring
-        // GameTip.find("byGameAndUser", game, user).first();
-        return null;
+        return this.datastore.find(GameTip.class).field("game").equal(game).field("user").equal(user).get();
     }
 
     public ExtraTip findExtraTipByExtraAndUser(Extra extra, User user) {
-        //TODO Refactoring
-        // ExtraTip.find("byExtraAndUser", extra, user).first();
-        return null;
+        return this.datastore.find(ExtraTip.class).field("extra").equal(extra).field("user").equal(user).get();
     }
 
     public List<User> findAllAdmins() {
@@ -166,51 +164,35 @@ public class DataService {
     }
 
     public ResultStatistic findResultStatisticByUserAndResult(User user, String score) {
-        //TODO Refactoring
-        //ResultStatistic.find("byUserAndResult", user, score).first();
-        return null;
+        return this.datastore.find(ResultStatistic.class).field("user").equal(user).field("score").equal(score).get();
     }
 
     public GameStatistic findGameStatisticByPlaydayAndResult(Playday playday, Object key) {
-        //TODO Refactoring
-        //GameStatistic.find("byPlaydayAndGameResult", playday, entry.getKey()).first();
-        return null;
+        return this.datastore.find(GameStatistic.class).field("pladay").equal(playday).field("gameResult").equal((String) key).get();
     }
 
-    public GameTipStatistic findGameTipStatisticByPlayday() {
-        //TODO Refactoring
-        // GameTipStatistic.find("byPlayday", playday).first();
-        return null;
+    public GameTipStatistic findGameTipStatisticByPlayday(Playday playday) {
+        return this.datastore.find(GameTipStatistic.class).field("playday").equal(playday).get();
     }
 
     public UserStatistic findUserStatisticByPlaydayAndUser(Playday playday, User user) {
-        //TODO Refactoring
-        // UserStatistic.find("byPlaydayAndUser", playday, user).first();
-        return null;
+        return this.datastore.find(UserStatistic.class).field("playday").equal(playday).field("user").equal(user).get();
     }
 
     public List<UserStatistic> findUserStatisticByPlaydayOrderByPlaydayPoints(Playday playday) {
-        //TODO Refactoring
-        // UserStatistic.find("SELECT u FROM UserStatistic u WHERE playday = ? ORDER BY playdayPoints DESC", playday).fetch();
-        return null;
+        return this.datastore.find(UserStatistic.class).field("playday").equal(playday).order("playdayPoints").asList();
     }
 
     public List<UserStatistic> findUserStatisticByPlaydayOrderByPoints(Playday playday) {
-        //TODO Refactoring
-        //  UserStatistic.find("SELECT u FROM UserStatistic u WHERE playday = ? ORDER BY points DESC", playday).fetch();
-        return null;
+        return this.datastore.find(UserStatistic.class).field("playday").equal(playday).order("points").asList();
     }
 
     public List<GameTip> findGameTipByGame(Game game) {
-        //TODO Refactoring
-        // GameTip.find("byGame", game).fetch();
-        return null;
+        return this.datastore.find(GameTip.class).field("game").equal(game).asList();
     }
 
     public PlaydayStatistic findPlaydayStatisticByPlaydayAndResult(Playday playday, Object key) {
-        //TODO Refactoring
-        // PlaydayStatistic.find("byPlaydayAndGameResult", playday, entry.getKey()).first();
-        return null;
+        return this.datastore.find(PlaydayStatistic.class).field("pladay").equal(playday).field("gameResult").equal((String) key).get();
     }
 
     public User findUserByEmail(String email) {
@@ -407,46 +389,42 @@ public class DataService {
     }
 
     public List<Map<User, List<GameTip>>> getPlaydayTips(final Playday playday, final List<User> users) {
-        //TODO Refactoring
-        //        final List<Map<User, List<GameTip>>> tips = new ArrayList<Map<User, List<GameTip>>>();
-        //
-        //        for (final User user : users) {
-        //            final Map<User, List<GameTip>> userTips = new HashMap<User, List<GameTip>>();
-        //            final List<GameTip> gameTips = new ArrayList<GameTip>();
-        //            for (final Game game : playday.getGames()) {
-        //                GameTip gameTip = GameTip.find("byGameAndUser", game, user).first();
-        //                if (gameTip == null) {
-        //                    gameTip = new GameTip();
-        //                }
-        //                gameTips.add(gameTip);
-        //            }
-        //            userTips.put(user,  gameTips);
-        //            tips.add(userTips);
-        //        }
-        //
-        //        return tips;
-        return null;
+        final List<Map<User, List<GameTip>>> tips = new ArrayList<Map<User, List<GameTip>>>();
+
+        for (final User user : users) {
+            final Map<User, List<GameTip>> userTips = new HashMap<User, List<GameTip>>();
+            final List<GameTip> gameTips = new ArrayList<GameTip>();
+            for (final Game game : playday.getGames()) {
+                GameTip gameTip = findGameTipByGameAndUser(user, game);
+                if (gameTip == null) {
+                    gameTip = new GameTip();
+                }
+                gameTips.add(gameTip);
+            }
+            userTips.put(user,  gameTips);
+            tips.add(userTips);
+        }
+
+        return tips;
     }
     public List<Map<User, List<ExtraTip>>> getExtraTips(final List<User> users, final List<Extra> extras) {
-        //TODO Refactoring
-        //        final List<Map<User, List<ExtraTip>>> tips = new ArrayList<Map<User, List<ExtraTip>>>();
-        //
-        //        for (final User user : users) {
-        //            final Map<User, List<ExtraTip>> userTips = new HashMap<User, List<ExtraTip>>();
-        //            final List<ExtraTip> extraTips = new ArrayList<ExtraTip>();
-        //            for (final Extra extra : extras) {
-        //                ExtraTip extraTip = ExtraTip.find("byExtraAndUser", extra, user).first();
-        //                if (extraTip == null) {
-        //                    extraTip = new ExtraTip();
-        //                }
-        //                extraTips.add(extraTip);
-        //            }
-        //            userTips.put(user, extraTips);
-        //            tips.add(userTips);
-        //        }
-        //
-        //        return tips;
-        return null;
+        final List<Map<User, List<ExtraTip>>> tips = new ArrayList<Map<User, List<ExtraTip>>>();
+    
+        for (final User user : users) {
+            final Map<User, List<ExtraTip>> userTips = new HashMap<User, List<ExtraTip>>();
+            final List<ExtraTip> extraTips = new ArrayList<ExtraTip>();
+            for (final Extra extra : extras) {
+                ExtraTip extraTip = findExtraTipByExtraAndUser(extra, user);
+                if (extraTip == null) {
+                    extraTip = new ExtraTip();
+                }
+                extraTips.add(extraTip);
+            }
+            userTips.put(user, extraTips);
+            tips.add(userTips);
+        }
+    
+        return tips;
     }
 
     public Playday findCurrentPlayday () {
@@ -532,13 +510,11 @@ public class DataService {
     }
 
     public List<Game> findGamesByHomeTeam(Team team) {
-        //TODO Refactoring
-        return null;
+        return this.datastore.find(Game.class).field("homeTeam").equal(team).asList();
     }
 
     public List<Game> findGamesByAwayTeam(Team team) {
-        //TODO Refactoring
-        return null;
+        return this.datastore.find(Game.class).field("awayTeam").equal(team).asList();
     }
 
     public List<User> findAllActiveUsersOrdered() {
@@ -627,9 +603,7 @@ public class DataService {
     }
 
     public Confirmation findConfirmationByTypeAndUser(ConfirmationType confirmationType, User user) {
-        // TODO refactoring
-        // Confirmation.find("byConfirmTypeAndUser", , user).first();
-        return null;
+        return this.datastore.find(Confirmation.class).field("confirmationType").equal(confirmationType).field("user").equal(user).get();
     }
 
     public List<Game> findAllGames() {
