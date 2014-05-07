@@ -32,8 +32,8 @@ public class AjaxController extends RootController {
     private DataService dataService;
 
     //TODO Refactoring
-    public Result webserviceid(final long gameid) {
-        Game game = dataService.findGameById(gameid);
+    public Result webserviceid(final String gameId) {
+        Game game = dataService.findGameById(gameId);
         if (game != null) {
             final String webserviceID = null;//params.get("value");
             if (StringUtils.isNotBlank(webserviceID)) {
@@ -47,8 +47,8 @@ public class AjaxController extends RootController {
     }
 
     //TODO Refactoring
-    public Result kickoff(final long gameid) {
-        Game game = dataService.findGameById(gameid);
+    public Result kickoff(final String gameId) {
+        Game game = dataService.findGameById(gameId);
         if (game != null) {
             final String kickoff = null;//params.get("value");
             if (StringUtils.isNotBlank(kickoff)) {
@@ -67,8 +67,8 @@ public class AjaxController extends RootController {
     }
 
     //TODO Refactoring
-    public Result place(final long teamid) {
-        Team team = dataService.findTeamById(teamid);
+    public Result place(final String teamId) {
+        Team team = dataService.findTeamById(teamId);
         if (team != null) {
             final String place = null;//params.get("value");
             if (StringUtils.isNotBlank(place)) {
@@ -85,8 +85,8 @@ public class AjaxController extends RootController {
         return Results.badRequest();
     }
 
-    public Result updateblegame(final long gameid) {
-        Game game = dataService.findGameById(gameid);
+    public Result updateblegame(final String gameId) {
+        Game game = dataService.findGameById(gameId);
         if (game != null) {
             game.setUpdateble(!game.isUpdateble());
             dataService.save(game);
@@ -96,8 +96,8 @@ public class AjaxController extends RootController {
         return Results.badRequest();
     }
 
-    public Result updateblebracket(final long bracketid) {
-        Bracket bracket = dataService.findBracketById(bracketid);
+    public Result updateblebracket(final String bracketId) {
+        Bracket bracket = dataService.findBracketById(bracketId);
         if (bracket != null) {
             bracket.setUpdateble(!bracket.isUpdateble());
             dataService.save(bracket);

@@ -19,13 +19,17 @@ import ninja.Context;
 import ninja.Result;
 import ninja.Results;
 import ninja.params.PathParam;
+import ninja.session.FlashScope;
 import ninja.session.Session;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import services.AuthService;
 import services.DataService;
+import services.I18nService;
 import services.MailService;
+import utils.AppUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -44,6 +48,12 @@ public class UserController extends RootController {
 
     @Inject
     private MailService mailService;
+    
+    @Inject
+    private I18nService i18nService;
+    
+    @Inject
+    private AuthService authService;
 
     public Result show(@PathParam("username") String username) {
         final User user = dataService.findUserByUsername(username);
@@ -110,7 +120,7 @@ public class UserController extends RootController {
         return Results.html().render("users", user).render(settings);
     }
 
-    public Result updateusername(final String username, Session session) {
+    public Result updateusername(final String username, Session session, Context context, FlashScope flashScope) {
         //TODO Refactoring
         //        validation.required(username);
         //        validation.minSize(username, 3);
@@ -124,23 +134,21 @@ public class UserController extends RootController {
             //            validation.keep();
         } else {
             //TODO Refactoring
-            final User user = null;//AppUtils.getConnectedUser();
+            final User user = context.getAttribute("connectedUser", User.class);
             user.setUsername(username);
             dataService.save(user);
 
-            //TODO Refactoring
-            //flash.put("infomessage", Messages.get("controller.profile.updateusername"));
+            flashScope.success(i18nService.get("controller.profile.updateusername"));
             LOG.info("username updated: " + user.getEmail() + " / " + username);
 
             session.put("username", username);
         }
-        //TODO Refactoring
 
         return Results.redirect("/users/profile");
     }
 
     //TODO Refactoring
-    public Result updateemail(final String email, final String emailConfirmation) {
+    public Result updateemail(final String email, final String emailConfirmation, Context context, FlashScope flashScope) {
         //        validation.required(email);
         //        validation.email(email);
         //        validation.equals(email, emailConfirmation);
@@ -152,25 +160,25 @@ public class UserController extends RootController {
             //            validation.keep();
         } else {
             final String token = UUID.randomUUID().toString();
-            final User user = null;//AppUtils.getConnectedUser();
+            final User user = context.getAttribute("connectedUser", User.class);
             if (user != null) {
                 final ConfirmationType confirmationType = ConfirmationType.CHANGEUSERNAME;
                 final Confirmation confirmation = new Confirmation();
                 confirmation.setConfirmType(confirmationType);
-                confirmation.setConfirmValue(null); // TODO Refactoring - was Crypto.encryptAES(email)
+                confirmation.setConfirmValue(authService.encryptAES(email));
                 confirmation.setCreated(new Date());
                 confirmation.setToken(token);
                 confirmation.setUser(user);
                 dataService.save(confirmation);
                 mailService.confirm(user, token, confirmationType);
-                //flash.put("infomessage", Messages.get("confirm.message"));
+                flashScope.success(i18nService.get("confirm.message"));
             }
         }
 
         return Results.redirect("/users/profile");
     }
 
-    public Result updatepassword(final String userpass, final String userpassConfirmation) {
+    public Result updatepassword(final String userpass, final String userpassConfirmation, Context context, FlashScope flashScope) {
         //        validation.required(userpass);
         //        validation.equals(userpass, userpassConfirmation);
         //        validation.minSize(userpass, 6);
@@ -182,18 +190,18 @@ public class UserController extends RootController {
             //            validation.keep();
         } else {
             final String token = UUID.randomUUID().toString();
-            final User user = null;//AppUtils.getConnectedUser();
+            final User user = context.getAttribute("connectedUser", User.class);
             if (user != null) {
                 final ConfirmationType confirmationType = ConfirmationType.CHANGEUSERPASS;
                 final Confirmation confirm = new Confirmation();
                 confirm.setConfirmType(confirmationType);
-                confirm.setConfirmValue(null); //TODO Refactoring - was Crypto.encryptAES(AppUtils.hashPassword(userpass, user.getSalt()))
+                confirm.setConfirmValue(authService.encryptAES(AppUtils.hashPassword(userpass, user.getSalt())));
                 confirm.setCreated(new Date());
                 confirm.setToken(token);
                 confirm.setUser(user);
                 dataService.save(confirm);
                 mailService.confirm(user, token, confirmationType);
-                //flash.put("infomessage", Messages.get("confirm.message"));
+                flashScope.success(i18nService.get("confirm.message"));
                 LOG.info("Password updated: " + user.getEmail());
             }
         }
@@ -201,23 +209,21 @@ public class UserController extends RootController {
         return Results.redirect("/users/profile");
     }
 
-    public Result updatenotifications(final boolean reminder, final boolean notification, final boolean sendstandings, final boolean sendgametips) {
-        final User user = null;//AppUtils.getConnectedUser(); TODO Refactoring
+    public Result updatenotifications(Context context, FlashScope flashScope, final boolean reminder, final boolean notification, final boolean sendstandings, final boolean sendgametips) {
+        final User user = context.getAttribute("conntectedUser", User.class);
         user.setReminder(reminder);
         user.setNotification(notification);
         user.setSendStandings(sendstandings);
         user.setSendGameTips(sendgametips);
         dataService.save(user);
 
-        //TODO Refactoring
-        //flash.put("infomessage", Messages.get("controller.profile.notifications"));
-        //flash.keep();
+        flashScope.success(i18nService.get("controller.profile.notifications"));
         LOG.info("Notifications updated: " + user.getEmail());
 
         return Results.redirect("/users/profile");
     }
 
-    public Result updatepicture(final File picture) {
+    public Result updatepicture(final File picture, FlashScope flashScope) {
         //validation.required(picture);
 
         if (picture != null) {
@@ -244,21 +250,20 @@ public class UserController extends RootController {
             }
 
             dataService.save(user);
-            //flash.put("infomessage", Messages.get("controller.profile.updatepicture"));
+            flashScope.success(i18nService.get("controller.profile.updatepicture"));
             LOG.info("Picture updated: " + user.getEmail());
         }
 
         return Results.redirect("/users/profile#picture");
     }
 
-    //TODO Refactoring
-    public Result deletepicture() {
-        final User user = null;//AppUtils.getConnectedUser();
+    public Result deletepicture(Context context, FlashScope flashScope) {
+        User user = context.getAttribute("connectedUser", User.class);
         user.setPicture(null);
         user.setPictureLarge(null);
         dataService.save(user);
 
-        //flash.put("infomessage", Messages.get("controller.profile.deletedpicture"));
+        flashScope.success(i18nService.get("controller.profile.deletedpicture"));
 
         return Results.redirect("/users/profile#picture");
     }

@@ -96,8 +96,8 @@ public class NotificationService {
                 }
                 count++;
             }
-            //TODO Refactoring
-            //message = i18nService.get("topthree.notification", i18nService.get(playday.getName())) + ": \n" + buffer.toString();
+
+            message = i18nService.get("topthree.notification", new Object[]{i18nService.get(playday.getName())}) + ": \n" + buffer.toString();
 
             users = dataService.findSendableUsers();
             for (final User user : users) {

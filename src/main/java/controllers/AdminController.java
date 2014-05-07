@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import models.AbstractJob;
 import models.Bracket;
 import models.Confirmation;
 import models.ConfirmationType;
@@ -100,13 +101,13 @@ public class AdminController extends RootController {
         }
 
         calculationService.calculations();
-        flashScope.put("warning", i18nService.get("controller.games.tippsstored"));
+        flashScope.put("warning", i18nService.get("controller.games.tippsstored", null));
 
         int playday = 1;
         if ((keys != null) && (keys.size() >= 1)) {
             if (StringUtils.isNotBlank(gamekey)) {
                 gamekey = gamekey.replace("_et", "");
-                final Game game = dataService.findGameById(new Long(gamekey));
+                final Game game = dataService.findGameById(gamekey);
                 if ((game != null) && (game.getPlayday() != null)) {
                     playday = game.getPlayday().getNumber();
                 }
@@ -140,26 +141,25 @@ public class AdminController extends RootController {
         return Results.redirect("/settings");
     }
 
-    public Result settings() {
+    public Result settings(FlashScope flashScope) {
         final Settings settings = dataService.findSettings();
 
-        //TODO Refactoring
-        //        flash.put("name", settings.getGameName());
-        //        flash.put("pointsTip", settings.getPointsTip());
-        //        flash.put("pointsTipDiff", settings.getPointsTipDiff());
-        //        flash.put("pointsTipTrend", settings.getPointsTipTrend());
-        //        flash.put("minutesBeforeTip", settings.getMinutesBeforeTip());
-        //        flash.put("informOnNewTipper", settings.isInformOnNewTipper());
-        //        flash.put("countFinalResult", settings.isCountFinalResult());
-        //        flash.put("enableRegistration", settings.isEnableRegistration());
+        flashScope.put("name", settings.getGameName());
+        flashScope.put("pointsTip", settings.getPointsTip());
+        flashScope.put("pointsTipDiff", settings.getPointsTipDiff());
+        flashScope.put("pointsTipTrend", settings.getPointsTipTrend());
+        flashScope.put("minutesBeforeTip", settings.getMinutesBeforeTip());
+        flashScope.put("informOnNewTipper", settings.isInformOnNewTipper());
+        flashScope.put("countFinalResult", settings.isCountFinalResult());
+        flashScope.put("enableRegistration", settings.isEnableRegistration());
 
         return Results.html().render(settings);
     }
 
     //TODO Refactoring
-    public Result changeactive(@PathParam("userid") long userid) {
-        final User connectedUser = null;//AppUtils.getConnectedUser();
-        final User user = dataService.findUserById(userid);
+    public Result changeactive(@PathParam("userid") String userId, Context context, FlashScope flashScope) {
+        final User connectedUser = context.getAttribute("connectedUser", User.class);
+        final User user = dataService.findUserById(userId);
 
         if (user != null) {
             if (!connectedUser.equals(user)) {
@@ -168,7 +168,7 @@ public class AdminController extends RootController {
                 if (user.isActive()) {
                     user.setActive(false);
                     activate = "deactivated";
-                    message = null;//Messages.get("info.change.deactivate", user.getEmail());
+                    message = i18nService.get("info.change.deactivate");
                 } else {
                     final Confirmation confirmation = dataService.findConfirmationByTypeAndUser(ConfirmationType.ACTIVATION, user);
                     if (confirmation != null) {
@@ -176,44 +176,13 @@ public class AdminController extends RootController {
                     }
                     user.setActive(true);
                     activate = "activated";
-                    message = null;//Messages.get("info.change.activate", user.getEmail());
+                    message = i18nService.get("info.change.activate", new Object[]{user.getEmail()});
                 }
                 dataService.save(user);
-                //flash.put("infomessage", message);
+                flashScope.success(message);
                 LOG.info("User " + user.getEmail() + " has been " + activate + " - by " + connectedUser.getEmail());
             } else {
-                //flash.put("warningmessage", Messages.get("warning.change.active"));
-            }
-        } else {
-            //flash.put("errormessage", Messages.get("error.loading.user"));
-        }
-
-        return Results.redirect("/admin/users");
-    }
-
-    //TODO Refactoring
-    public Result changeadmin(@PathParam("userid") long userid, FlashScope flashScope) {
-        final User connectedUser = null;//AppUtils.getConnectedUser();
-        final User user = dataService.findUserById(userid);
-
-        if (user != null) {
-            if (!connectedUser.equals(user)) {
-                String message;
-                String admin;
-                if (user.isAdmin()) {
-                    message = null;//Messages.get("info.change.deadmin", user.getEmail());
-                    admin = "is now admin";
-                    user.setAdmin(false);
-                } else {
-                    message = null;//Messages.get("info.change.admin", user.getEmail());
-                    admin = "is not admin anymore";
-                    user.setAdmin(true);
-                }
-                dataService.save(user);
-                //flash.put("infomessage", message);
-                LOG.info("User " + user.getEmail() + " " + admin + " - by " + connectedUser.getEmail());
-            } else {
-                //flash.put("warningmessage", Messages.get("warning.change.admin"));
+                flashScope.put("warning", i18nService.get("warning.change.active"));
             }
         } else {
             flashScope.error(i18nService.get("error.loading.user"));
@@ -222,20 +191,51 @@ public class AdminController extends RootController {
         return Results.redirect("/admin/users");
     }
 
-    public Result deleteuser(@PathParam("userid") long userid, FlashScope flashScope) {
-        final User connectedUser = null;//AppUtils.getConnectedUser();
-        final User user = dataService.findUserById(userid);
+    //TODO Refactoring
+    public Result changeadmin(@PathParam("userid") String userId, FlashScope flashScope, Context context) {
+        final User connectedUser = context.getAttribute("connectedUser", User.class);
+        final User user = dataService.findUserById(userId);
+
+        if (user != null) {
+            if (!connectedUser.equals(user)) {
+                String message;
+                String admin;
+                if (user.isAdmin()) {
+                    message = i18nService.get("info.change.deadmin", new Object[]{user.getEmail()});
+                    admin = "is now admin";
+                    user.setAdmin(false);
+                } else {
+                    message = i18nService.get("info.change.admin", new Object[]{user.getEmail()});
+                    admin = "is not admin anymore";
+                    user.setAdmin(true);
+                }
+                dataService.save(user);
+                flashScope.success(message);
+                LOG.info("User " + user.getEmail() + " " + admin + " - by " + connectedUser.getEmail());
+            } else {
+                flashScope.put("warning", i18nService.get("warning.change.admin"));
+            }
+        } else {
+            flashScope.error(i18nService.get("error.loading.user"));
+        }
+
+        return Results.redirect("/admin/users");
+    }
+
+    public Result deleteuser(@PathParam("userid") String userId, FlashScope flashScope, Context context) {
+        final User connectedUser = context.getAttribute("conntectedUser", User.class);
+        final User user = dataService.findUserById(userId);
 
         if (user != null) {
             if (!connectedUser.equals(user)) {
                 final String username = user.getEmail();
                 dataService.delete(user);
-                //flash.put("infomessage", Messages.get("info.delete.user", username));
+                flashScope.success(i18nService.get("info.delete.user", new Object[]{username}));
                 LOG.info("User " + username + " has been deleted - by " + connectedUser.getEmail());
 
                 calculationService.calculations();
             } else {
-                //flash.put("warningmessage", Messages.get("warning.delete.user"));
+                flashScope.put("warning", i18nService.get("warning.delete.user"));
             }
         } else {
             flashScope.error(i18nService.get("error.loading.user"));
@@ -276,7 +276,7 @@ public class AdminController extends RootController {
         return Results.html().render("brackets", brackets).render("games", games);
     }
 
-    public Result send(final String subject, final String message, FlashScope flashScope) {
+    public Result send(final String subject, final String message, FlashScope flashScope, Context context) {
         //        validation.required(subject);
         //        validation.required(message);
 
@@ -288,10 +288,10 @@ public class AdminController extends RootController {
                 recipients.add(user.getEmail());
             }
 
-            mailService.rudelmail(subject, message, recipients.toArray(), null/*AppUtils.getConnectedUser().getEmail()*/);
-            //flash.put("infomessage", Messages.get("info.rudelmail.send"));
+            User connectedUser = context.getAttribute("connectedUser", User.class);
+            mailService.rudelmail(subject, message, recipients.toArray(), connectedUser.getEmail());
+            flashScope.success(i18nService.get("info.rudelmail.send"));
         } else {
-            //flash.put("errormessage", Messages.get("error.rudelmail.send"));
             flashScope.error(i18nService.get("error.rudelmail.send"));
         }
 
@@ -299,15 +299,13 @@ public class AdminController extends RootController {
     }
 
     public Result jobstatus(final String name) {
-        //TODO Refactoring
-        //        if (StringUtils.isNotBlank(name)) {
-        //            AbstractJob abstractJob = AbstractJob.find("byName", name).first();
-        //            abstractJob.setActive(!abstractJob.isActive());
-        //            abstractJob._save();
-        //        }
-        //        jobs();
+        if (StringUtils.isNotBlank(name)) {
+            AbstractJob abstractJob = dataService.findAbstractJobByName(name);
+            abstractJob.setActive(!abstractJob.isActive());
+            dataService.save(abstractJob);
+        }
 
-        return Results.html();
+        return Results.redirect("/admin/jobs");
     }
 
     public Result calculations() {

@@ -31,7 +31,7 @@ import com.google.inject.Singleton;
  *
  */
 @Singleton
-public class PlaydayJob implements Job {
+public class PlaydayJob extends AppJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(GameTipJob.class);
 
     @Inject
@@ -47,9 +47,8 @@ public class PlaydayJob implements Job {
     private I18nService i18nService;
 
     public PlaydayJob() {
-        //TODO Refactoring
-        //        this.setDescription(Messages.get("job.playdayjob.description"));
-        //        this.setExecuted(Messages.get("job.playdayjob.executed"));
+        this.setDescription(i18nService.get("job.playdayjob.description"));
+        this.setExecuted(i18nService.get("job.playdayjob.executed"));
     }
 
     @Override

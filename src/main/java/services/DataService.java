@@ -91,7 +91,6 @@ public class DataService {
     public List<Confirmation>  findAllPendingActivatations() {
         //TODO Refactoring
         //Confirmation.find("SELECT c FROM Confirmation c WHERE confirmType = ? AND DATE(NOW()) > (DATE(created) + 2)", ConfirmationType.ACTIVATION).fetch();
-
         return null;
     }
 
@@ -527,9 +526,8 @@ public class DataService {
         return this.datastore.find(Bracket.class).asList();
     }
 
-    public Game findGameById(long parseLong) {
-        // TODO Refactoring
-        return null;
+    public Game findGameById(String gameId) {
+        return this.datastore.get(Game.class, gameId);
     }
 
     public List<Bracket> findAllUpdatableBrackets() {
@@ -552,7 +550,7 @@ public class DataService {
         return null;
     }
 
-    public List<Game> findReferencedGames() {
+    public List<Game> findReferencedGames(String bracketString) {
         // TODO Refactoring
         // Game.find("SELECT g FROM Game g WHERE homeReference LIKE ? OR awayReference LIKE ?", bracketString, bracketString).fetch();
         return null;
@@ -578,28 +576,24 @@ public class DataService {
         return this.datastore.find(User.class).field("active").equal(true).order("place").asList();
     }
 
-    public Team findTeamById(long teamid) {
-        // TODO Refactoring
-        return null;
+    public Team findTeamById(String teamId) {
+        return this.datastore.get(Team.class, teamId);
     }
 
-    public Bracket findBracketById(long bracketid) {
-        // TODO Refactoring
-        return null;
+    public Bracket findBracketById(String bracketid) {
+        return this.datastore.get(Bracket.class, bracketid);
     }
 
-    public Extra findExtaById(Long bonusTippId) {
-        // TODO Refactoring
-        return null;
+    public Extra findExtaById(String bonusTippId) {
+        return this.datastore.get(Extra.class, bonusTippId);
     }
 
     public List<User> findUsersOrderByUsername() {
         return this.datastore.find(User.class).field("active").equal(true).order("username").asList();
     }
 
-    public User findUserById(long userid) {
-        // TODO Refactoring
-        return null;
+    public User findUserById(String userId) {
+        return this.datastore.get(User.class, userId);
     }
 
     public Confirmation findConfirmationByTypeAndUser(ConfirmationType confirmationType, User user) {

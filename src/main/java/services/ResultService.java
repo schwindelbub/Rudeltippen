@@ -4,12 +4,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import models.Constants;
 import models.Game;
 import models.User;
 import models.WSResult;
 import models.WSResults;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -27,9 +34,6 @@ import com.google.inject.Singleton;
 @Singleton
 public class ResultService {
     private static final Logger LOG = LoggerFactory.getLogger(ResultService.class);
-    private static final String WS_ENCODING = "UTF-8";
-    private static final String WS_CONTENT_TYPE = "application/soap+xml";
-    private static final String WS_URL = "http://www.openligadb.de/Webservices/Sportsdata.asmx";
 
     @Inject
     private MailService mailService;
@@ -66,19 +70,29 @@ public class ResultService {
 
         Document document = null;
         try {
-            //TODO Refactoring
-            //document = WS.url(WS_URL).setHeader("Content-Type", WS_CONTENT_TYPE).setHeader("charset", WS_ENCODING).body(buffer.toString()).post().getXml();
+            HttpResponse httpResponse = Request
+                .Post(Constants.WS_URL.value())
+                .setHeader("Content-Type", Constants.WS_COTENT_TYPE.value())
+                .setHeader("charset", Constants.DEFAULT_ENCODING.value())
+                .bodyString(buffer.toString(), ContentType.TEXT_XML)
+                .execute()
+                .returnResponse();
+            
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            document = builder.parse(httpResponse.getEntity().getContent());
         } catch (final Exception e) {
             final List<User> users = dataService.findAllAdmins();
             for (final User user : users) {
                 mailService.error(e.getMessage(), user.getEmail());
             }
+            
             LOG.error("Updating of results from WebService failed", e);
         }
+        
         return document;
     }
 
-    public static WSResults getEndResult(final WSResults wsResults, final Document document) {
+    private WSResults getEndResult(final WSResults wsResults, final Document document) {
         final Map<String, WSResult> resultsMap = new HashMap<String, WSResult>();
         final Node matchResults = document.getElementsByTagName("matchResults").item(0);
         final NodeList matchResult = matchResults.getChildNodes();

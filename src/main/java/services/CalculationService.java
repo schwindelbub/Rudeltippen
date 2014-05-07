@@ -262,7 +262,7 @@ public class CalculationService {
                 if (bracket.allGamesEnded()) {
                     final int number = bracket.getNumber();
                     final String bracketString = "B-" + number + "%";
-                    final List<Game> games = dataService.findReferencedGames();
+                    final List<Game> games = dataService.findReferencedGames(bracketString);
                     for (final Game game : games) {
                         homeTeam = dataService.getTeamByReference(game.getHomeReference());
                         awayTeam = dataService.getTeamByReference(game.getAwayReference());
@@ -300,7 +300,7 @@ public class CalculationService {
 
     public void setGameScore(final String gameId, final String homeScore, final String awayScore, final String extratime, final String homeScoreExtratime, final String awayScoreExtratime) {
         if (ValidationUtils.isValidScore(homeScore, awayScore)) {
-            final Game game = dataService.findGameById(Long.parseLong(gameId));
+            final Game game = dataService.findGameById(gameId);
             if (game != null) {
                 dataService.saveScore(game, homeScore, awayScore, extratime, homeScoreExtratime, awayScoreExtratime);
             }

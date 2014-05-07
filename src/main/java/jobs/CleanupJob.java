@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import services.DataService;
+import services.I18nService;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -25,16 +26,18 @@ import com.google.inject.Singleton;
  *
  */
 @Singleton
-public class CleanupJob implements Job {
+public class CleanupJob extends AppJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(CleanupJob.class);
 
     @Inject
     private DataService dataService;
 
+    @Inject
+    private I18nService i18nService;
+    
     public CleanupJob() {
-        //TODO Refactoring
-        //        this.setDescription(Messages.get("job.cleanupjob.description"));
-        //        this.setExecuted(Messages.get("job.cleanupjob.executed"));
+        this.setDescription(i18nService.get("job.cleanupjob.description"));
+        this.setExecuted(i18nService.get("job.cleanupjob.executed"));
     }
 
     @Override

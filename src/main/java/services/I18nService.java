@@ -24,8 +24,14 @@ public class I18nService {
     @Inject
     private NinjaProperties ninjaProperties;
 
+    public String get(String key, Object [] paramters) {
+        Optional<String> language = Optional.of(getDefaultLanguage());
+        return messages.getWithDefault(key, "Language: " + language + " - Missing translation for key: " + key, language, paramters);
+    }
+    
     public String get(String key) {
-        return messages.getWithDefault(key, "Missing translation for: " + key, Optional.of("de"), null);
+        Optional<String> language = Optional.of(getDefaultLanguage());
+        return messages.getWithDefault(key, "Language: " + language + " - Missing translation for key: " + key, language, new Object[]{});
     }
 
     /**
@@ -37,13 +43,9 @@ public class I18nService {
     public String getDiffToTop(final int pointsDiff) {
         String message = "";
         if (pointsDiff == 1) {
-            message = get("points.to.top.one");
-            //TODO Refactoring
-            //message = get("points.to.top.one", pointsDiff);
+            message = get("points.to.top.one", new Object[]{pointsDiff});
         } else if (pointsDiff > 1) {
-            //TODO Refactoring
-            //message = get("points.to.top.many", pointsDiff);
-            message = get("points.to.top.one");
+            message = get("points.to.top.many", new Object[]{pointsDiff});
         }
 
         return message;
@@ -61,5 +63,20 @@ public class I18nService {
             timezone = Constants.DEFAULT_TIMEZONE.value();
         }
         return timezone;
+    }
+
+    public String getDefaultLanguage() {
+        String language = ninjaProperties.get("default.language");
+        if (StringUtils.isBlank(language)) {
+            if (("en").equalsIgnoreCase(language)) {
+                language = "en";
+            } else if (("de").equalsIgnoreCase(language)) {
+                language = "de";
+            }
+        } else {
+            language = "en";
+        }
+        
+        return language;
     }
 }

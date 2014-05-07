@@ -14,10 +14,12 @@ import models.User;
 import ninja.Result;
 import ninja.Results;
 import ninja.params.PathParam;
+import ninja.session.FlashScope;
 
 import org.apache.commons.lang.StringUtils;
 
 import services.DataService;
+import services.I18nService;
 import utils.AppUtils;
 import utils.ValidationUtils;
 
@@ -34,6 +36,9 @@ public class TipController extends RootController {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private I18nService i18nService;
 
     public Result playday(@PathParam("number") long number) {
         final Pagination pagination = AppUtils.getPagination(number, "/tips/playday/", dataService.findAllPlaydaysOrderByNumber().size());
@@ -46,7 +51,7 @@ public class TipController extends RootController {
     }
 
     //TODO Refactoring
-    public Result storetips() {
+    public Result storetips(FlashScope flashScope) {
         int tipped = 0;
         int playday = 1;
         final List<String> keys = new ArrayList<String>();
@@ -70,7 +75,7 @@ public class TipController extends RootController {
                     continue;
                 }
 
-                final Game game = dataService.findGameById(Long.parseLong(key));
+                final Game game = dataService.findGameById(key);
                 if (game == null) {
                     continue;
                 }
@@ -82,18 +87,18 @@ public class TipController extends RootController {
                 playday = game.getPlayday().getNumber();
             }
         }
-        //TODO Refactoring
+
         if (tipped > 0) {
-            //flash.put("infomessage", Messages.get("controller.tipps.tippsstored"));
+            flashScope.success(i18nService.get("controller.tipps.tippsstored"));
         } else {
-            //flash.put("warningmessage", Messages.get("controller.tipps.novalidtipps"));
+            flashScope.put("warning", i18nService.get("controller.tipps.novalidtipps"));
         }
 
         return Results.redirect("/tips/playday/" + playday);
     }
 
     //TODO Refactroing
-    public Result storeextratips() {
+    public Result storeextratips(FlashScope flashScope) {
         final Map<String, String> map = null;//params.allSimple();
         for (final Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();
@@ -106,21 +111,16 @@ public class TipController extends RootController {
 
                 final String bId = key;
                 final String tId = teamdId;
-                Long bonusTippId = null;
-                Long teamId = null;
 
-                if (StringUtils.isNotBlank(bId) && StringUtils.isNotBlank(tId)) {
-                    bonusTippId = Long.parseLong(bId);
-                    teamId = Long.parseLong(tId);
-                } else {
-                    playday(dataService.findCurrentPlayday().getNumber());
+                if (StringUtils.isNotBlank(bId) || StringUtils.isNotBlank(tId)) {
+                    return Results.redirect("/tips/playday/" + dataService.findCurrentPlayday().getNumber());
                 }
 
-                final Extra extra = dataService.findExtaById(bonusTippId);
+                final Extra extra = dataService.findExtaById(bId);
                 if (extra.isTipable()) {
-                    final Team team = dataService.findTeamById(teamId);
+                    final Team team = dataService.findTeamById(tId);
                     dataService.placeExtraTip(extra, team);
-                    //flash.put("infomessage", Messages.get("controller.tipps.bonussaved"));
+                    flashScope.success(i18nService.get("controller.tipps.bonussaved"));
                 }
             }
         }

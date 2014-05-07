@@ -4,6 +4,7 @@ import ninja.FilterWith;
 
 import com.google.inject.Singleton;
 
+import filters.LanguageFilter;
 import filters.AuthenticationFilter;
 import filters.SetupFilter;
 
@@ -13,5 +14,5 @@ import filters.SetupFilter;
  *
  */
 @Singleton
-@FilterWith({SetupFilter.class, AuthenticationFilter.class})
+@FilterWith({LanguageFilter.class, SetupFilter.class, AuthenticationFilter.class})
 public class RootController {}

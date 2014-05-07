@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import services.DataService;
+import services.I18nService;
 import services.ResultService;
 
 import com.google.inject.Inject;
@@ -24,7 +25,7 @@ import com.google.inject.Singleton;
  *
  */
 @Singleton
-public class ResultsJob implements Job {
+public class ResultsJob extends AppJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(GameTipJob.class);
 
     @Inject
@@ -32,11 +33,13 @@ public class ResultsJob implements Job {
 
     @Inject
     private ResultService resultService;
+    
+    @Inject
+    private I18nService i18nService;
 
     public ResultsJob() {
-        //TODO Refactoring
-        //        this.setDescription(Messages.get("job.resultsjob.descrption"));
-        //        this.setExecuted(Messages.get("job.resultsjob.executed"));
+        this.setDescription(i18nService.get("job.resultsjob.descrption"));
+        this.setExecuted(i18nService.get("job.resultsjob.executed"));
     }
 
     @Override

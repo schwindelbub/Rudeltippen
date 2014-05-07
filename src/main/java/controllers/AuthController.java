@@ -37,6 +37,7 @@ import com.google.inject.Singleton;
 import dtos.LoginDTO;
 import dtos.PasswordDTO;
 import dtos.UserDTO;
+import filters.LanguageFilter;
 import filters.SetupFilter;
 
 /**
@@ -45,7 +46,7 @@ import filters.SetupFilter;
  *
  */
 @Singleton
-@FilterWith(SetupFilter.class)
+@FilterWith({LanguageFilter.class, SetupFilter.class})
 public class AuthController {
     private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
 
@@ -106,7 +107,7 @@ public class AuthController {
         return Results.redirect("/");
     }
 
-    public Result confirm(@PathParam("token") String token, FlashScope flashScope) {
+    public Result confirm(@PathParam("token") String token, FlashScope flashScope, Session session) {
         Confirmation confirmation = null;
 
         if (!ValidationUtils.isValidConfirmationToken(token)) {
@@ -122,7 +123,31 @@ public class AuthController {
                 if (ConfirmationType.NEWUSERPASS.equals(confirmationType)) {
                     return Results.redirect("/auth/password/" + token);
                 } else {
-                    authService.confirmationUser(confirmation, user, confirmationType);
+                    if ((ConfirmationType.ACTIVATION).equals(confirmationType)) {
+                        authService.activateAndSetAvatar(user);
+                        flashScope.success(i18nService.get("controller.users.accountactivated"));
+                        dataService.delete(confirmation);
+
+                        LOG.info("User activated: " + user.getEmail());
+                    } else if ((ConfirmationType.CHANGEUSERNAME).equals(confirmationType)) {
+                        final String oldusername = user.getEmail();
+                        final String newusername = authService.decryptAES(confirmation.getConfirmValue());
+                        user.setEmail(newusername);
+                        dataService.save(user);
+                        session.remove(Constants.USERNAME.value());
+                        flashScope.success(i18nService.get("controller.users.changedusername"));
+                        dataService.delete(confirmation);
+
+                        LOG.info("User changed username... old username: " + oldusername + " - " + "new username: " + newusername);
+                    } else if ((ConfirmationType.CHANGEUSERPASS).equals(confirmationType)) {
+                        user.setUserpass(authService.decryptAES(confirmation.getConfirmValue()));
+                        dataService.save(user);
+                        session.remove("username");
+                        flashScope.success(i18nService.get("controller.users.changeduserpass"));
+                        dataService.delete(confirmation);
+
+                        LOG.info(user.getEmail() + " changed his password");
+                    }
                 }
             } else {
                 flashScope.put("warningmessage", i18nService.get("controller.users.invalidtoken"));

@@ -9,6 +9,7 @@ import models.Game;
 import models.Settings;
 import models.User;
 import ninja.Context;
+import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 import ninja.session.Session;
@@ -24,12 +25,15 @@ import utils.AppUtils;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import filters.LanguageFilter;
+
 /**
  * 
  * @author svenkubiak
  *
  */
 @Singleton
+@FilterWith(LanguageFilter.class)
 public class SystemController {
     private static final Logger LOG = LoggerFactory.getLogger(SystemController.class);
 
@@ -115,7 +119,6 @@ public class SystemController {
         //            final List<String> games = SetupService.getGamesFromWebService(34, "WM-2014", "2014");
         //            render(playdays, games);
         //        }
-        //        notFound();
 
         return Results.notFound();
     }
