@@ -9,10 +9,10 @@ import models.Game;
 import models.Settings;
 import models.User;
 import ninja.Context;
-import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
 import ninja.session.Session;
+import ninja.utils.NinjaProperties;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
@@ -20,12 +20,11 @@ import org.slf4j.LoggerFactory;
 
 import services.DataService;
 import services.ImportService;
+import services.SetupService;
 import utils.AppUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import filters.LanguageFilter;
 
 /**
  * 
@@ -33,7 +32,6 @@ import filters.LanguageFilter;
  *
  */
 @Singleton
-@FilterWith(LanguageFilter.class)
 public class SystemController {
     private static final Logger LOG = LoggerFactory.getLogger(SystemController.class);
 
@@ -42,6 +40,12 @@ public class SystemController {
     
     @Inject
     private ImportService importService;
+    
+    @Inject
+    private SetupService setupService;
+    
+    @Inject
+    private NinjaProperties ninjaProperties;
 
     public Result setup() {
         if (dataService.appIsInizialized()) {
@@ -113,13 +117,12 @@ public class SystemController {
     }
 
     public Result yamler() {
-        //TODO Refactoring
-        //        if (("true").equals(Play.configuration.getProperty("yamler"))) {
-        //            final List<String> playdays = SetupService.generatePlaydays(34);
-        //            final List<String> games = SetupService.getGamesFromWebService(34, "WM-2014", "2014");
-        //            render(playdays, games);
-        //        }
+        if (("true").equals(ninjaProperties.get("rudeltippen.yamler"))) {
+            final List<String> playdays = setupService.generatePlaydays(34);
+            final List<String> games = setupService.getGamesFromWebService(34, "WM-2014", "2014");
+            return Results.html().render("playdays", playdays).render("games", games);
+        }
 
-        return Results.notFound();
+        return Results.redirect("/");
     }
 }

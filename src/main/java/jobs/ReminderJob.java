@@ -17,8 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import services.DataService;
-import services.I18nService;
 import services.MailService;
+import services.ResultService;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -29,7 +29,7 @@ import com.google.inject.Singleton;
  *
  */
 @Singleton
-public class ReminderJob extends AppJob implements Job {
+public class ReminderJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(GameTipJob.class);
 
     @Inject
@@ -39,16 +39,14 @@ public class ReminderJob extends AppJob implements Job {
     private MailService mailService;
     
     @Inject
-    private I18nService i18nService;
-
+    private ResultService resultService;
+    
     public ReminderJob() {
-        this.setDescription(i18nService.get("job.reminderjob.description"));
-        this.setExecuted(i18nService.get("job.reminderjob.executed"));
     }
 
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
-        if (dataService.isJobInstance()) {
+        if (resultService.isJobInstance()) {
             AbstractJob job = dataService.findAbstractJobByName("PlaydayJob");
             if (job != null && job.isActive()) {
                 LOG.info("Started Job: ReminderJob");

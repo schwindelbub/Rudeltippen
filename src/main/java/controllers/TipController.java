@@ -11,6 +11,7 @@ import models.Pagination;
 import models.Playday;
 import models.Team;
 import models.User;
+import ninja.Context;
 import ninja.Result;
 import ninja.Results;
 import ninja.params.PathParam;
@@ -50,12 +51,11 @@ public class TipController extends RootController {
         return Results.html().render(playday).render(number).render(pagination).render(extras).render(tippable);
     }
 
-    //TODO Refactoring
-    public Result storetips(FlashScope flashScope) {
+    public Result storetips(FlashScope flashScope, Context context) {
         int tipped = 0;
         int playday = 1;
         final List<String> keys = new ArrayList<String>();
-        final Map<String, String> map = null;//params.allSimple();
+        final Map<String, String> map = AppUtils.convertParamaters(context.getParameters());
         for (final Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();
             if (StringUtils.isNotBlank(key) && key.contains("game_") && (key.contains("_homeScore") || key.contains("_awayScore"))) {
@@ -80,7 +80,7 @@ public class TipController extends RootController {
                     continue;
                 }
 
-                dataService.placeTip(game, Integer.parseInt(homeScore), Integer.parseInt(awayScore));
+                dataService.saveGameTip(game, Integer.parseInt(homeScore), Integer.parseInt(awayScore), context.getAttribute("connectedUser", User.class));
                 keys.add(key);
                 tipped++;
 
@@ -97,14 +97,13 @@ public class TipController extends RootController {
         return Results.redirect("/tips/playday/" + playday);
     }
 
-    //TODO Refactroing
-    public Result storeextratips(FlashScope flashScope) {
-        final Map<String, String> map = null;//params.allSimple();
+    public Result storeextratips(FlashScope flashScope, Context context) {
+        final Map<String, String> map = AppUtils.convertParamaters(context.getParameters());
         for (final Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();
 
             if (StringUtils.isNotBlank(key) && key.contains("bonus_") && key.contains("_teamId")) {
-                final String teamdId = null;//params.get(key);
+                final String teamdId = context.getParameter(key);
                 key = key.replace("bonus_", "");
                 key = key.replace("_teamId", "");
                 key = key.trim();
@@ -119,7 +118,7 @@ public class TipController extends RootController {
                 final Extra extra = dataService.findExtaById(bId);
                 if (extra.isTipable()) {
                     final Team team = dataService.findTeamById(tId);
-                    dataService.placeExtraTip(extra, team);
+                    dataService.saveExtraTip(extra, team, context.getAttribute("connectedUser", User.class));
                     flashScope.success(i18nService.get("controller.tipps.bonussaved"));
                 }
             }

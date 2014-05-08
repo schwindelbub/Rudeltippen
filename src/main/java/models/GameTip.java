@@ -29,6 +29,10 @@ public class GameTip {
     
     private Date placed;
 
+    public ObjectId getId() {
+        return id;
+    }
+    
     public User getUser() {
         return user;
     }

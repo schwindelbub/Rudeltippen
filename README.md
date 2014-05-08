@@ -38,6 +38,7 @@ Available Languages
 ------------------
 
 - German
+- English
 
 
 Installation guide

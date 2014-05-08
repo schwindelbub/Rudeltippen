@@ -22,6 +22,8 @@ import ninja.Result;
 import ninja.Results;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
+import ninja.validation.JSR303Validation;
+import ninja.validation.Validation;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -31,11 +33,13 @@ import services.CalculationService;
 import services.DataService;
 import services.I18nService;
 import services.MailService;
+import services.ValidationService;
 import utils.AppUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import dtos.SettingsDTO;
 import filters.AuthorizationFilter;
 
 /**
@@ -60,6 +64,9 @@ public class AdminController extends RootController {
     @Inject
     private I18nService i18nService;
     
+    @Inject
+    private ValidationService validationService;
+    
     public Result results(@PathParam("number") long number) {
         final Pagination pagination = AppUtils.getPagination(number, "/admin/results/", dataService.findAllPlaydaysOrderByNumber().size());
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
@@ -73,8 +80,7 @@ public class AdminController extends RootController {
     }
 
     public Result storeresults(Context context, FlashScope flashScope) {
-        //TODO Refactoring
-        final Map<String, String> map = null;//params.allSimple();
+        final Map<String, String> map = AppUtils.convertParamaters(context.getParameters());
         final Set<String> keys = new HashSet<String>();
         for (final Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();
@@ -117,22 +123,19 @@ public class AdminController extends RootController {
         return Results.redirect("/admin/results/" + playday);
     }
 
-    public Result updatesettings (FlashScope flashScope, final String name, final int pointsTip, final int pointsTipDiff, final int pointsTipTrend, final int minutesBeforeTip, final boolean countFinalResult, final boolean informOnNewTipper, final boolean enableRegistration, final String trackingcode) {
-        //        validation.range(pointsTip, 0, 99);
-        //        validation.range(pointsTipDiff, 0, 99);
-        //        validation.range(pointsTipTrend, 0, 99);
-
-        //TODO Refactoring - was !validation.hasErrors()
-        if (true) {
+    public Result updatesettings (FlashScope flashScope, @JSR303Validation SettingsDTO settingsDTO, Validation validation) {
+        validationService.validateSettingsDTO(settingsDTO, validation);
+        
+        if (!validation.hasBeanViolations()) {
             final Settings settings = dataService.findSettings();
-            settings.setGameName(name);
-            settings.setPointsTip(pointsTip);
-            settings.setPointsTipDiff(pointsTipDiff);
-            settings.setPointsTipTrend(pointsTipTrend);
-            settings.setMinutesBeforeTip(minutesBeforeTip);
-            settings.setInformOnNewTipper(informOnNewTipper);
-            settings.setCountFinalResult(countFinalResult);
-            settings.setEnableRegistration(enableRegistration);
+            settings.setGameName(settingsDTO.name);
+            settings.setPointsTip(settingsDTO.pointsTip);
+            settings.setPointsTipDiff(settingsDTO.pointsTipDiff);
+            settings.setPointsTipTrend(settingsDTO.pointsTipTrend);
+            settings.setMinutesBeforeTip(settingsDTO.minutesBeforeTip);
+            settings.setInformOnNewTipper(settingsDTO.informOnNewTipper);
+            settings.setCountFinalResult(settingsDTO.countFinalResult);
+            settings.setEnableRegistration(settingsDTO.enableRegistration);
             dataService.save(settings);
 
             flashScope.success(i18nService.get("setup.saved"));
@@ -156,7 +159,6 @@ public class AdminController extends RootController {
         return Results.html().render(settings);
     }
 
-    //TODO Refactoring
     public Result changeactive(@PathParam("userid") String userId, Context context, FlashScope flashScope) {
         final User connectedUser = context.getAttribute("connectedUser", User.class);
         final User user = dataService.findUserById(userId);
@@ -191,7 +193,6 @@ public class AdminController extends RootController {
         return Results.redirect("/admin/users");
     }
 
-    //TODO Refactoring
     public Result changeadmin(@PathParam("userid") String userId, FlashScope flashScope, Context context) {
         final User connectedUser = context.getAttribute("connectedUser", User.class);
         final User user = dataService.findUserById(userId);
@@ -244,27 +245,6 @@ public class AdminController extends RootController {
         return Results.redirect("/admin/users");
     }
 
-    public Result jobs() {
-        //TODO Refactoring
-        //        final List<Job> jobs = JobsPlugin.scheduledJobs;
-        //        render(jobs);
-        return Results.html();
-    }
-
-    //TODO Refactoring
-    public Result runjob(final String name) {
-        //        if (StringUtils.isNotBlank(name)) {
-        //            final List<Job> jobs = JobsPlugin.scheduledJobs;
-        //            for (final Job job : jobs) {
-        //                if (name.equalsIgnoreCase(job.getClass().getSimpleName())) {
-        //                    job.now();
-        //                }
-        //            }
-        //        }
-        //        jobs();
-        return Results.html();
-    }
-
     public Result rudelmail() {
         return Results.html();
     }
@@ -276,12 +256,11 @@ public class AdminController extends RootController {
         return Results.html().render("brackets", brackets).render("games", games);
     }
 
-    public Result send(final String subject, final String message, FlashScope flashScope, Context context) {
-        //        validation.required(subject);
-        //        validation.required(message);
-
-        //TODO Refactoring - was !validation.hasErrors()
-        if (true) {
+    public Result send(FlashScope flashScope, Context context) {
+        String subject = context.getParameter("subject");
+        String message = context.getParameter("message");
+        
+        if (StringUtils.isNotBlank(subject) && StringUtils.isNotBlank(message)) {
             final List<String> recipients = new ArrayList<String>();
             final List<User> users = dataService.findAllActiveUsers();
             for (final User user : users) {

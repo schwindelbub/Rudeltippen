@@ -1,19 +1,27 @@
 package utils;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import javax.imageio.ImageIO;
+
+import models.Constants;
 import models.Extra;
 import models.Game;
 import models.Pagination;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.slf4j.Logger;
@@ -32,7 +40,7 @@ public class AppUtils {
      *
      * @param userpass The password
      * @param usersalt The salt
-     * @return SHA1 hashed string
+     * @return SHA512 hashed string
      */
     public static String hashPassword(final String userpass, final String usersalt) {
         String hash = "";
@@ -82,59 +90,57 @@ public class AppUtils {
     }
 
     /**
-     * Returns a Base64 encoded Image from Gravatar if available
+     * Returns the filename from a Gravatar image
      * 
      * @param email The email adress to check
-     * @param d Return a default image if no email is available
-     * @return Base64 encoded Image, null if no image on gravatar exists
+     * @param type Return a default image if no email is available
+     * @return The image filename
      */
-    public static String getGravatarImage(final String email, final String d, int size) {
-        String image = null;
-
-        if (ValidationUtils.isValidEmail(email)) {
-            if ((size <= 0) || (size > 128)) {
-                size = 64;
-            }
-
-            String url = null;
-            if (StringUtils.isNotBlank(d)) {
-                url = "https://secure.gravatar.com/avatar/" + DigestUtils.md5Hex(email) + ".jpg?s=" + size + "&r=pg&d=" + d;
-            } else {
-                url = "https://secure.gravatar.com/avatar/" + DigestUtils.md5Hex(email) + ".jpg?s=" + size + "&r=pg";
-            }
-
-            HttpResponse response = null;
-            try {
-                response = Request.Get(url).execute().returnResponse();
-            } catch (IOException e) {
-                LOG.error("Failed to get response from gravator", e);
-            }
-
-            if (response != null && response.getStatusLine().getStatusCode() == 200) {
-                try {
-                    final File file = new File(UUID.randomUUID().toString());
-                    final InputStream inputStream = response.getEntity().getContent();
-                    final OutputStream out = new FileOutputStream(file);
-                    final byte buf[] = new byte[1024];
-                    int len;
-                    while ((len = inputStream.read(buf)) > 0) {
-                        out.write(buf, 0, len);
-                    }
-                    out.close();
-                    inputStream.close();
-
-                    //TODO Refactoring
-                    //image = Images.toBase64(file);
-                    file.delete();
-                } catch (final Exception e) {
-                    LOG.error("Failed to get and convert gravatar image. " + e);
-                }
-            }
+    public static String getGravatarImage(final String email, final String type, int size) {
+        if ((size <= 0) || (size > 128)) {
+            size = 64;
         }
 
-        return image;
+        String url = "https://secure.gravatar.com/avatar/" + DigestUtils.md5Hex(email) + ".jpg?s=" + size + "&r=pg&d=" + type;
+        HttpResponse response = null;
+        try {
+            response = Request.Get(url).execute().returnResponse();
+        } catch (IOException e) {
+            LOG.error("Failed to get response from gravator", e);
+        }
+
+        final String filename = UUID.randomUUID().toString();
+        if (response != null && response.getStatusLine().getStatusCode() == 200) {
+            try {
+                final File file = new File(filename);
+                final InputStream inputStream = response.getEntity().getContent();
+                final OutputStream out = new FileOutputStream(file);
+                final byte buf[] = new byte[1024];
+                int len;
+                while ((len = inputStream.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+                out.close();
+                inputStream.close();
+                
+                FileUtils.copyFile(file, new File(Constants.MEDIAFOLDER.value() + filename));
+                file.delete();
+            } catch (final Exception e) {
+                LOG.error("Failed to get and convert gravatar image. " + e);
+            }
+        }
+        
+        return filename;
     }
 
+    /**
+     * Calculates the pagination 
+     * 
+     * @param number The number of pages
+     * @param url The urls to set to the links
+     * @param totalPlaydays The total number of playdays
+     * @return Pagination object conatining the ready computed pagination
+     */
     public static Pagination getPagination(long number, final String url, long totalPlaydays) {
         final Pagination pagination = new Pagination();
 
@@ -163,5 +169,36 @@ public class AppUtils {
         pagination.setUrl(url);
 
         return pagination;
+    }
+    
+    public static BufferedImage resizeImage(File file, int width, int height){
+        BufferedImage originalImage = null;
+        try {
+            originalImage = ImageIO.read(file);
+        } catch (IOException e) {
+            LOG.error("Failed to read image for resizing", e);
+        }
+        int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
+        
+        BufferedImage resizedImage = new BufferedImage(width, height, type);
+        Graphics2D graphics2D = resizedImage.createGraphics();
+        graphics2D.drawImage(originalImage, 0, 0, width, height, null);
+        graphics2D.dispose();
+     
+        return resizedImage;
+    }
+    
+    public static Map<String, String> convertParamaters(Map<String, String[]> parameters) {
+        Map<String, String> map = new HashMap<String, String>();
+        Iterator<Map.Entry<String, String[]>> entries = parameters.entrySet().iterator();
+        while (entries.hasNext()) {
+            Map.Entry<String, String[]> entry = entries.next();
+            
+            if (entry.getValue() != null && entry.getValue().length > 0) {
+                map.put(entry.getKey(), entry.getValue()[0]);  
+            }
+        }
+        
+        return map;
     }
 }

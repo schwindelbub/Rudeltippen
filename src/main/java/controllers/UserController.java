@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import models.Confirmation;
 import models.ConfirmationType;
+import models.Constants;
 import models.ExtraTip;
 import models.GameTip;
 import models.Settings;
@@ -30,6 +31,7 @@ import services.DataService;
 import services.I18nService;
 import services.MailService;
 import utils.AppUtils;
+import utils.ValidationUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -120,20 +122,12 @@ public class UserController extends RootController {
         return Results.html().render("users", user).render(settings);
     }
 
-    public Result updateusername(final String username, Session session, Context context, FlashScope flashScope) {
-        //TODO Refactoring
-        //        validation.required(username);
-        //        validation.minSize(username, 3);
-        //        validation.maxSize(username, 20);
-        //        validation.isTrue(!ValidationService.usernameExists(username)).key("username").message(Messages.get("controller.users.usernamexists"));
+    public Result updateusername(Session session, Context context, FlashScope flashScope) {
+        String username = context.getParameter("username");
 
-        //TODO Refactoring - was validation.hasErrors();
-        if (true) {
-            //TODO Refactroing
-            //            params.flash();
-            //            validation.keep();
+        if (!ValidationUtils.isValidUsername(username)) {
+            flashScope.error(i18nService.get("controller.users.usernamexists"));
         } else {
-            //TODO Refactoring
             final User user = context.getAttribute("connectedUser", User.class);
             user.setUsername(username);
             dataService.save(user);
@@ -147,17 +141,12 @@ public class UserController extends RootController {
         return Results.redirect("/users/profile");
     }
 
-    //TODO Refactoring
-    public Result updateemail(final String email, final String emailConfirmation, Context context, FlashScope flashScope) {
-        //        validation.required(email);
-        //        validation.email(email);
-        //        validation.equals(email, emailConfirmation);
-        //        validation.equals(ValidationService.emailExists(email), false).key("email").message(Messages.get("controller.users.emailexists"));
+    public Result updateemail(Context context, FlashScope flashScope) {
+        String email = context.getParameter("email");
+        String emailConfirmation = context.getParameter("emailConfirmation");
 
-        //TODO Refactoring - was validations.hasErrors()
-        if (true) {
-            //            params.flash();
-            //            validation.keep();
+        if (!ValidationUtils.isValidEmail(email) || !email.equals(emailConfirmation)) {
+            flashScope.error(i18nService.get("controller.users.invalidemail"));
         } else {
             final String token = UUID.randomUUID().toString();
             final User user = context.getAttribute("connectedUser", User.class);
@@ -178,16 +167,12 @@ public class UserController extends RootController {
         return Results.redirect("/users/profile");
     }
 
-    public Result updatepassword(final String userpass, final String userpassConfirmation, Context context, FlashScope flashScope) {
-        //        validation.required(userpass);
-        //        validation.equals(userpass, userpassConfirmation);
-        //        validation.minSize(userpass, 6);
-        //        validation.maxSize(userpass, 30);
+    public Result updatepassword(Context context, FlashScope flashScope) {
+        String userpass = context.getParameter("userpass");
+        String userpassConfirmation = context.getParameter("userpassConfirmation");
 
-        //TODO Refactoring - was validations.hasErrors()
-        if (true) {
-            //            params.flash();
-            //            validation.keep();
+        if (ValidationUtils.isValidPassword(userpass) || !userpass.equals(userpassConfirmation)) {
+            flashScope.error(i18nService.get("controller.users.passwordisinvalid"));
         } else {
             final String token = UUID.randomUUID().toString();
             final User user = context.getAttribute("connectedUser", User.class);
@@ -223,38 +208,32 @@ public class UserController extends RootController {
         return Results.redirect("/users/profile");
     }
 
-    public Result updatepicture(final File picture, FlashScope flashScope) {
-        //validation.required(picture);
+    public Result updatepicture(final File picture, FlashScope flashScope, Context context) {
+        final User user = context.getAttribute("connectedUser", User.class);
+        
+        String pictureLargeFilename = UUID.randomUUID().toString();
+        String pictureSmallFilename = UUID.randomUUID().toString();
+        
+        File pictureSmall = new File(Constants.MEDIAFOLDER.value() + pictureSmallFilename);
+        File pictureLarge = new File(Constants.MEDIAFOLDER.value() + pictureLargeFilename);
 
-        if (picture != null) {
-            //final String message = Messages.get("profile.maxpicturesize", 100);
-            //validation.isTrue(ValidationService.checkFileLength(picture.length())).key("picture").message(message);
+        AppUtils.resizeImage(pictureSmall, 64, 64);
+        AppUtils.resizeImage(pictureLarge, 128, 128);
+        
+        if (picture.delete()) {
+            LOG.warn("User-Picutre could not be deleted after upload.");
         } else {
-            //validation.isTrue(false);
+            LOG.info("User-Picture deleted after upload.");
         }
+        
+        user.setPicture(pictureSmallFilename);
+        user.setPictureLarge(pictureLargeFilename);
+        dataService.save(user);
 
-        //TODO Refactoring - was validation.hasErrors();
-        if (true) {
-            //            params.flash();
-            //            validation.keep();
-        } else {
-            final User user = null;//AppUtils.getConnectedUser();
-            //Images.resize(picture, picture, PICTURELARGE, PICTURELARGE);
-            //user.setPictureLarge(Images.toBase64(picture));
-            //Images.resize(picture, picture, PICTURESMALL, PICTURESMALL);
-            //user.setPicture(Images.toBase64(picture));
-            if (picture.delete()) {
-                LOG.warn("User-Picutre could not be deleted after upload.");
-            } else {
-                LOG.info("User-Picture deleted after upload.");
-            }
+        flashScope.success(i18nService.get("controller.profile.updatepicture"));
+        LOG.info("Picture updated: " + user.getEmail());
 
-            dataService.save(user);
-            flashScope.success(i18nService.get("controller.profile.updatepicture"));
-            LOG.info("Picture updated: " + user.getEmail());
-        }
-
-        return Results.redirect("/users/profile#picture");
+        return Results.redirect("/users/profile");
     }
 
     public Result deletepicture(Context context, FlashScope flashScope) {
@@ -265,6 +244,6 @@ public class UserController extends RootController {
 
         flashScope.success(i18nService.get("controller.profile.deletedpicture"));
 
-        return Results.redirect("/users/profile#picture");
+        return Results.redirect("/users/profile");
     }
 }

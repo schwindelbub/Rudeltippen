@@ -34,7 +34,7 @@ public class OverviewController extends RootController {
 
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
         final List<User> users = dataService.findActiveUsers(15);
-        final List<Map<User, List<GameTip>>> tips = dataService.getPlaydayTips(playday, users);
+        final List<Map<User, List<GameTip>>> tips = dataService.findPlaydayTips(playday, users);
         final long usersCount = dataService.countAllUsers();
 
         return Results.html()
@@ -47,7 +47,7 @@ public class OverviewController extends RootController {
     public Result extras() {
         final List<User> users = dataService.findAllActiveUsersOrderedByPlace();
         final List<Extra> extras = dataService.findAllExtras();
-        final List<Map<User, List<ExtraTip>>> tips = dataService.getExtraTips(users, extras);
+        final List<Map<User, List<ExtraTip>>> tips = dataService.findExtraTips(users, extras);
 
         return Results.html()
                 .render("tips", tips)

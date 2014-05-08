@@ -209,8 +209,8 @@ public class MailService {
     private Mail getMailInstance(final Settings settings, final String recipient, String subject) {
         Mail mail = mailProvider.get();
         mail.setCharset("UTF-8");
-        mail.setFrom(ninjaProperties.get("mailservice.from"));
-        mail.addReplyTo(ninjaProperties.get("mailservice.replyto"));
+        mail.setFrom(ninjaProperties.get("rudeltippen.mail.from"));
+        mail.addReplyTo(ninjaProperties.get("rudeltippen.mail.replyto"));
         mail.addTo(recipient);
         mail.setSubject(subject);
 

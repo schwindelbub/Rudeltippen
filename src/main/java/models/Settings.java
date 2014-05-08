@@ -35,6 +35,10 @@ public class Settings implements Serializable {
     private boolean playoffs;
     private boolean countFinalResult;
     private boolean enableRegistration;
+    
+    public ObjectId getId() {
+        return id;
+    }
 
     public String getAppSalt() {
         return appSalt;

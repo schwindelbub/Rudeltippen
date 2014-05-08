@@ -37,8 +37,7 @@ import com.google.inject.Singleton;
 import dtos.LoginDTO;
 import dtos.PasswordDTO;
 import dtos.UserDTO;
-import filters.LanguageFilter;
-import filters.SetupFilter;
+import filters.AppFilter;
 
 /**
  * 
@@ -46,7 +45,7 @@ import filters.SetupFilter;
  *
  */
 @Singleton
-@FilterWith({LanguageFilter.class, SetupFilter.class})
+@FilterWith({AppFilter.class})
 public class AuthController {
     private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
 

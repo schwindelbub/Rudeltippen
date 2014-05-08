@@ -31,6 +31,10 @@ public class Team {
     private int gamesLost;
     private int place;
     private int previousPlace;
+    
+    public ObjectId getId() {
+        return id;
+    }
 
     public String getName() {
         return this.name;
@@ -135,13 +139,4 @@ public class Team {
     public void setPreviousPlace(final int previousPlace) {
         this.previousPlace = previousPlace;
     }
-    //TODO Refactoring
-    //    public String nameUnescaped() {
-    //        if (StringUtils.isNotBlank(this.name)) {
-    //            final String name = Messages.get(this.name);
-    //            return StringEscapeUtils.unescapeHtml(name);
-    //        }
-    //
-    //        return "";
-    //    }
 }

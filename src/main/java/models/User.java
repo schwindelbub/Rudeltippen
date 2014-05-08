@@ -61,6 +61,10 @@ public class User {
     private int correctDifferences;
     private int correctTrends;
     private int correctExtraTips;
+    
+    public ObjectId getId() {
+        return id;
+    }
 
     public String getEmail() {
         return this.email;

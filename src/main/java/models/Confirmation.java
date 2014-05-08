@@ -27,6 +27,10 @@ public class Confirmation {
     
     private Date created;
 
+    public ObjectId getId() {
+        return id;
+    }
+
     public User getUser() {
         return user;
     }

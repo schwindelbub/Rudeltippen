@@ -99,8 +99,8 @@ public class AuthService {
     }
 
     public void activateAndSetAvatar(final User user) {
-        final String avatar = AppUtils.getGravatarImage(user.getEmail(), "retro", 128);
-        final String avatarSmall = AppUtils.getGravatarImage(user.getEmail(), "retro", 64);
+        final String avatar = AppUtils.getGravatarImage(user.getEmail(), "mm", 128);
+        final String avatarSmall = AppUtils.getGravatarImage(user.getEmail(), "mm", 64);
         if (StringUtils.isNotBlank(avatar)) {
             user.setPictureLarge(avatar);
         }

@@ -37,6 +37,10 @@ public class Extra {
     private int points;
     
     private Date ending;
+    
+    public ObjectId getId() {
+        return id;
+    }
 
     public List<ExtraTip> getExtraTipps() {
         return extraTips;
@@ -110,22 +114,11 @@ public class Extra {
         this.answer = answer;
     }
 
-    //TODO Refactoring
     public boolean isTipable() {
-//        if (new Date().getTime() >= this.ending.getTime()) {
-//            return false;
-//        }
+        if (new Date().getTime() >= this.ending.getTime()) {
+            return false;
+        }
 
         return true;
     }
-
-    //TODO Refactoring
-    //    public String questionUnescaped() {
-    //        if (StringUtils.isNotBlank(this.question)) {
-    //            String question = Messages.get(this.question);
-    //            return StringEscapeUtils.unescapeHtml(question);
-    //        }
-    //
-    //        return "";
-    //    }
 }

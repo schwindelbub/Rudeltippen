@@ -54,6 +54,10 @@ public class Game {
     private boolean ended;
     private boolean informed;
     private boolean updateble;
+    
+    public ObjectId getId() {
+        return id;
+    }
 
     public Playday getPlayday() {
         return this.playday;
@@ -231,16 +235,6 @@ public class Game {
         this.updateble = updateble;
     }
 
-    public Date getTippEnding() {
-        //TODO Refactoring
-        //        final long time = this.kickoff.getTime();
-        //        final int offset = AppUtils.findSettings().getMinutesBeforeTip() * 60000 ;
-        //
-        //        return new Date (time - offset);
-        return null;
-    }
-
-    //TODO Refactoring
     public Team getWinner() {
         String home, away;
         if (this.overtime) {
@@ -264,7 +258,6 @@ public class Game {
         return null;
     }
 
-    //TODO Refactoring
     public Team getLoser() {
         String home, away;
         if (this.overtime) {
@@ -287,7 +280,7 @@ public class Game {
 
         return null;
     }
-
+    
     public boolean isTippable() {
         //TODO Refactoring
         //        final Date now = new Date();

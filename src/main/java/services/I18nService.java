@@ -47,7 +47,7 @@ public class I18nService {
         } else if (pointsDiff > 1) {
             message = get("points.to.top.many", new Object[]{pointsDiff});
         }
-
+        
         return message;
     }
 
@@ -58,7 +58,7 @@ public class I18nService {
      * @return The String value of the timezone
      */
     public String getCurrentTimeZone() {
-        String timezone = ninjaProperties.get("app.timezone");
+        String timezone = ninjaProperties.get("rudeltippen.timezone");
         if (StringUtils.isBlank(timezone)) {
             timezone = Constants.DEFAULT_TIMEZONE.value();
         }
@@ -66,8 +66,8 @@ public class I18nService {
     }
 
     public String getDefaultLanguage() {
-        String language = ninjaProperties.get("default.language");
-        if (StringUtils.isBlank(language)) {
+        String language = ninjaProperties.get("rudeltippen.language");
+        if (StringUtils.isNotBlank(language)) {
             if (("en").equalsIgnoreCase(language)) {
                 language = "en";
             } else if (("de").equalsIgnoreCase(language)) {

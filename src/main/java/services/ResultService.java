@@ -9,9 +9,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import models.Constants;
 import models.Game;
+import models.Settings;
 import models.User;
 import models.WSResult;
 import models.WSResults;
+import ninja.utils.NinjaProperties;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
@@ -40,6 +42,9 @@ public class ResultService {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private NinjaProperties ninjaProperties;
 
     public WSResults getResultsFromWebService(final Game game) {
         WSResults wsResults = new WSResults();
@@ -124,5 +129,81 @@ public class ResultService {
         wsResults.setWsResult(resultsMap);
 
         return wsResults;
+    }
+    
+
+    public int getTipPoints(final int homeScore, final int awayScore, final int homeScoreTipp, final int awayScoreTipp) {
+        final Settings settings = dataService.findSettings();
+        int points = 0;
+
+        if ((homeScore == homeScoreTipp) && (awayScore == awayScoreTipp)) {
+            points = settings.getPointsTip();
+        } else if ((homeScore - awayScore) == (homeScoreTipp - awayScoreTipp)) {
+            points = settings.getPointsTipDiff();
+        } else if ((awayScore - homeScore) == (awayScoreTipp - homeScoreTipp)) {
+            points = settings.getPointsTipDiff();
+        } else {
+            points = getTipPointsTrend(homeScore, awayScore, homeScoreTipp, awayScoreTipp);
+        }
+
+        return points;
+    }
+
+    public int getTipPointsTrend(final int homeScore, final int awayScore, final int homeScoreTipp, final int awayScoreTipp) {
+        final Settings settings = dataService.findSettings();
+        int points = 0;
+
+        if ((homeScore > awayScore) && (homeScoreTipp > awayScoreTipp)) {
+            points = settings.getPointsTipTrend();
+        } else if ((homeScore < awayScore) && (homeScoreTipp < awayScoreTipp)) {
+            points = settings.getPointsTipTrend();
+        }
+
+        return points;
+    }
+
+    public int getTipPointsOvertime(final int homeScore, final int awayScore, final int homeScoreOT, final int awayScoreOT, final int homeScoreTipp, final int awayScoreTipp) {
+        final Settings settings = dataService.findSettings();
+        int points = 0;
+
+        if (settings.isCountFinalResult()) {
+            points = getTipPoints(homeScoreOT, awayScoreOT, homeScoreTipp, awayScoreTipp);
+        } else {
+            if ((homeScore == awayScore) && (homeScore == homeScoreTipp) && (awayScore == awayScoreTipp)) {
+                points = settings.getPointsTip();
+            } else if ((homeScore == awayScore) && (homeScoreTipp == awayScoreTipp)) {
+                points = settings.getPointsTipDiff();
+            }
+        }
+
+        return points;
+    }
+
+    public int[] getPoints(final int homeScore, final int awayScore) {
+        final Settings settings = dataService.findSettings();
+        final int[] points = new int[2];
+
+        if (homeScore == awayScore) {
+            points[0] = settings.getPointsGameDraw();
+            points[1] = settings.getPointsGameDraw();
+        } else if (homeScore > awayScore) {
+            points[0] = settings.getPointsGameWin();
+            points[1] = 0;
+        } else if (homeScore < awayScore) {
+            points[0] = 0;
+            points[1] = settings.getPointsGameWin();
+        }
+
+        return points;
+    }
+    
+    public boolean isJobInstance() {
+        boolean isInstance = false;
+        final String jobInstance = ninjaProperties.get("rudeltippen.jobinstance");
+        if (StringUtils.isNotBlank(jobInstance) && jobInstance.equalsIgnoreCase("true")) {
+            isInstance = true;
+        }
+    
+        return isInstance;
     }
 }

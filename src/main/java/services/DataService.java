@@ -2,6 +2,7 @@ package services;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,6 @@ import models.Playday;
 import models.Settings;
 import models.Team;
 import models.User;
-import models.WSResults;
 import models.statistic.GameStatistic;
 import models.statistic.GameTipStatistic;
 import models.statistic.PlaydayStatistic;
@@ -27,11 +27,14 @@ import models.statistic.ResultStatistic;
 import models.statistic.UserStatistic;
 import ninja.cache.NinjaCache;
 
+import org.apache.commons.lang.StringUtils;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import utils.ValidationUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -51,6 +54,12 @@ public class DataService {
 
     @Inject
     private NinjaCache ninjaCache;
+    
+    @Inject
+    private ResultService resultService;
+    
+    @Inject
+    private NotificationService notificationService;
 
     public DataService() {
         MongoClient mongoClient = null;
@@ -80,7 +89,7 @@ public class DataService {
         this.datastore.delete(object);
     }
 
-    public void deleteAll(final Class<?> clazz) {
+    public void deleteCollection(final Class<?> clazz) {
         this.datastore.delete(this.datastore.createQuery(clazz));
     }
 
@@ -88,7 +97,7 @@ public class DataService {
         return this.datastore.find(AbstractJob.class).field("name").equal(jobName).get();
     }
 
-    public List<Confirmation>  findAllPendingActivatations() {
+    public List<Confirmation> findAllPendingActivatations() {
         //TODO Refactoring
         //Confirmation.find("SELECT c FROM Confirmation c WHERE confirmType = ? AND DATE(NOW()) > (DATE(created) + 2)", ConfirmationType.ACTIVATION).fetch();
         return null;
@@ -216,178 +225,85 @@ public class DataService {
         return settings;
     }
 
-    public int getPointsToFirstPlace() {
-        //TODO Refactoring
-        //        final User connectedUser = AppUtils.getConnectedUser();
-        //        final User user = User.find("byPlace", 1).first();
-        //
-        //        int pointsDiff = 0;
-        //        if (user != null && connectedUser != null) {
-        //            pointsDiff = user.getPoints() - connectedUser.getPoints();
-        //        }
-        //
-        //        return pointsDiff;
-        return 0;
+    public User findUserByPlace(int place) {
+        return this.datastore.find(User.class).field("place").equal(place).get();
+    }
+    
+    public Team findTeamByReference(final String reference) {
+        Team team = null;
+        if (StringUtils.isNotBlank(reference)) {
+            final String[] references = reference.split("-");
+            if ((references != null) && (references.length == 3)) {
+                if ("B".equals(references[0])) {
+                    final Bracket bracket = findBracketByNumber(references[1]);
+                    if (bracket != null) {
+                        team = bracket.getTeamByPlace(Integer.parseInt(references[2]));
+                    }
+                } else if ("G".equals(references[0])) {
+                    final Game aGame = findGameByNumber(references[1]);
+                    if ((aGame != null) && aGame.isEnded()) {
+                        if ("W".equals(references[2])) {
+                            team = aGame.getWinner();
+                        } else if ("L".equals(references[2])) {
+                            team = aGame.getLoser();
+                        }
+                    }
+                }
+            }
+        }
+
+        return team;
     }
 
-    public boolean isJobInstance() {
-        //TODO Refactoring
-        //        boolean isInstance = false;
-        //        final String appName = Play.configuration.getProperty("application.name");
-        //        final String jobInstance = Play.configuration.getProperty("app.jobinstance");
-        //        if (StringUtils.isNotBlank(appName) && StringUtils.isNotBlank(jobInstance) && appName.equalsIgnoreCase(jobInstance)) {
-        //            isInstance = true;
-        //        }
-        //
-        //        return isInstance;
-
-        return false;
+    public Game findGameByNumber(String number) {
+        return this.datastore.find(Game.class).field("number").equal(number).get();
     }
-    public Team getTeamByReference(final String reference) {
-        // TODO Refactoring
-        //        Team team = null;
-        //        if (StringUtils.isNotBlank(reference)) {
-        //            final String[] references = reference.split("-");
-        //            if ((references != null) && (references.length == 3)) {
-        //                if ("B".equals(references[0])) {
-        //                    final Bracket bracket = Bracket.find("byNumber", Integer.parseInt(references[1])).first();
-        //                    if (bracket != null) {
-        //                        team = bracket.getTeamByPlace(Integer.parseInt(references[2]));
-        //                    }
-        //                } else if ("G".equals(references[0])) {
-        //                    final Game aGame = Game.find("byNumber", Integer.parseInt(references[1])).first();
-        //                    if ((aGame != null) && aGame.isEnded()) {
-        //                        if ("W".equals(references[2])) {
-        //                            team = aGame.getWinner();
-        //                        } else if ("L".equals(references[2])) {
-        //                            team = aGame.getLoser();
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //
-        //        return team;
-        return null;
+
+    public Bracket findBracketByNumber(String number) {
+        return this.datastore.find(Bracket.class).field("number").equal(number).get();
     }
 
     public void saveScore(final Game game, final String homeScore, final String awayScore, final String extratime, String homeScoreExtratime, String awayScoreExtratime) {
-        //TODO Refactoring
-        //        final int[] points = AppUtils.getPoints(Integer.parseInt(homeScore), Integer.parseInt(awayScore));
-        //        game.setHomePoints(points[0]);
-        //        game.setAwayPoints(points[1]);
-        //        game.setHomeScore(homeScore);
-        //        game.setAwayScore(awayScore);
-        //        if (ValidationService.isValidScore(homeScoreExtratime, awayScoreExtratime )) {
-        //            homeScoreExtratime = homeScoreExtratime.trim();
-        //            awayScoreExtratime = awayScoreExtratime.trim();
-        //            game.setOvertimeType(extratime);
-        //            game.setHomeScoreOT(homeScoreExtratime);
-        //            game.setAwayScoreOT(awayScoreExtratime);
-        //            game.setOvertime(true);
-        //        } else {
-        //            game.setOvertime(false);
-        //        }
-        //
-        //        if (!game.isEnded()) {
-        //            NotificationService.sendNotfications(game);
-        //            game.setEnded(true);
-        //        }
-        //        game._save();
+        final int[] points = resultService.getPoints(Integer.parseInt(homeScore), Integer.parseInt(awayScore));
+        game.setHomePoints(points[0]);
+        game.setAwayPoints(points[1]);
+        game.setHomeScore(homeScore);
+        game.setAwayScore(awayScore);
+        if (ValidationUtils.isValidScore(homeScoreExtratime, awayScoreExtratime )) {
+            homeScoreExtratime = homeScoreExtratime.trim();
+            awayScoreExtratime = awayScoreExtratime.trim();
+            game.setOvertimeType(extratime);
+            game.setHomeScoreOT(homeScoreExtratime);
+            game.setAwayScoreOT(awayScoreExtratime);
+            game.setOvertime(true);
+        } else {
+            game.setOvertime(false);
+        }
+
+        if (!game.isEnded()) {
+            notificationService.sendNotfications(game);
+            game.setEnded(true);
+        }
+        save(game);
     }
 
-    public int getTipPoints(final int homeScore, final int awayScore, final int homeScoreTipp, final int awayScoreTipp) {
-        //TODO Refactrogin
-        //        final Settings settings = AppUtils.getSettings();
-        //        int points = 0;
-        //
-        //        if ((homeScore == homeScoreTipp) && (awayScore == awayScoreTipp)) {
-        //            points = settings.getPointsTip();
-        //        } else if ((homeScore - awayScore) == (homeScoreTipp - awayScoreTipp)) {
-        //            points = settings.getPointsTipDiff();
-        //        } else if ((awayScore - homeScore) == (awayScoreTipp - homeScoreTipp)) {
-        //            points = settings.getPointsTipDiff();
-        //        } else {
-        //            points = getTipPointsTrend(homeScore, awayScore, homeScoreTipp, awayScoreTipp);
-        //        }
-        //
-        //        return points;
-        return 0;
+    public void saveGameTip(final Game game, final int homeScore, final int awayScore, User user) {
+        GameTip gameTip = findGameTipByGameAndUser(user, game);
+        if (game.isTippable() && ValidationUtils.isValidScore(String.valueOf(homeScore), String.valueOf(awayScore))) {
+            if (gameTip == null) {
+                gameTip = new GameTip();
+                gameTip.setGame(game);
+                gameTip.setUser(user);
+            }
+            gameTip.setPlaced(new Date());
+            gameTip.setHomeScore(homeScore);
+            gameTip.setAwayScore(awayScore);
+            save(gameTip);
+            LOG.info("Tipp placed - " + user.getEmail() + " - " + gameTip);
+        }
     }
 
-    public int getTipPointsTrend(final int homeScore, final int awayScore, final int homeScoreTipp, final int awayScoreTipp) {
-        //TODO Refactoring
-        //        final Settings settings = AppUtils.getSettings();
-        //        int points = 0;
-        //
-        //        if ((homeScore > awayScore) && (homeScoreTipp > awayScoreTipp)) {
-        //            points = settings.getPointsTipTrend();
-        //        } else if ((homeScore < awayScore) && (homeScoreTipp < awayScoreTipp)) {
-        //            points = settings.getPointsTipTrend();
-        //        }
-        //
-        //        return points;
-        return 0;
-    }
-
-    public int getTipPointsOvertime(final int homeScore, final int awayScore, final int homeScoreOT, final int awayScoreOT, final int homeScoreTipp, final int awayScoreTipp) {
-        //TODO Refacttoring
-        //        final Settings settings = AppUtils.getSettings();
-        //        int points = 0;
-        //
-        //        if (settings.isCountFinalResult()) {
-        //            points = getTipPoints(homeScoreOT, awayScoreOT, homeScoreTipp, awayScoreTipp);
-        //        } else {
-        //            if ((homeScore == awayScore) && (homeScore == homeScoreTipp) && (awayScore == awayScoreTipp)) {
-        //                points = settings.getPointsTip();
-        //            } else if ((homeScore == awayScore) && (homeScoreTipp == awayScoreTipp)) {
-        //                points = settings.getPointsTipDiff();
-        //            }
-        //        }
-        //
-        //        return points;
-        return 0;
-    }
-
-    public int[] getPoints(final int homeScore, final int awayScore) {
-        //TODO Refactoring
-        //        final Settings settings = AppUtils.getSettings();
-        //        final int[] points = new int[2];
-        //
-        //        if (homeScore == awayScore) {
-        //            points[0] = settings.getPointsGameDraw();
-        //            points[1] = settings.getPointsGameDraw();
-        //        } else if (homeScore > awayScore) {
-        //            points[0] = settings.getPointsGameWin();
-        //            points[1] = 0;
-        //        } else if (homeScore < awayScore) {
-        //            points[0] = 0;
-        //            points[1] = settings.getPointsGameWin();
-        //        }
-        //
-        //        return points;
-        return null;
-    }
-
-    public void placeTip(final Game game, final int homeScore, final int awayScore) {
-        //TODO Refactoring
-        //        final User user = AppUtils.getConnectedUser();
-        //        GameTip gameTip = GameTip.find("byUserAndGame", user, game).first();
-        //        if (game.isTippable() && ValidationService.isValidScore(String.valueOf(homeScore), String.valueOf(awayScore))) {
-        //            if (gameTip == null) {
-        //                gameTip = new GameTip();
-        //                gameTip.setGame(game);
-        //                gameTip.setUser(user);
-        //            }
-        //            gameTip.setPlaced(new Date());
-        //            gameTip.setHomeScore(homeScore);
-        //            gameTip.setAwayScore(awayScore);
-        //            gameTip._save();
-        //            Logger.info("Tipp placed - " + user.getEmail() + " - " + gameTip);
-        //        }
-    }
-
-    public List<Map<User, List<GameTip>>> getPlaydayTips(final Playday playday, final List<User> users) {
+    public List<Map<User, List<GameTip>>> findPlaydayTips(final Playday playday, final List<User> users) {
         final List<Map<User, List<GameTip>>> tips = new ArrayList<Map<User, List<GameTip>>>();
 
         for (final User user : users) {
@@ -406,7 +322,7 @@ public class DataService {
 
         return tips;
     }
-    public List<Map<User, List<ExtraTip>>> getExtraTips(final List<User> users, final List<Extra> extras) {
+    public List<Map<User, List<ExtraTip>>> findExtraTips(final List<User> users, final List<Extra> extras) {
         final List<Map<User, List<ExtraTip>>> tips = new ArrayList<Map<User, List<ExtraTip>>>();
     
         for (final User user : users) {
@@ -439,53 +355,19 @@ public class DataService {
         return playday;
     }
 
-    public void setGameScoreFromWebService(final Game game, final WSResults wsResults) {
-        //TODO Refactoring
-        //        final Map<String, WSResult> wsResult = wsResults.getWsResult();
-        //
-        //        String homeScore = null;
-        //        String awayScore = null;
-        //        String homeScoreExtratime = null;
-        //        String awayScoreExtratime = null;
-        //        String extratime = null;
-        //
-        //        if (wsResult.containsKey("90")) {
-        //            homeScore = wsResult.get("90").getHomeScore();
-        //            awayScore = wsResult.get("90").getAwayScore();
-        //        }
-        //
-        //        if (wsResult.containsKey("121")) {
-        //            homeScoreExtratime = wsResult.get("121").getHomeScore();
-        //            awayScoreExtratime = wsResult.get("121").getAwayScore();
-        //            extratime = "ie";
-        //        } else if (wsResult.containsKey("120")) {
-        //            homeScoreExtratime = wsResult.get("120").getHomeScore();
-        //            awayScoreExtratime = wsResult.get("120").getAwayScore();
-        //            extratime = "nv";
-        //        }
-        //
-        //        Logger.info("Recieved from WebService - HomeScore: " + homeScore + " AwayScore: " + awayScore);
-        //        Logger.info("Recieved from WebService - HomeScoreExtra: " + homeScoreExtratime + " AwayScoreExtra: " + awayScoreExtratime + " (" + extratime + ")");
-        //        Logger.info("Updating results from WebService. " + game);
-        //        setGameScore(String.valueOf(game.getId()), homeScore, awayScore, extratime, homeScoreExtratime, awayScoreExtratime);
-        //        calculations();
-    }
+    public void saveExtraTip(final Extra extra, final Team team, User user) {
+        if (team != null) {
+            ExtraTip extraTip = findExtraTipByExtraAndUser(extra, user);
+            if (extraTip == null) {
+                extraTip = new ExtraTip();
+            }
 
-    public void placeExtraTip(final Extra extra, final Team team) {
-        //TODO Refactoring
-        //        final User user = AppUtils.getConnectedUser();
-        //        if (team != null) {
-        //            ExtraTip extraTip = ExtraTip.find("byUserAndExtra", user, extra).first();
-        //            if (extraTip == null) {
-        //                extraTip = new ExtraTip();
-        //            }
-        //
-        //            extraTip.setUser(user);
-        //            extraTip.setExtra(extra);
-        //            extraTip.setAnswer(team);
-        //            extraTip._save();
-        //            Logger.info("Stored extratip - " + user.getEmail() + " - " + extraTip);
-        //        }
+            extraTip.setUser(user);
+            extraTip.setExtra(extra);
+            extraTip.setAnswer(team);
+            save(extraTip);
+            LOG.info("Stored extratip - " + user.getEmail() + " - " + extraTip);
+        }
     }
 
     public boolean appIsInizialized() {
@@ -517,9 +399,7 @@ public class DataService {
     }
 
     public List<User> findAllActiveUsersOrdered() {
-        //TODO Refactoring
-        //User.find("SELECT u FROM User u WHERE active = true ORDER BY points DESC, correctResults DESC, correctDifferences DESC, correctTrends DESC, correctExtraTips DESC").fetch();
-        return null;
+        return this.datastore.find(User.class).field("active").equal(true).order("points, correctResults, correctDifferences, correctTrends, correctExtraTips").asList();
     }
 
     public List<Bracket> findAllBrackets() {
@@ -535,9 +415,7 @@ public class DataService {
     }
 
     public List<Team> findTeamsByBracketOrdered(Bracket bracket) {
-        // TODO Refactoring
-        //Team.find("SELECT t FROM Team t WHERE bracket_id = ? ORDER BY points DESC, goalsDiff DESC, goalsFor DESC", bracket.getId()).fetch();
-        return null;
+        return this.datastore.find(Team.class).field("bracket").equal(bracket).order("points, goalsDiff, goalsFor").asList();
     }
     
     public List<Team> findTeamsByBracket(Bracket bracket) {
@@ -545,9 +423,7 @@ public class DataService {
     }
 
     public List<Game> findGamesByPlayoffAndEndedAndBracket() {
-        // TODO Refactoring
-        // Game.find("byPlayoffAndEndedAndBracket", true, false, null).fetch();
-        return null;
+        return this.datastore.find(Game.class).field("playoff").equal(true).field("ended").equal(false).field("bracket").equal(null).asList();
     }
 
     public List<Game> findReferencedGames(String bracketString) {

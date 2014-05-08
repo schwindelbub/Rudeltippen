@@ -9,6 +9,7 @@ import models.Team;
 import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
+import ninja.params.PathParam;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -32,7 +33,7 @@ public class AjaxController extends RootController {
     private DataService dataService;
 
     //TODO Refactoring
-    public Result webserviceid(final String gameId) {
+    public Result webserviceid(@PathParam("gameId") String gameId) {
         Game game = dataService.findGameById(gameId);
         if (game != null) {
             final String webserviceID = null;//params.get("value");
@@ -47,7 +48,7 @@ public class AjaxController extends RootController {
     }
 
     //TODO Refactoring
-    public Result kickoff(final String gameId) {
+    public Result kickoff(@PathParam("gameId") String gameId) {
         Game game = dataService.findGameById(gameId);
         if (game != null) {
             final String kickoff = null;//params.get("value");
@@ -67,7 +68,7 @@ public class AjaxController extends RootController {
     }
 
     //TODO Refactoring
-    public Result place(final String teamId) {
+    public Result place(@PathParam("teamId") String teamId) {
         Team team = dataService.findTeamById(teamId);
         if (team != null) {
             final String place = null;//params.get("value");
@@ -85,7 +86,7 @@ public class AjaxController extends RootController {
         return Results.badRequest();
     }
 
-    public Result updateblegame(final String gameId) {
+    public Result updateblegame(@PathParam("gameId") String gameId) {
         Game game = dataService.findGameById(gameId);
         if (game != null) {
             game.setUpdateble(!game.isUpdateble());
@@ -96,7 +97,7 @@ public class AjaxController extends RootController {
         return Results.badRequest();
     }
 
-    public Result updateblebracket(final String bracketId) {
+    public Result updateblebracket(@PathParam("bracketId") String bracketId) {
         Bracket bracket = dataService.findBracketById(bracketId);
         if (bracket != null) {
             bracket.setUpdateble(!bracket.isUpdateble());

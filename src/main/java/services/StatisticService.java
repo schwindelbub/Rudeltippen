@@ -75,7 +75,7 @@ public class StatisticService {
             }
         }
 
-        for (final Entry entry : scores.entrySet()) {
+        for (final Entry<String, Integer> entry : scores.entrySet()) {
             GameStatistic gameStatistic = dataService.findGameStatisticByPlaydayAndResult(playday, entry.getKey());
             if (gameStatistic == null) {
                 gameStatistic = new GameStatistic();
@@ -176,7 +176,7 @@ public class StatisticService {
     }
 
     public void setPlaydayStatistics(final Playday playday, final Map<String, Integer> scores) {
-        for (final Entry entry : scores.entrySet()) {
+        for (final Entry<String, Integer> entry : scores.entrySet()) {
             PlaydayStatistic playdayStatistic = dataService.findPlaydayStatisticByPlaydayAndResult(playday, entry.getKey());
             if (playdayStatistic == null) {
                 playdayStatistic = new PlaydayStatistic();

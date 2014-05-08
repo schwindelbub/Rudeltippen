@@ -9,8 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import models.Constants;
 import models.User;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -126,10 +133,18 @@ public class SetupService {
 
         Document document = null;
         try {
-            //TODO Refactoring
-            //document = WS.url(WS_URL).setHeader("Content-Type", WS_CONTENT_TYPE).setHeader("charset", WS_ENCODING).body(buffer.toString()).post().getXml();
+            HttpResponse httpResponse = Request
+                    .Post(Constants.WS_URL.value())
+                    .setHeader("Content-Type", Constants.WS_COTENT_TYPE.value())
+                    .setHeader("charset", Constants.DEFAULT_ENCODING.value())
+                    .bodyString(buffer.toString(), ContentType.TEXT_XML)
+                    .execute()
+                    .returnResponse();
+                
+                DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                document = builder.parse(httpResponse.getEntity().getContent());
         } catch (final Exception e) {
-            e.printStackTrace();
+            LOG.error("Failed to get league data from webservice", e);
         }
 
         return document;

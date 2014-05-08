@@ -29,6 +29,10 @@ public class Bracket {
     
     private boolean updateble;
 
+    public ObjectId getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
@@ -69,7 +73,6 @@ public class Bracket {
         this.updateble = updateble;
     }
 
-    //TODO Refactoring
     public boolean allGamesEnded() {
         for (final Game game : games) {
             if (!game.isEnded()) {
@@ -80,7 +83,6 @@ public class Bracket {
         return true;
     }
 
-    //TODO Refactoring
     public Team getTeamByPlace(final int place) {
         int i = 1;
         for (final Team team : teams) {

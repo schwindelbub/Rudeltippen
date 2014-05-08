@@ -31,29 +31,27 @@ import com.google.inject.Singleton;
  *
  */
 @Singleton
-public class PlaydayJob extends AppJob implements Job {
+public class PlaydayJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(GameTipJob.class);
 
     @Inject
     private DataService dataService;
 
     @Inject
-    private ResultService resultService;
-
-    @Inject
     private SetupService setupService;
+    
+    @Inject
+    private ResultService resultService;
 
     @Inject
     private I18nService i18nService;
 
     public PlaydayJob() {
-        this.setDescription(i18nService.get("job.playdayjob.description"));
-        this.setExecuted(i18nService.get("job.playdayjob.executed"));
     }
 
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
-        if (dataService.isJobInstance()) {
+        if (resultService.isJobInstance()) {
             AbstractJob job = dataService.findAbstractJobByName("GameTipJob");
             if (job != null && job.isActive()) {
                 LOG.info("Started Job: PlaydayJob");

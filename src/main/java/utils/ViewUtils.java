@@ -1,5 +1,6 @@
 package utils;
 
+import java.util.Date;
 import java.util.List;
 
 import models.Bracket;
@@ -59,36 +60,13 @@ public class ViewUtils {
 //            return difference;
 //        }
 //    
-//        public static String formatted (final Date date) {
-//            String dateString = Play.configuration.getProperty("app.dateformat");
-//            String timeString = Play.configuration.getProperty("app.timeformat");
-//    
-//            if (StringUtils.isBlank(dateString)) {
-//                dateString = DEFAULT_DATEFORMAT;
-//            }
-//    
-//            if (StringUtils.isBlank(timeString)) {
-//                timeString = DEFAULT_TIMEFORMAT;
-//            }
-//    
-//            String lang = Lang.get();
-//            if (StringUtils.isBlank(lang)) {
-//                lang = "de";
-//            }
-//    
-//            final Locale currentLocale = new Locale(lang, lang.toUpperCase());
-//            final SimpleDateFormat df = new SimpleDateFormat(dateString + " - " + timeString, currentLocale);
-//    
-//            return df.format(date);
-//        }
-//    
-        public String homeReferenceName (final Game game) {
-            return getReference(game.getHomeReference());
-        }
-    
-        public String awayReferenceName (final Game game) {
-            return getReference(game.getAwayReference());
-        }
+    public String homeReferenceName (final Game game) {
+        return getReference(game.getHomeReference());
+    }
+
+    public String awayReferenceName (final Game game) {
+        return getReference(game.getAwayReference());
+    }
 //    
 //        public static String getGameTipAndPoints(final Game game) {
 //            String tip = "-";
@@ -153,95 +131,95 @@ public class ViewUtils {
 //            return points;
 //        }
 //    
-        public String getTrend(final Game game) {
-            String trend = i18nService.get("model.game.notenoughtipps");
-            final List<GameTip> gameTips = game.getGameTips();
-            if ((gameTips != null) && (gameTips.size() >= 4)) {
-                int tipsHome = 0;
-                int tipsDraw = 0;
-                int tipsAway = 0;
-    
-                for (final GameTip gameTip : gameTips) {
-                    final int homeScore = gameTip.getHomeScore();
-                    final int awayScore = gameTip.getAwayScore();
-    
-                    if (homeScore == awayScore) {
-                        tipsDraw++;
-                    } else if (homeScore > awayScore) {
-                        tipsHome++;
-                    } else if (homeScore < awayScore) {
-                        tipsAway++;
-                    }
+    public String getTrend(final Game game) {
+        String trend = i18nService.get("model.game.notenoughtipps");
+        final List<GameTip> gameTips = game.getGameTips();
+        if ((gameTips != null) && (gameTips.size() >= 4)) {
+            int tipsHome = 0;
+            int tipsDraw = 0;
+            int tipsAway = 0;
+
+            for (final GameTip gameTip : gameTips) {
+                final int homeScore = gameTip.getHomeScore();
+                final int awayScore = gameTip.getAwayScore();
+
+                if (homeScore == awayScore) {
+                    tipsDraw++;
+                } else if (homeScore > awayScore) {
+                    tipsHome++;
+                } else if (homeScore < awayScore) {
+                    tipsAway++;
                 }
-    
-                trend = tipsHome + " / " + tipsDraw + " / " + tipsAway;
             }
-    
-            return trend;
+
+            trend = tipsHome + " / " + tipsDraw + " / " + tipsAway;
         }
 
-        private String getReference(final String reference) {
-            final String [] references = reference.split("-");
-            String message = "";
-            if (("G").equals(references[0])) {
-                if ("W".equals(references[2])) {
-                    message = i18nService.get("model.game.winnergame") + " " + references[1];
-                } else if (("L").equals(references[2])) {
-                    message = i18nService.get("model.game.losergame") + " " + references[1];
-                }
-            } else if (("B").equals(references[0])) {
+        return trend;
+    }
+
+    private String getReference(final String reference) {
+        final String [] references = reference.split("-");
+        String message = "";
+        if (("G").equals(references[0])) {
+            if ("W".equals(references[2])) {
+                message = i18nService.get("model.game.winnergame") + " " + references[1];
+            } else if (("L").equals(references[2])) {
+                message = i18nService.get("model.game.losergame") + " " + references[1];
+            }
+        } else if (("B").equals(references[0])) {
+            //TODO Refactoring
+            final Bracket bracket = null;//Bracket.find("byNumber", Integer.parseInt(references[1])).first();
+            final String groupName = "";//bracket.getName();
+            final String placeName = getPlaceName(Integer.parseInt(references[2]));
+
+            message = placeName + " " + i18nService.get(groupName);
+        }
+
+        return message;
+    }
+
+    public String getPlaceName(final int place) {
+        String message = "";
+
+        if (place == 1) {
+            message = i18nService.get("helper.first");
+        } else if (place == 2){
+            message = i18nService.get("helper.second");
+        } else if (place == 3){
+            message = i18nService.get("helper.third");
+        } else if (place == 4){
+            message = i18nService.get("helper.fourth");
+        } else if (place == 5){
+            message = i18nService.get("helper.fifth");
+        } else if (place == 6){
+            message = i18nService.get("helper.six");
+        } else if (place == 7){
+            message = i18nService.get("helper.seventh");
+        } else if (place == 8){
+            message = i18nService.get("helper.eight");
+        } else if (place == 9){
+            message = i18nService.get("helper.ninth");
+        } else if (place == 10){
+            message = i18nService.get("helper.tenth");
+        }
+
+        return message;
+    }
+
+    public String getResult(final Game game) {
+        String result = "-";
+        if (game.isEnded()) {
+            if (game.isOvertime()) {
                 //TODO Refactoring
-                final Bracket bracket = null;//Bracket.find("byNumber", Integer.parseInt(references[1])).first();
-                final String groupName = "";//bracket.getName();
-                final String placeName = getPlaceName(Integer.parseInt(references[2]));
-    
-                message = placeName + " " + i18nService.get(groupName);
+                result = game.getHomeScoreOT() + " : " + game.getAwayScoreOT() + " (OVERTIME Translation)";
+            } else {
+                result = game.getHomeScore() + " : " + game.getAwayScore();
             }
-    
-            return message;
         }
 
-        public String getPlaceName(final int place) {
-            String message = "";
-    
-            if (place == 1) {
-                message = i18nService.get("helper.first");
-            } else if (place == 2){
-                message = i18nService.get("helper.second");
-            } else if (place == 3){
-                message = i18nService.get("helper.third");
-            } else if (place == 4){
-                message = i18nService.get("helper.fourth");
-            } else if (place == 5){
-                message = i18nService.get("helper.fifth");
-            } else if (place == 6){
-                message = i18nService.get("helper.six");
-            } else if (place == 7){
-                message = i18nService.get("helper.seventh");
-            } else if (place == 8){
-                message = i18nService.get("helper.eight");
-            } else if (place == 9){
-                message = i18nService.get("helper.ninth");
-            } else if (place == 10){
-                message = i18nService.get("helper.tenth");
-            }
-    
-            return message;
-        }
-
-        public String getResult(final Game game) {
-            String result = "-";
-            if (game.isEnded()) {
-                if (game.isOvertime()) {
-                    //TODO Refactoring
-                    result = game.getHomeScoreOT() + " : " + game.getAwayScoreOT() + " (OVERTIME Translation)";
-                } else {
-                    result = game.getHomeScore() + " : " + game.getAwayScore();
-                }
-            }
-    
-            return result;
-        }
+        return result;
+    }
 //    
 //        public static String getGameTipAndPoints(final GameTip gameTip) {
 //            String tip = "-";
@@ -318,68 +296,61 @@ public class ViewUtils {
 //            return StringEscapeUtils.unescapeHtml(html);
 //        }
 //    
-        public String getPlaceTrend(final User user) {
-            final int currentPlace = user.getPlace();
-            final int previousPlace = user.getPreviousPlace();
-            String trend = "";
-    
-            if (previousPlace > 0) {
-                if (currentPlace < previousPlace) {
-                    trend = "<i class=\"icon-arrow-up icon-green\"></i>" + " (" + previousPlace + ")";
-                } else if (currentPlace > previousPlace) {
-                    trend = "<i class=\"icon-arrow-down icon-red\"></i>" + " (" + previousPlace + ")";
-                } else {
-                    trend = "<i class=\"icon-minus\"></i>" + " (" + previousPlace + ")";
-                }
+    public String getPlaceTrend(final User user) {
+        final int currentPlace = user.getPlace();
+        final int previousPlace = user.getPreviousPlace();
+        String trend = "";
+
+        if (previousPlace > 0) {
+            if (currentPlace < previousPlace) {
+                trend = "<i class=\"icon-arrow-up icon-green\"></i>" + " (" + previousPlace + ")";
+            } else if (currentPlace > previousPlace) {
+                trend = "<i class=\"icon-arrow-down icon-red\"></i>" + " (" + previousPlace + ")";
+            } else {
+                trend = "<i class=\"icon-minus\"></i>" + " (" + previousPlace + ")";
             }
-    
-            return trend;
         }
-    
-        public String getPlaceTrend(final Team team) {
-            final int currentPlace = team.getPlace();
-            final int previousPlace = team.getPreviousPlace();
-            String trend = "";
-    
-            if (previousPlace > 0) {
-                if (currentPlace < previousPlace) {
-                    trend = "<i class=\"icon-arrow-up icon-green\"></i>" + " (" + previousPlace + ")";
-                } else if (currentPlace > previousPlace) {
-                    trend = "<i class=\"icon-arrow-down icon-red\"></i>" + " (" + previousPlace + ")";
-                } else {
-                    trend = "<i class=\"icon-minus\"></i>" + " (" + previousPlace + ")";
-                }
+
+        return trend;
+    }
+
+    public String getPlaceTrend(final Team team) {
+        final int currentPlace = team.getPlace();
+        final int previousPlace = team.getPreviousPlace();
+        String trend = "";
+
+        if (previousPlace > 0) {
+            if (currentPlace < previousPlace) {
+                trend = "<i class=\"icon-arrow-up icon-green\"></i>" + " (" + previousPlace + ")";
+            } else if (currentPlace > previousPlace) {
+                trend = "<i class=\"icon-arrow-down icon-red\"></i>" + " (" + previousPlace + ")";
+            } else {
+                trend = "<i class=\"icon-minus\"></i>" + " (" + previousPlace + ")";
             }
-    
-            return trend;
         }
-    
-        public String getScore(final Game game) {
-            String score = "- : -";
-            if (game.isEnded()) {
-                if (game.isOvertime()) {
-                    score = game.getHomeScore() + " : " + game.getAwayScore() + " / " + game.getHomeScoreOT() + ":" + game.getAwayScoreOT() + " (" + game.getOvertimeType() + ")";
-                } else {
-                    score = game.getHomeScore() + " : " + game.getAwayScore();
-                }
+
+        return trend;
+    }
+
+    public String getScore(final Game game) {
+        String score = "- : -";
+        if (game.isEnded()) {
+            if (game.isOvertime()) {
+                score = game.getHomeScore() + " : " + game.getAwayScore() + " / " + game.getHomeScoreOT() + ":" + game.getAwayScoreOT() + " (" + game.getOvertimeType() + ")";
+            } else {
+                score = game.getHomeScore() + " : " + game.getAwayScore();
             }
-    
-            return score;
         }
-//    
-//        public static String formatTimestamp(final Long timestamp) {
-//            final SimpleDateFormat df = new SimpleDateFormat(DEFAULT_DATEFORMAT + " - " + DEFAULT_TIMEFORMAT);
-//            return df.format(new Date(timestamp));
-//        }
-//    
-//        public static boolean getJobStatus(final String jobName) {
-//            boolean status = false;
-//    
-//            AbstractJob job = AbstractJob.find("byName", jobName).first();
-//            if (job != null) {
-//                status = job.isActive();
-//            }
-//    
-//            return status;
-//        }
+
+        return score;
+    }
+    
+    //TODO Refactoring
+    public Date getTippEnding(Game game) {
+        final long time = game.getKickoff().getTime();
+        //final int offset = AppUtils.findSettings().getMinutesBeforeTip() * 60000 ;
+        //
+        //        return new Date (time - offset);
+        return null;
+    }
 }

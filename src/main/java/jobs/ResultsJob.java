@@ -12,8 +12,8 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import services.CalculationService;
 import services.DataService;
-import services.I18nService;
 import services.ResultService;
 
 import com.google.inject.Inject;
@@ -25,26 +25,24 @@ import com.google.inject.Singleton;
  *
  */
 @Singleton
-public class ResultsJob extends AppJob implements Job {
+public class ResultsJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(GameTipJob.class);
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private CalculationService calculationService;
 
     @Inject
     private ResultService resultService;
     
-    @Inject
-    private I18nService i18nService;
-
     public ResultsJob() {
-        this.setDescription(i18nService.get("job.resultsjob.descrption"));
-        this.setExecuted(i18nService.get("job.resultsjob.executed"));
     }
 
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
-        if (dataService.isJobInstance()) {
+        if (resultService.isJobInstance()) {
             AbstractJob job = dataService.findAbstractJobByName("ResultsJob");
             if (job != null && job.isActive()) {
                 LOG.info("Started Job: ResultsJob");
@@ -52,7 +50,7 @@ public class ResultsJob extends AppJob implements Job {
                 for (final Game game : games) {
                     final WSResults wsResults = resultService.getResultsFromWebService(game);
                     if ((wsResults != null) && wsResults.isUpdated()) {
-                        dataService.setGameScoreFromWebService(game, wsResults);
+                        calculationService.setGameScoreFromWebService(game, wsResults);
                     }
                 }
                 LOG.info("Finished Job: ResultsJob");

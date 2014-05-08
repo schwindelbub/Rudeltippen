@@ -42,6 +42,10 @@ public class Playday implements Serializable {
 
     private boolean playoff;
     private boolean current;
+    
+    public ObjectId getId() {
+        return id;
+    }
 
     public boolean isCurrent() {
         return this.current;
@@ -107,7 +111,6 @@ public class Playday implements Serializable {
         this.gameStatistic = gameStatistic;
     }
 
-    //TODO Refactoring
     public boolean isTippable() {
         for (final Game game : this.games){
             if (game.isTippable()) {
@@ -117,7 +120,6 @@ public class Playday implements Serializable {
         return false;
     }
 
-    //TODO Refactoring
     public boolean allGamesEnded() {
         for (final Game game : this.games) {
             if (!game.isEnded()) {

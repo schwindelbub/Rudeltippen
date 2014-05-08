@@ -10,6 +10,7 @@ import models.User;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
+import dtos.SettingsDTO;
 import dtos.UserDTO;
 
 /**
@@ -96,5 +97,11 @@ public class ValidationService {
         if (!ValidationUtils.match(userDTO.userpass, userDTO.userpassConfirmation)) {
             validation.addBeanViolation(ValidationUtils.createBeanValidation("userpass", i18nService.get("validation.password.notmatch")));
         }
+    }
+
+    public void validateSettingsDTO(SettingsDTO settingsDTO,
+            Validation validation) {
+        // TODO Auto-generated method stub
+        
     }
 }

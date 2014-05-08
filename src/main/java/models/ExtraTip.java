@@ -26,6 +26,10 @@ public class ExtraTip {
 
     private int points;
 
+    public ObjectId getId() {
+        return id;
+    }
+    
     public User getUser() {
         return user;
     }

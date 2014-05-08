@@ -17,7 +17,8 @@ public enum Constants {
     EMAILPATTERN(".+@.+\\.[a-z]+"),
     USERNAMEPATTERN("[a-zA-Z0-9-_]+"),
     USERNAME("username"),
-    COOKIENAME("rudelremember");
+    COOKIENAME("rudelremember"),
+    MEDIAFOLDER("src/main/java/assets/media/");
 
     private String value;
 

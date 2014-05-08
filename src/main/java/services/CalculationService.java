@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -16,6 +19,8 @@ import models.Playday;
 import models.Settings;
 import models.Team;
 import models.User;
+import models.WSResult;
+import models.WSResults;
 import utils.AppUtils;
 import utils.ValidationUtils;
 
@@ -26,9 +31,13 @@ import utils.ValidationUtils;
  */
 @Singleton
 public class CalculationService {
+    private static final Logger LOG = LoggerFactory.getLogger(CalculationService.class);
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private ResultService resultService;
 
     @Inject
     private StatisticService statisticService;
@@ -76,7 +85,7 @@ public class CalculationService {
         for (final Extra extra : extras) {
             if (extra.getAnswer() == null) {
                 if (AppUtils.allReferencedGamesEnded(extra.getGameReferences())) {
-                    final Team team = dataService.getTeamByReference(extra.getExtraReference());
+                    final Team team = dataService.findTeamByReference(extra.getExtraReference());
                     if (team != null) {
                         extra.setAnswer(team);
                         dataService.save(extra);
@@ -103,9 +112,9 @@ public class CalculationService {
 
                 int pointsForTipp = 0;
                 if (game.isOvertime()) {
-                    pointsForTipp = dataService.getTipPointsOvertime(Integer.parseInt(game.getHomeScore()), Integer.parseInt(game.getAwayScore()), Integer.parseInt(game.getHomeScoreOT()), Integer.parseInt(game.getAwayScoreOT()), gameTip.getHomeScore(), gameTip.getAwayScore());
+                    pointsForTipp = resultService.getTipPointsOvertime(Integer.parseInt(game.getHomeScore()), Integer.parseInt(game.getAwayScore()), Integer.parseInt(game.getHomeScoreOT()), Integer.parseInt(game.getAwayScoreOT()), gameTip.getHomeScore(), gameTip.getAwayScore());
                 } else {
-                    pointsForTipp = dataService.getTipPoints(Integer.parseInt(game.getHomeScore()), Integer.parseInt(game.getAwayScore()), gameTip.getHomeScore(), gameTip.getAwayScore());
+                    pointsForTipp = resultService.getTipPoints(Integer.parseInt(game.getHomeScore()), Integer.parseInt(game.getAwayScore()), gameTip.getHomeScore(), gameTip.getAwayScore());
                 }
                 gameTip.setPoints(pointsForTipp);
                 dataService.save(gameTip);
@@ -264,8 +273,8 @@ public class CalculationService {
                     final String bracketString = "B-" + number + "%";
                     final List<Game> games = dataService.findReferencedGames(bracketString);
                     for (final Game game : games) {
-                        homeTeam = dataService.getTeamByReference(game.getHomeReference());
-                        awayTeam = dataService.getTeamByReference(game.getAwayReference());
+                        homeTeam = dataService.findTeamByReference(game.getHomeReference());
+                        awayTeam = dataService.findTeamByReference(game.getAwayReference());
                         game.setHomeTeam(homeTeam);
                         game.setAwayTeam(awayTeam);
                         dataService.save(game);
@@ -275,8 +284,8 @@ public class CalculationService {
 
             final List<Game> playoffGames = dataService.findGamesByPlayoffAndEndedAndBracket();
             for (final Game game : playoffGames) {
-                homeTeam = dataService.getTeamByReference(game.getHomeReference());
-                awayTeam = dataService.getTeamByReference(game.getAwayReference());
+                homeTeam = dataService.findTeamByReference(game.getHomeReference());
+                awayTeam = dataService.findTeamByReference(game.getAwayReference());
                 game.setHomeTeam(homeTeam);
                 game.setAwayTeam(awayTeam);
                 dataService.save(game);
@@ -323,5 +332,47 @@ public class CalculationService {
             }
         }
         return scores;
+    }
+
+    public void setGameScoreFromWebService(final Game game, final WSResults wsResults) {
+        final Map<String, WSResult> wsResult = wsResults.getWsResult();
+
+        String homeScore = null;
+        String awayScore = null;
+        String homeScoreExtratime = null;
+        String awayScoreExtratime = null;
+        String extratime = null;
+
+        if (wsResult.containsKey("90")) {
+            homeScore = wsResult.get("90").getHomeScore();
+            awayScore = wsResult.get("90").getAwayScore();
+        }
+
+        if (wsResult.containsKey("121")) {
+            homeScoreExtratime = wsResult.get("121").getHomeScore();
+            awayScoreExtratime = wsResult.get("121").getAwayScore();
+            extratime = "ie";
+        } else if (wsResult.containsKey("120")) {
+            homeScoreExtratime = wsResult.get("120").getHomeScore();
+            awayScoreExtratime = wsResult.get("120").getAwayScore();
+            extratime = "nv";
+        }
+
+        LOG.info("Recieved from WebService - HomeScore: " + homeScore + " AwayScore: " + awayScore);
+        LOG.info("Recieved from WebService - HomeScoreExtra: " + homeScoreExtratime + " AwayScoreExtra: " + awayScoreExtratime + " (" + extratime + ")");
+        LOG.info("Updating results from WebService. " + game);
+        setGameScore(String.valueOf(game.getId()), homeScore, awayScore, extratime, homeScoreExtratime, awayScoreExtratime);
+        calculations();
+    }
+    
+    public int getPointsToFirstPlace(User connectedUser) {
+        final User user = dataService.findUserByPlace(1);
+
+        int pointsDiff = 0;
+        if (user != null && connectedUser != null) {
+            pointsDiff = user.getPoints() - connectedUser.getPoints();
+        }
+
+        return pointsDiff;
     }
 }
