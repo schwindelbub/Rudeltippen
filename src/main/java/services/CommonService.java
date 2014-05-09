@@ -97,22 +97,30 @@ public class CommonService extends ViewService {
 
         final String filename = UUID.randomUUID().toString();
         if (response != null && response.getStatusLine().getStatusCode() == 200) {
+            final File file = new File(filename);
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
             try {
-                final File file = new File(filename);
-                final InputStream inputStream = response.getEntity().getContent();
-                final OutputStream out = new FileOutputStream(file);
-                final byte buf[] = new byte[1024];
-                int len;
-                while ((len = inputStream.read(buf)) > 0) {
-                    out.write(buf, 0, len);
+                inputStream = response.getEntity().getContent();
+                outputStream = new FileOutputStream(file);
+                
+                final byte byteBuffer[] = new byte[1024];
+                int length;
+                while ((length = inputStream.read(byteBuffer)) > 0) {
+                    outputStream.write(byteBuffer, 0, length);
                 }
-                out.close();
-                inputStream.close();
                 
                 FileUtils.copyFile(file, new File(Constants.MEDIAFOLDER.value() + filename));
                 file.delete();
             } catch (final Exception e) {
                 LOG.error("Failed to get and convert gravatar image. " + e);
+            } finally {
+                try {
+                    inputStream.close();
+                    outputStream.close();
+                } catch (IOException e) {
+                    LOG.error("Failed to close stream while getting gravatar image", e);
+                }                
             }
         }
         
@@ -164,12 +172,16 @@ public class CommonService extends ViewService {
         } catch (IOException e) {
             LOG.error("Failed to read image for resizing", e);
         }
-        int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
         
-        BufferedImage resizedImage = new BufferedImage(width, height, type);
-        Graphics2D graphics2D = resizedImage.createGraphics();
-        graphics2D.drawImage(originalImage, 0, 0, width, height, null);
-        graphics2D.dispose();
+        BufferedImage resizedImage = null;
+        if (originalImage != null) {
+            int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
+            
+            resizedImage = new BufferedImage(width, height, type);
+            Graphics2D graphics2D = resizedImage.createGraphics();
+            graphics2D.drawImage(originalImage, 0, 0, width, height, null);
+            graphics2D.dispose();
+        }
      
         return resizedImage;
     }

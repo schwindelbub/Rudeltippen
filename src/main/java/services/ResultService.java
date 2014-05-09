@@ -200,7 +200,7 @@ public class ResultService {
     public boolean isJobInstance() {
         boolean isInstance = false;
         final String jobInstance = ninjaProperties.get("rudeltippen.jobinstance");
-        if (StringUtils.isNotBlank(jobInstance) && jobInstance.equalsIgnoreCase("true")) {
+        if (("true").equalsIgnoreCase(jobInstance)) {
             isInstance = true;
         }
     

@@ -48,7 +48,7 @@ public class SystemController {
     private NinjaProperties ninjaProperties;
     
     @Inject
-    private AuthService authService;;
+    private AuthService authService;
 
     public Result setup() {
         if (dataService.appIsInizialized()) {
