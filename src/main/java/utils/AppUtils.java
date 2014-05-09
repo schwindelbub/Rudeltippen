@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -16,7 +18,6 @@ import java.util.UUID;
 import javax.imageio.ImageIO;
 
 import models.Constants;
-import models.Extra;
 import models.Game;
 import models.Pagination;
 
@@ -26,6 +27,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 
 /**
  * 
@@ -49,24 +53,6 @@ public class AppUtils {
         }
 
         return hash;
-    }
-
-    /**
-     * Checks if at least one extra tip in given list is tipable
-     *
-     * @param extras List of extra tips
-     * @return true if at least one extra tip is tipable, false otherwise
-     */
-    public static boolean extrasTipable(final List<Extra> extras) {
-        boolean tippable = false;
-        for (final Extra extra : extras) {
-            if (extra.isTipable()) {
-                tippable = true;
-                break;
-            }
-        }
-
-        return tippable;
     }
 
     /**
@@ -200,5 +186,18 @@ public class AppUtils {
         }
         
         return map;
+    }
+    
+    public static String getProcessedTemplate(String name, Map<String, Object> content) {
+        Writer writer = new StringWriter(); 
+        Configuration configuration = new Configuration();
+        try {
+            Template template = configuration.getTemplate(name);
+            template.process(content, writer); 
+        } catch (Exception e) {
+            LOG.error("Failed to create template for: " + name, e);
+        }
+        
+        return writer.toString();
     }
 }

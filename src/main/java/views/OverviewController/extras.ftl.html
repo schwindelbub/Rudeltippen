@@ -10,20 +10,22 @@
 						<th></th>
 						<th></th>
 						<#list extras as extra>
-							<th>&{extra.questionShort}</th>
+							<th>${i18n(extra.questionShort)}</th>
 						</#list>
 					</tr>
 				</thead>
 				<tbody>
 					<#list tips as extraTips>
 					<tr>
-						<#list extraTips.entrySet() as user>
-							<td style="width: 60px;"><a href="/users/show/${user.key.username}"><img src="/assets/img/user_placeholder.gif" /></a></td>
-							<td><br /><b><a href="/users/show/${user.key.username}">${user.key.username}</a></b><br /><small>&{'place'} ${user.key.place}, ${user.key.points} &{'points'}</small></td>
-							<#list user.value as extraTip>
-								<td>&{extraTip.getExtraTipAnswer()}${extraTip.getExtraTipPoints()}</td>
+						<#if (extraTips.entrySet())??>
+							<#list extraTips.entrySet() as user>
+								<td style="width: 60px;"><a href="/users/show/${user.key.username}"><img src="/assets/img/user_placeholder.gif" /></a></td>
+								<td><br /><b><a href="/users/show/${user.key.username}">${user.key.username}</a></b><br /><small>&{'place'} ${user.key.place}, ${user.key.points} &{'points'}</small></td>
+								<#list user.value as extraTip>
+									<td>&{extraTip.getExtraTipAnswer()}${extraTip.getExtraTipPoints()}</td>
+								</#list>
 							</#list>
-						</#list>
+						</#if>
 					</tr>
 					</#list>
 				</tbody>

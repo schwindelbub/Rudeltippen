@@ -53,8 +53,8 @@
 			                      <td>${game.kickoff?datetime}</td>
 			                      <td><img src="/assets/img/flags/${game.homeTeam.flag}" class="flag">${i18n(game.homeTeam.name)}</td>
 			                      <td><img src="/assets/img/flags/${game.awayTeam.flag}" class="flag">${i18n(game.awayTeam.name)}</td>
-			                      <td>${ViewUtils.getScore(game)}</td>
-			                      <td>game.getGameTipAndPoints()</td>
+			                      <td>${ViewService.getScore(game)}</td>
+			                      <td>${ViewService.getGameTipAndPoints(game, connectedUser)}</td>
 			                  </tr>
 			              </#list>
 		              <#else>

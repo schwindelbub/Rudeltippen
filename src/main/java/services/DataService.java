@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import models.AbstractJob;
 import models.Bracket;
@@ -35,8 +36,6 @@ import org.mongodb.morphia.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import utils.ValidationUtils;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mongodb.MongoClient;
@@ -61,6 +60,12 @@ public class DataService {
     
     @Inject
     private NotificationService notificationService;
+    
+    @Inject
+    private ValidationService validationService;
+    
+    @Inject
+    private ViewService viewService;
 
     public DataService() {
         MongoClient mongoClient = null;
@@ -238,15 +243,15 @@ public class DataService {
                 if ("B".equals(references[0])) {
                     final Bracket bracket = findBracketByNumber(references[1]);
                     if (bracket != null) {
-                        team = bracket.getTeamByPlace(Integer.parseInt(references[2]));
+                        team = viewService.getTeamByPlace(Integer.parseInt(references[2]), bracket);
                     }
                 } else if ("G".equals(references[0])) {
                     final Game aGame = findGameByNumber(references[1]);
                     if ((aGame != null) && aGame.isEnded()) {
                         if ("W".equals(references[2])) {
-                            team = aGame.getWinner();
+                            team = viewService.getWinner(aGame);
                         } else if ("L".equals(references[2])) {
-                            team = aGame.getLoser();
+                            team = viewService.getLoser(aGame);
                         }
                     }
                 }
@@ -270,7 +275,7 @@ public class DataService {
         game.setAwayPoints(points[1]);
         game.setHomeScore(homeScore);
         game.setAwayScore(awayScore);
-        if (ValidationUtils.isValidScore(homeScoreExtratime, awayScoreExtratime )) {
+        if (validationService.isValidScore(homeScoreExtratime, awayScoreExtratime )) {
             homeScoreExtratime = homeScoreExtratime.trim();
             awayScoreExtratime = awayScoreExtratime.trim();
             game.setOvertimeType(extratime);
@@ -290,7 +295,7 @@ public class DataService {
 
     public void saveGameTip(final Game game, final int homeScore, final int awayScore, User user) {
         GameTip gameTip = findGameTipByGameAndUser(user, game);
-        if (game.isTippable() && ValidationUtils.isValidScore(String.valueOf(homeScore), String.valueOf(awayScore))) {
+        if (viewService.gameIsTippable(game) && validationService.isValidScore(String.valueOf(homeScore), String.valueOf(awayScore))) {
             if (gameTip == null) {
                 gameTip = new GameTip();
                 gameTip.setGame(game);
@@ -428,9 +433,11 @@ public class DataService {
     }
 
     public List<Game> findReferencedGames(String bracketString) {
-        // TODO Refactoring
-        // Game.find("SELECT g FROM Game g WHERE homeReference LIKE ? OR awayReference LIKE ?", bracketString, bracketString).fetch();
-        return null;
+        Pattern pattern = Pattern.compile(bracketString);
+        List<Game> games = this.datastore.find(Game.class).filter("homeReference", pattern).asList();
+        games.addAll(this.datastore.find(Game.class).filter("awayReference", pattern).asList());
+        
+        return games;
     }
 
     public List<Game> findAllNonPlayoffGames() {
@@ -527,5 +534,17 @@ public class DataService {
 
     public List<AbstractJob> findAllAbstractJobs() {
         return this.datastore.find(AbstractJob.class).asList();
+    }
+
+    public void deleteResultsStatisticByUser(User user) {
+        this.datastore.delete(this.datastore.find(ResultStatistic.class).field("user").equal(user).get());
+    }
+
+    public List<GameStatistic> findAllGameStatistics() {
+        return this.datastore.find(GameStatistic.class).asList();
+    }
+
+    public List<GameTipStatistic> findGameTipStatisticsOrderByPlayday() {
+        return this.datastore.find(GameTipStatistic.class).order("playday").asList();
     }
 }

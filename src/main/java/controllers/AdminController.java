@@ -267,8 +267,11 @@ public class AdminController extends RootController {
                 recipients.add(user.getEmail());
             }
 
+            String[] recipientsArray = new String[users.size()];
+            recipientsArray = recipients.toArray(recipientsArray);
+            
             User connectedUser = context.getAttribute("connectedUser", User.class);
-            mailService.rudelmail(subject, message, recipients.toArray(), connectedUser.getEmail());
+            mailService.rudelmail(subject, message, recipientsArray, connectedUser.getEmail());
             flashScope.success(i18nService.get("info.rudelmail.send"));
         } else {
             flashScope.error(i18nService.get("error.rudelmail.send"));

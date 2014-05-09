@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import services.AuthService;
 import services.DataService;
-import utils.ViewUtils;
+import services.ViewService;
 
 import com.google.inject.Inject;
 
@@ -31,7 +31,7 @@ public class AuthenticationFilter implements Filter {
     private DataService dataService;
     
     @Inject
-    private ViewUtils viewUtils;
+    private ViewService viewService;
 
     @Override
     public Result filter(FilterChain filterChain, Context context) {
@@ -53,7 +53,7 @@ public class AuthenticationFilter implements Filter {
 
             Result result = filterChain.next(context);
             result.render("connectedUser", connectedUser);
-            result.render("ViewUtils", viewUtils);
+            result.render("viewService", viewService);
             result.render("currentPlayday", dataService.findCurrentPlayday());
             
             return result;

@@ -32,11 +32,11 @@
 		           </tr>
 				<tr>
 					<td><b>${i18n('placedbets')}</b></td>
-					<td>'placedbets.value', statistics?.sumTipps, statistics?.sumGames</td>
+					<td>${i18n('placedbets', statistics.sumTipps, statistics.sumGames)}</td>
 				</tr>
 				<tr>
 					<td><b>${i18n('correct.extratips')}</b></td>
-					<td>'extratips.statistic', statistics?.correctExtraTips, statistics?.extraTips</td>
+					<td>${i18n('extratips.statistic', statistics.correctExtraTips, statistics.extraTips)}</td>
 				</tr>		
 				<tr>
 					<td><b>${i18n('correctresults')}</b></td>

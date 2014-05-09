@@ -113,12 +113,4 @@ public class Extra {
     public void setAnswer(Team answer) {
         this.answer = answer;
     }
-
-    public boolean isTipable() {
-        if (this.ending != null && (new Date().getTime() >= this.ending.getTime())) {
-            return false;
-        }
-
-        return true;
-    }
 }

@@ -22,7 +22,7 @@
 						<th>
 							<div align="center">
 								<#if (game.homeTeam)?? && (game.awayTeam)??>
-									<img alt="&{game.homeTeam?.name}" title="&{game.homeTeam.name}" rel="tooltip" src="/assets/img/flags${game.homeTeam.flag}"> <br/> ${ViewUtils.getResult(game)} <br/> <img alt="&{game.awayTeam?.name}" rel="tooltip" title="&{game.awayTeam?.name}" src="/public/img/flags/${game.awayTeam.flag}">
+									<img alt="${i18n(game.homeTeam.name)}" title="${i18n(game.homeTeam.name)}" rel="tooltip" src="/assets/img/flags/${game.homeTeam.flag}"> <br/> ${ViewService.getResult(game)} <br/> <img alt="${i18n(game.awayTeam.name)}" rel="tooltip" title="${i18n(game.awayTeam.name)}" src="/assets/img/flags/${game.awayTeam.flag}">
 								<#else>
 									${game.homeReferenceName()} - ${game.awayReferenceName()}
 								</#if>
@@ -37,7 +37,7 @@
 						<#list playday.games as game>
 						<th>
 							<div align="center">
-								${ViewUtils.getTrend(game)}
+								${ViewService.getTrend(game)}
 							</div>
 						</th>
 						</#list>
@@ -47,20 +47,22 @@
 				<tbody>
 					<#list tips as userTips>
 					<tr>
-						<#list userTips.entrySet() as user>
-							<#if user.key.picture == null>
-								<td style="width: 60px;"><a href="@{users.show()}/${user.key.username}"><img src="/public/img/user_placeholder.gif" width="54" height="54" /></a></td>
-							<#else>
-								<td style="width: 60px;"><a href="@{users.show()}/${user.key.username}"><img src="${user.key.picture}" /></a></td>
-							</#if>
-								<td style="vertical-align: top;"><b><a href="@{users.show()}/${user.key.username}">${user.key.username}</a></b><br /><small>&{'place'} ${user.key.place}, ${user.key.points} &{'points'}</small></td>
-							points = 0
-							<#list user.value as gameTip>
-								<td style="vertical-align: middle;"><div align="center">${gameTip.getGameTipAndPoints()}</div></td>
-								points = points + gameTip.points
+						<#if (userTips.entrySet())??>
+							<#list userTips.entrySet() as user>
+								<#if user.key.picture == null>
+									<td style="width: 60px;"><a href="/users/show/${user.key.username}"><img src="/assets/img/user_placeholder.gif" width="54" height="54" /></a></td>
+								<#else>
+									<td style="width: 60px;"><a href="/users/show//${user.key.username}"><img src="${user.key.picture}" /></a></td>
+								</#if>
+									<td style="vertical-align: top;"><b><a href="/users/show/${user.key.username}">${user.key.username}</a></b><br /><small>&{'place'} ${user.key.place}, ${user.key.points} &{'points'}</small></td>
+								points = 0
+								<#list user.value as gameTip>
+									<td style="vertical-align: middle;"><div align="center">${gameTip.getGameTipAndPoints()}</div></td>
+									points = points + gameTip.points
+								</#list>
+								<td style="vertical-align: middle;"><div align="center">out.print(points);</div></td>
 							</#list>
-							<td style="vertical-align: middle;"><div align="center">out.print(points);</div></td>
-						</#list>
+						</#if>
 					</tr>
 					</#list>
 				</tbody>

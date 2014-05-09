@@ -4,12 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import models.Bracket;
 import models.Extra;
 import models.ExtraTip;
@@ -21,8 +15,14 @@ import models.Team;
 import models.User;
 import models.WSResult;
 import models.WSResults;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import utils.AppUtils;
-import utils.ValidationUtils;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * 
@@ -44,6 +44,12 @@ public class CalculationService {
 
     @Inject
     private NotificationService notificationService;
+    
+    @Inject
+    private ValidationService validationService;
+
+    @Inject
+    private ViewService viewService;
 
     public void calculations() {
         calculateBrackets();
@@ -52,13 +58,14 @@ public class CalculationService {
         setUserPlaces();
         setPlayoffTeams();
         calculateStatistics();
+        setCurrentPlayday();
     }
 
     private void calculateStatistics() {
         final List<Playday> playdays = dataService.findAllPlaydaysOrderByNumber();
         final List<User> users = dataService.findAllActiveUsers();
         for (final Playday playday : playdays) {
-            if (playday.allGamesEnded()) {
+            if (viewService.allGamesEnded(playday)) {
                 final Map<String, Integer> scores = getScores(playday);
                 statisticService.setPlaydayStatistics(playday, scores);
 
@@ -177,7 +184,7 @@ public class CalculationService {
             int goalsAgainst = 0;
             for (final Game game : homeGames) {
                 if (!game.isPlayoff()) {
-                    if (ValidationUtils.isValidScore(game.getHomeScore(), game.getAwayScore())) {
+                    if (validationService.isValidScore(game.getHomeScore(), game.getAwayScore())) {
                         final int points = game.getHomePoints();
                         homePoints = homePoints + points;
                         gamesPlayed++;
@@ -197,7 +204,7 @@ public class CalculationService {
 
             for (final Game game : awayGames) {
                 if (!game.isPlayoff()) {
-                    if (ValidationUtils.isValidScore(game.getHomeScore(), game.getAwayScore())) {
+                    if (validationService.isValidScore(game.getHomeScore(), game.getAwayScore())) {
                         final int points = game.getAwayPoints();
                         awayPoints = awayPoints + points;
                         gamesPlayed++;
@@ -242,7 +249,7 @@ public class CalculationService {
         final Playday currentPlayday = dataService.findCurrentPlayday();
         final List<Playday> playdays = dataService.findAllPlaydaysOrderByNumber();
         for (final Playday playday : playdays) {
-            if (playday.allGamesEnded()) {
+            if (viewService.allGamesEnded(playday)) {
                 playday.setCurrent(false);
                 dataService.save(playday);
             } else {
@@ -268,7 +275,7 @@ public class CalculationService {
 
             final List<Bracket> brackets = dataService.findAllBrackets();
             for (final Bracket bracket : brackets) {
-                if (bracket.allGamesEnded()) {
+                if (viewService.allGamesEnded(bracket)) {
                     final int number = bracket.getNumber();
                     final String bracketString = "B-" + number + "%";
                     final List<Game> games = dataService.findReferencedGames(bracketString);
@@ -308,7 +315,7 @@ public class CalculationService {
     }
 
     public void setGameScore(final String gameId, final String homeScore, final String awayScore, final String extratime, final String homeScoreExtratime, final String awayScoreExtratime) {
-        if (ValidationUtils.isValidScore(homeScore, awayScore)) {
+        if (validationService.isValidScore(homeScore, awayScore)) {
             final Game game = dataService.findGameById(gameId);
             if (game != null) {
                 dataService.saveScore(game, homeScore, awayScore, extratime, homeScoreExtratime, awayScoreExtratime);

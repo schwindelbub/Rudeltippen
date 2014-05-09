@@ -31,7 +31,7 @@
 		                <tr>
 		                    <td>${game.number}</td>		                
 		                    <td>${game.kickoff?datetime}</td>
-		                    <td>game.tippEnding.difference</td>
+		                    <td>${ViewService.difference(game.kickoff)}</td>
 		                    <#if (game.homeTeam)?? && (game.awayTeam.name)??>
 		                        <td><img class="flag" src="/assets/img/flags/${game.homeTeam.flag}">${i18n(game.homeTeam.name)}</td>
 		                        <td><img class="flag" src="/assets/img/flags/${game.awayTeam.flag}">${i18n(game.awayTeam.name)}</td>
@@ -39,12 +39,12 @@
 		                        <td>${game.homeReferenceName()}</td>
 		                        <td>${game.awayReferenceName()}</td>
 		                    </#if>
-		                    <td align="center">${ViewUtils.getResult(game)}</td>
+		                    <td align="center">${ViewService.getResult(game)}</td>
 		                    <#if !game.tippable>
-		                        <td align="right"><input type="text" value="game.getHomeScoreTip" id="game_homeScore_${game_index}" name="game_${game.id}_homeScore" maxlength="2" class="form-control input-small"></td>
+		                        <td align="right"><input type="text" value="${ViewService.getHomeScoreTip(game, connectedUser)}" id="game_homeScore_${game_index}" name="game_${game.id}_homeScore" maxlength="2" class="form-control input-small"></td>
 		                        <td align="center">:</td>
-		                        <td align="left"><input type="text" value="game.getAwayScoreTip" id="game_awayScore_${game_index}" name="game_${game.id}_awayScore" maxlength="2" class="form-control input-small"></td>
-		                        <td align="center" colspan="3">game.getGameTipAndPoints</td>
+		                        <td align="left"><input type="text" value="${ViewService.getAwayScoreTip(game, connectedUser)}" id="game_awayScore_${game_index}" name="game_${game.id}_awayScore" maxlength="2" class="form-control input-small"></td>
+		                        <td align="center" colspan="3">${ViewService.getGameTipAndPoints(game, connectedUser)}</td>
 		                    </#if>
 		                </tr>
 		            </#list>

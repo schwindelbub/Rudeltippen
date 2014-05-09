@@ -29,7 +29,6 @@ import services.I18nService;
 import services.MailService;
 import services.ValidationService;
 import utils.AppUtils;
-import utils.ValidationUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -63,7 +62,7 @@ public class AuthController {
 
     @Inject
     private I18nService i18nService;
-
+    
     public Result password(@PathParam("token") String token, FlashScope flashScope) {
         final Confirmation confirmation = dataService.findConfirmationByToken(token);
         if (confirmation == null) {
@@ -80,7 +79,7 @@ public class AuthController {
     }
 
     public Result reset(@PathParam("email") String email, FlashScope flashScope) {
-        if (ValidationUtils.isValidEmail(email)) {
+        if (validationService.isValidEmail(email)) {
             flashScope.put("errormessage", i18nService.get("controller.auth.resenderror"));
 
             return Results.redirect("/auth/forgotton");
@@ -109,7 +108,7 @@ public class AuthController {
     public Result confirm(@PathParam("token") String token, FlashScope flashScope, Session session) {
         Confirmation confirmation = null;
 
-        if (!ValidationUtils.isValidConfirmationToken(token)) {
+        if (!validationService.isValidConfirmationToken(token)) {
             flashScope.put("warningmessage", i18nService.get("controller.users.invalidtoken"));
         } else {
             confirmation = dataService.findConfirmationByToken(token);

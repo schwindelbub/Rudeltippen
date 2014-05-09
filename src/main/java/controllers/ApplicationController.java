@@ -59,8 +59,11 @@ public class ApplicationController extends RootController {
     public Result statistics() {
         final List<Object[]> games = statisticService.getGameStatistics();
         final List<Object[]> results = statisticService.getResultsStatistic();
-        final List<GameTipStatistic> gameTipStatistics = statisticService.getGamTipStatisticsOrderByPlayday();
+        final List<GameTipStatistic> gameTipStatistics = dataService.findGameTipStatisticsOrderByPlayday();
 
-        return Results.html().render(results).render(gameTipStatistics).render(games);
+        return Results.html()
+                .render("results", results)
+                .render("gameTipStatistics", gameTipStatistics)
+                .render("games", games);
     }
 }

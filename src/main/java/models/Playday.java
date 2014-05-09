@@ -110,22 +110,4 @@ public class Playday implements Serializable {
     public void setGameStatistic(List<GameStatistic> gameStatistic) {
         this.gameStatistic = gameStatistic;
     }
-
-    public boolean isTippable() {
-        for (final Game game : this.games){
-            if (game.isTippable()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean allGamesEnded() {
-        for (final Game game : this.games) {
-            if (!game.isEnded()) {
-                return false;
-            }
-        }
-        return true;
-    }
 }

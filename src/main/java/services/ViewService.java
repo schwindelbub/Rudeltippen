@@ -1,31 +1,35 @@
-package utils;
+package services;
 
 import java.util.Date;
 import java.util.List;
+
+import javax.inject.Singleton;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+
+import com.google.inject.Inject;
 
 import models.Bracket;
 import models.Extra;
 import models.ExtraTip;
 import models.Game;
 import models.GameTip;
+import models.Playday;
+import models.Settings;
 import models.Team;
 import models.User;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
-import services.DataService;
-import services.I18nService;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
-/**
- * 
- * @author svenkubiak
- *
- */
 @Singleton
-public class ViewUtils {
+public class ViewService {
+    public boolean extrasIsTipable(Extra extra) {
+        if (extra.getEnding() != null && (new Date().getTime() >= extra.getEnding().getTime())) {
+            return false;
+        }
+
+        return true;
+    }
+    
     
     @Inject
     private I18nService i18nService;
@@ -215,8 +219,7 @@ public class ViewUtils {
         String result = "-";
         if (game.isEnded()) {
             if (game.isOvertime()) {
-                //TODO Refactoring
-                result = game.getHomeScoreOT() + " : " + game.getAwayScoreOT() + " (OVERTIME Translation)";
+                result = game.getHomeScoreOT() + " : " + game.getAwayScoreOT() + " (" + i18nService.get(game.getOvertimeType()) + ")";
             } else {
                 result = game.getHomeScore() + " : " + game.getAwayScore();
             }
@@ -235,14 +238,13 @@ public class ViewUtils {
                 if (game.isEnded()) {
                     tip = gameTip.getHomeScore() + " : " + gameTip.getAwayScore() + " (" + gameTip.getPoints() + ")";
                 } else {
-                    //TODO Refactoring
-//                    if (date.after(game.getTippEnding())) {
-//                        tip = gameTip.getHomeScore() + " : " + gameTip.getAwayScore();
-//                    } else {
-//                        if (user.equals(gameTip.getUser())) {
-//                            tip = gameTip.getHomeScore() + " : " + gameTip.getAwayScore();
-//                        }
-//                    }
+                    if (date.after(getTippEnding(game))) {
+                        tip = gameTip.getHomeScore() + " : " + gameTip.getAwayScore();
+                    } else {
+                        if (user.equals(gameTip.getUser())) {
+                            tip = gameTip.getHomeScore() + " : " + gameTip.getAwayScore();
+                        }
+                    }
                 }
             }
         }
@@ -250,13 +252,12 @@ public class ViewUtils {
         return tip;
     }
 
-    public long getExtraTip(final Extra extra, User user) {
+    public String getExtraTip(final Extra extra, User user) {
         final ExtraTip extraTip = dataService.findExtraTipByExtraAndUser(extra, user);
-        long id = 0;
+        String id = null;
 
         if ((extraTip != null) && (extraTip.getAnswer() != null)) {
-            //TODO Refactoring
-            //id = extraTip.getAnswer().getId();
+            id = extraTip.getAnswer().getId().toString();
         }
 
         return id;
@@ -353,5 +354,126 @@ public class ViewUtils {
         final int offset = dataService.findSettings().getMinutesBeforeTip() * 60000 ;
         
         return new Date (time - offset);
+    }
+    
+    
+    public boolean gameIsTippable(Game game) {
+        final Date now = new Date();
+        final Settings settings = dataService.findSettings();
+        final int secondsBefore = settings.getMinutesBeforeTip() * 60000;
+
+        if (game.isEnded()) {
+            return false;
+        } else if (((game.getKickoff().getTime() - secondsBefore) > now.getTime()) && (game.getHomeTeam() != null) && (game.getAwayTeam() != null)) {
+            return true;
+        }
+
+        return false;
+    }
+    
+    public boolean playdayIsTippable(Playday playday) {
+        for (final Game game : playday.getGames()){
+            if (gameIsTippable(game)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean allGamesEnded(Playday playday) {
+        for (final Game game : playday.getGames()) {
+            if (!game.isEnded()) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+
+    public boolean allGamesEnded(Bracket bracket) {
+        for (final Game game : bracket.getGames()) {
+            if (!game.isEnded()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public Team getTeamByPlace(final int place, Bracket bracket) {
+        int i = 1;
+        for (final Team team : bracket.getTeams()) {
+            if  (i == place) {
+                return team;
+            }
+            i++;
+        }
+
+        return null;
+    }
+    
+    public Team getWinner(Game game) {
+        String home, away;
+        if (game.isOvertime()) {
+            home = game.getHomeScoreOT();
+            away = game.getAwayScoreOT();
+        } else {
+            home = game.getHomeScore();
+            away = game.getAwayScore();
+        }
+
+        if (StringUtils.isNotBlank(home) && StringUtils.isNotBlank(away)) {
+            final int homeScore = Integer.parseInt(home);
+            final int awayScore = Integer.parseInt(away);
+            if (homeScore > awayScore) {
+                return game.getHomeTeam();
+            } else {
+                return game.getAwayTeam();
+            }
+        }
+
+        return null;
+    }
+
+    public Team getLoser(Game game) {
+        String home, away;
+        if (game.isOvertime()) {
+            home = game.getHomeScoreOT();
+            away = game.getAwayScoreOT();
+        } else {
+            home = game.getHomeScore();
+            away = game.getAwayScore();
+        }
+
+        if (StringUtils.isNotBlank(home) && StringUtils.isNotBlank(away)) {
+            final int homeScore = Integer.parseInt(home);
+            final int awayScore = Integer.parseInt(away);
+            if (homeScore > awayScore) {
+                return game.getHomeTeam();
+            } else {
+                return game.getAwayTeam();
+            }
+        }
+
+        return null;
+    }
+    
+
+    /**
+     * Checks if at least one extra tip in given list is tipable
+     *
+     * @param extras List of extra tips
+     * @return true if at least one extra tip is tipable, false otherwise
+     */
+    public boolean extrasAreTipable(final List<Extra> extras) {
+        boolean tippable = false;
+        for (final Extra extra : extras) {
+            if (extrasIsTipable(extra)) {
+                tippable = true;
+                break;
+            }
+        }
+
+        return tippable;
     }
 }

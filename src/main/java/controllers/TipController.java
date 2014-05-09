@@ -21,8 +21,9 @@ import org.apache.commons.lang.StringUtils;
 
 import services.DataService;
 import services.I18nService;
+import services.ValidationService;
+import services.ViewService;
 import utils.AppUtils;
-import utils.ValidationUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -40,13 +41,19 @@ public class TipController extends RootController {
     
     @Inject
     private I18nService i18nService;
+    
+    @Inject
+    private ValidationService validationService;
 
+    @Inject
+    private ViewService viewService;
+    
     public Result playday(@PathParam("number") long number) {
         final Pagination pagination = AppUtils.getPagination(number, "/tips/playday/", dataService.findAllPlaydaysOrderByNumber().size());
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
 
         final List<Extra> extras = dataService.findAllExtras();
-        final boolean tippable = AppUtils.extrasTipable(extras);
+        final boolean tippable = viewService.extrasAreTipable(extras);
 
         return Results.html().render(playday).render(number).render(pagination).render(extras).render(tippable);
     }
@@ -71,7 +78,7 @@ public class TipController extends RootController {
                 final String homeScore = map.get("game_" + key + "_homeScore");
                 final String awayScore = map.get("game_" + key + "_awayScore");
 
-                if (!ValidationUtils.isValidScore(homeScore, awayScore)) {
+                if (!validationService.isValidScore(homeScore, awayScore)) {
                     continue;
                 }
 
@@ -116,7 +123,7 @@ public class TipController extends RootController {
                 }
 
                 final Extra extra = dataService.findExtaById(bId);
-                if (extra.isTipable()) {
+                if (viewService.extrasIsTipable(extra)) {
                     final Team team = dataService.findTeamById(tId);
                     dataService.saveExtraTip(extra, team, context.getAttribute("connectedUser", User.class));
                     flashScope.success(i18nService.get("controller.tipps.bonussaved"));

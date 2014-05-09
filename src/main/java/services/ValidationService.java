@@ -1,11 +1,19 @@
 package services;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import ninja.validation.Validation;
-import utils.ValidationUtils;
 import models.Confirmation;
+import models.Constants;
 import models.User;
+import ninja.validation.ConstraintViolation;
+import ninja.validation.FieldViolation;
+import ninja.validation.Validation;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -20,6 +28,7 @@ import dtos.UserDTO;
  */
 @Singleton
 public class ValidationService {
+    private static final Logger LOG = LoggerFactory.getLogger(ValidationService.class);
 
     @Inject
     private DataService dataService;
@@ -70,38 +79,135 @@ public class ValidationService {
     }
 
     public void validateUserDTO(UserDTO userDTO, Validation validation) {
-        if (!ValidationUtils.isValidUsername(userDTO.username)) {
-            validation.addBeanViolation(ValidationUtils.createBeanValidation("username", i18nService.get("validation.username.size")));
+        if (!isValidUsername(userDTO.username)) {
+            validation.addBeanViolation(createBeanValidation("username", i18nService.get("validation.username.size")));
         }
 
         if (usernameExists(userDTO.username)) {
-            validation.addBeanViolation(ValidationUtils.createBeanValidation("username", i18nService.get("validation.username.exists")));
+            validation.addBeanViolation(createBeanValidation("username", i18nService.get("validation.username.exists")));
         }
 
-        if (!ValidationUtils.isValidEmail(userDTO.email)) {
-            validation.addBeanViolation(ValidationUtils.createBeanValidation("email", i18nService.get("validation.email.invalid")));
+        if (!isValidEmail(userDTO.email)) {
+            validation.addBeanViolation(createBeanValidation("email", i18nService.get("validation.email.invalid")));
         }
 
         if (emailExists(userDTO.email)) {
-            validation.addBeanViolation(ValidationUtils.createBeanValidation("email", i18nService.get("validation.email.exsits")));
+            validation.addBeanViolation(createBeanValidation("email", i18nService.get("validation.email.exsits")));
         }
 
-        if (!ValidationUtils.match(userDTO.email, userDTO.emailConfirmation)) {
-            validation.addBeanViolation(ValidationUtils.createBeanValidation("email", i18nService.get("validation.email.notmatch")));
+        if (!match(userDTO.email, userDTO.emailConfirmation)) {
+            validation.addBeanViolation(createBeanValidation("email", i18nService.get("validation.email.notmatch")));
         }
 
-        if (!ValidationUtils.isValidPassword(userDTO.userpass)) {
-            validation.addBeanViolation(ValidationUtils.createBeanValidation("userpass", i18nService.get("validation.password.invalid")));
+        if (!isValidPassword(userDTO.userpass)) {
+            validation.addBeanViolation(createBeanValidation("userpass", i18nService.get("validation.password.invalid")));
         }
 
-        if (!ValidationUtils.match(userDTO.userpass, userDTO.userpassConfirmation)) {
-            validation.addBeanViolation(ValidationUtils.createBeanValidation("userpass", i18nService.get("validation.password.notmatch")));
+        if (!match(userDTO.userpass, userDTO.userpassConfirmation)) {
+            validation.addBeanViolation(createBeanValidation("userpass", i18nService.get("validation.password.notmatch")));
         }
     }
 
-    public void validateSettingsDTO(SettingsDTO settingsDTO,
-            Validation validation) {
+    public void validateSettingsDTO(SettingsDTO settingsDTO, Validation validation) {
         // TODO Auto-generated method stub
-        
+    }
+    
+    /**
+     * Checks if the given filesize is lower or equal than configured in application.conf
+     * 
+     * @param filesize The filesize to check
+     * @return true if filesiize is lower or equal given filesize, false otherwise
+     */
+    public boolean checkFileLength(final Long filesize) {
+        boolean check = false;
+        if ((filesize > 0) && (filesize <= 102400)) {
+            check = true;
+        }
+
+        return check;
+    }
+
+    /**
+     * Checks if given homeScore and awayScore is casteble to string and between 0 and 99
+     * 
+     * @param homeScore The homeScore to check
+     * @param awayScore The awayScore to check
+     * @return true if score is valid, false otherwise
+     */
+    public boolean isValidScore(String homeScore, String awayScore) {
+        boolean valid = false;
+        if (StringUtils.isNotBlank(homeScore) && StringUtils.isNotBlank(awayScore)) {
+            homeScore = homeScore.trim();
+            awayScore = awayScore.trim();
+            int home, away;
+            try {
+                home = Integer.parseInt(homeScore);
+                away = Integer.parseInt(awayScore);
+
+                if ((home >= 0) && (home <= 99) && (away >= 0) && (away <= 99)) {
+                    valid = true;
+                }
+            } catch (final Exception e) {
+                LOG.error("Invalid score given",  e);
+            }
+        }
+
+        return valid;
+    }
+
+    /**
+     * Checks if a given email is matching defined EMAILPATTERN
+     * 
+     * @param email The email to check
+     * @return true if email is valid, false otherwise
+     */
+    public boolean isValidEmail(final String email) {
+        final Pattern p = Pattern.compile(Constants.EMAILPATTERN.value());
+        final Matcher m = p.matcher(email);
+
+        return m.matches();
+    }
+
+    /**
+     * Checks if a given username is matching defined USERNAMEPATTERN
+     * 
+     * @param username The username to check
+     * @return true if username is valid, false otherwise
+     */
+    public boolean isValidUsername(final String username) {
+        boolean valid = false;
+        final Pattern p = Pattern.compile(Constants.USERNAMEPATTERN.value());
+        final Matcher m = p.matcher(username);
+
+        if (StringUtils.isNotBlank(username) && username.length() >= 3 && username.length() <= 32 && m.matches()) {
+            valid = true;
+        }
+
+        return valid;
+    }
+
+    public boolean isValidConfirmationToken(String token) {
+        final Pattern p = Pattern.compile(Constants.CONFIRMATIONPATTERN.value());
+        final Matcher m = p.matcher(token);
+
+        return m.matches();
+    }
+
+    public boolean match(String string1, String string2) {
+        boolean valid = true;
+        if (StringUtils.isNotBlank(string1) && !string1.equals(string2)) {
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    public FieldViolation createBeanValidation(String field, String message) {
+        ConstraintViolation constraintViolation = new ConstraintViolation(message,"","");
+        return new FieldViolation(field, constraintViolation);
+    }
+
+    public boolean isValidPassword(String userpass) {
+        return (StringUtils.isNotBlank(userpass) && userpass.length() >= 8 && userpass.length() <= 32);
     }
 }

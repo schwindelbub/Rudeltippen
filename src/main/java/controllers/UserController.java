@@ -30,8 +30,8 @@ import services.AuthService;
 import services.DataService;
 import services.I18nService;
 import services.MailService;
+import services.ValidationService;
 import utils.AppUtils;
-import utils.ValidationUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -56,6 +56,9 @@ public class UserController extends RootController {
     
     @Inject
     private AuthService authService;
+    
+    @Inject
+    private ValidationService validationService;
 
     public Result show(@PathParam("username") String username) {
         final User user = dataService.findUserByUsername(username);
@@ -125,7 +128,7 @@ public class UserController extends RootController {
     public Result updateusername(Session session, Context context, FlashScope flashScope) {
         String username = context.getParameter("username");
 
-        if (!ValidationUtils.isValidUsername(username)) {
+        if (!validationService.isValidUsername(username)) {
             flashScope.error(i18nService.get("controller.users.usernamexists"));
         } else {
             final User user = context.getAttribute("connectedUser", User.class);
@@ -145,7 +148,7 @@ public class UserController extends RootController {
         String email = context.getParameter("email");
         String emailConfirmation = context.getParameter("emailConfirmation");
 
-        if (!ValidationUtils.isValidEmail(email) || !email.equals(emailConfirmation)) {
+        if (!validationService.isValidEmail(email) || !email.equals(emailConfirmation)) {
             flashScope.error(i18nService.get("controller.users.invalidemail"));
         } else {
             final String token = UUID.randomUUID().toString();
@@ -171,7 +174,7 @@ public class UserController extends RootController {
         String userpass = context.getParameter("userpass");
         String userpassConfirmation = context.getParameter("userpassConfirmation");
 
-        if (ValidationUtils.isValidPassword(userpass) || !userpass.equals(userpassConfirmation)) {
+        if (validationService.isValidPassword(userpass) || !userpass.equals(userpassConfirmation)) {
             flashScope.error(i18nService.get("controller.users.passwordisinvalid"));
         } else {
             final String token = UUID.randomUUID().toString();

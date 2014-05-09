@@ -72,26 +72,4 @@ public class Bracket {
     public void setUpdateble(boolean updateble) {
         this.updateble = updateble;
     }
-
-    public boolean allGamesEnded() {
-        for (final Game game : games) {
-            if (!game.isEnded()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public Team getTeamByPlace(final int place) {
-        int i = 1;
-        for (final Team team : teams) {
-            if  (i == place) {
-                return team;
-            }
-            i++;
-        }
-
-        return null;
-    }
 }

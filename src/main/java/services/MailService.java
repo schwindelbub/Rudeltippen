@@ -1,6 +1,8 @@
 package services;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import models.ConfirmationType;
 import models.Extra;
@@ -16,7 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import utils.ValidationUtils;
+import utils.AppUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -45,17 +47,23 @@ public class MailService {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private ValidationService validationService;
 
     public void reminder(final User user, final List<Game> games, final List<Extra> extras) {
         final Settings settings = dataService.findSettings();
         final String recipient = user.getEmail();
 
-        if (ValidationUtils.isValidEmail(recipient)) {
+        if (validationService.isValidEmail(recipient)) {
             Mail mail = getMailInstance(settings, recipient, StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + i18nService.get("mails.subject.reminder")));
 
-            //TODO Refactoring
-            //mail.setBodyText("bodyText");
-            //send(user, games, settings, extras);
+            Map<String, Object> content = new HashMap<String, Object>();
+            content.put("user", user);
+            content.put("games", games);
+            content.put("settings", settings);
+            content.put("extras", extras);
+            mail.setBodyHtml(AppUtils.getProcessedTemplate("/src/main/java/view/mails/reminder.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -70,7 +78,7 @@ public class MailService {
     public void confirm(final User user, final String token, final ConfirmationType confirmationType) {
         final Settings settings = dataService.findSettings();
 
-        if ((user != null) && ValidationUtils.isValidEmail(user.getEmail()) && StringUtils.isNotBlank(token) && (confirmationType != null)) {
+        if ((user != null) && validationService.isValidEmail(user.getEmail()) && StringUtils.isNotBlank(token) && (confirmationType != null)) {
             String subject = "";
             String message = "";
 
@@ -88,13 +96,14 @@ public class MailService {
                 message = i18nService.get("mails.message.forgotuserpass");
             }
             message = StringEscapeUtils.unescapeHtml(message);
-
             Mail mail = getMailInstance(settings, user.getEmail(), StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + subject));
 
-            //TODO Refactoring
-            //mail.setBodyText("bodyText");
-            //send(user, token, appUrl, message);
-
+            Map<String, Object> content = new HashMap<String, Object>();
+            content.put("user", user);
+            content.put("token", token);
+            content.put("message", message);
+            mail.setBodyText(AppUtils.getProcessedTemplate("/src/main/java/view/mails/confirm.ftl", content));
+            
             try {
                 postoffice.send(mail);
             } catch (Exception e) {
@@ -107,13 +116,14 @@ public class MailService {
 
     public void newuser(final User user, final User admin) {
         final Settings settings = dataService.findSettings();
-        if (ValidationUtils.isValidEmail(admin.getEmail()) && (user != null)) {
+        if (validationService.isValidEmail(admin.getEmail()) && (user != null)) {
             Mail mail = getMailInstance(settings, user.getEmail(), StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + i18nService.get("mails.subject.newuser")));
 
-            //TODO Refactoring
-            //mail.setBodyText("bodyText");
-            //send(user, settings);
-
+            Map<String, Object> content = new HashMap<String, Object>();
+            content.put("user", user);
+            content.put("settings", settings);
+            mail.setBodyText(AppUtils.getProcessedTemplate("/src/main/java/view/mails/newuser.ftl", content));
+            
             try {
                 postoffice.send(mail);
             } catch (Exception e) {
@@ -127,12 +137,12 @@ public class MailService {
     public void error(final String response, final String recipient) {
         final Settings settings = dataService.findSettings();
 
-        if (ValidationUtils.isValidEmail(recipient) && StringUtils.isNotBlank(response)) {
+        if (validationService.isValidEmail(recipient) && StringUtils.isNotBlank(response)) {
             Mail mail = getMailInstance(settings, recipient, StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + i18nService.get("mails.subject.updatefailed")));
 
-            //TODO Refactoring
-            //mail.setBodyText("bodyText");
-            //send(response);
+            Map<String, Object> content = new HashMap<String, Object>();
+            content.put("response", response);
+            mail.setBodyText(AppUtils.getProcessedTemplate("/src/main/java/view/mails/error.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -148,13 +158,13 @@ public class MailService {
         final Settings settings = dataService.findSettings();
         notification = StringEscapeUtils.unescapeHtml(notification);
 
-        if (ValidationUtils.isValidEmail(user.getEmail()) && StringUtils.isNotEmpty(notification)) {
+        if (validationService.isValidEmail(user.getEmail()) && StringUtils.isNotEmpty(notification)) {
             Mail mail = getMailInstance(settings, user.getEmail(), StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + subject));
 
-            //TODO Refactoring
-            //mail.setBodyText("bodyText");
-            //send(notification);
-
+            Map<String, Object> content = new HashMap<String, Object>();
+            content.put("notification", notification);
+            mail.setBodyText(AppUtils.getProcessedTemplate("/src/main/java/view/mails/notification.ftl", content));
+            
             try {
                 postoffice.send(mail);
             } catch (Exception e) {
@@ -168,12 +178,13 @@ public class MailService {
     public void gametips(final User user, final List<Game> games) {
         final Settings settings = dataService.findSettings();
 
-        if (ValidationUtils.isValidEmail(user.getEmail()) && (games.size() > 0)) {
+        if (validationService.isValidEmail(user.getEmail()) && (games.size() > 0)) {
             Mail mail = getMailInstance(settings, user.getEmail(), StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + i18nService.get("overview")));
 
-            //TODO Refactoring
-            //mail.setBodyHTML("bodyHTML");
-            //send(games, user);
+            Map<String, Object> content = new HashMap<String, Object>();
+            content.put("games", games);
+            content.put("user", user);
+            mail.setBodyHtml(AppUtils.getProcessedTemplate("/src/main/java/view/mails/gametips.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -185,16 +196,16 @@ public class MailService {
         }
     }
 
-    public void rudelmail(final String subject, final String message, final Object [] bbcRecipients, String recipient) {
+    public void rudelmail(final String subject, final String message, final String [] bbcRecipients, String recipient) {
         final Settings settings = dataService.findSettings();
 
         if (StringUtils.isNotBlank(subject) && StringUtils.isNotBlank(message) && (bbcRecipients != null)) {
             Mail mail = getMailInstance(settings, recipient, StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + subject));
 
-            //TODO Refactoring
-            //mail.addBcc(bbcRecipients);
-            //mail.setBodyText("bodyText");
-            //send(message);
+            Map<String, Object> content = new HashMap<String, Object>();
+            content.put("message", message);
+            mail.setBodyText(AppUtils.getProcessedTemplate("/src/main/java/view/mails/rudelmail.ftl", content));
+            mail.addBcc(bbcRecipients);
 
             try {
                 postoffice.send(mail);

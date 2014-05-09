@@ -3,7 +3,6 @@ package models;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -233,66 +232,5 @@ public class Game {
 
     public void setUpdateble(boolean updateble) {
         this.updateble = updateble;
-    }
-
-    public Team getWinner() {
-        String home, away;
-        if (this.overtime) {
-            home = this.getHomeScoreOT();
-            away = this.getAwayScoreOT();
-        } else {
-            home = this.getHomeScore();
-            away = this.getAwayScore();
-        }
-
-        if (StringUtils.isNotBlank(home) && StringUtils.isNotBlank(away)) {
-            final int homeScore = Integer.parseInt(home);
-            final int awayScore = Integer.parseInt(away);
-            if (homeScore > awayScore) {
-                return this.homeTeam;
-            } else {
-                return this.awayTeam;
-            }
-        }
-
-        return null;
-    }
-
-    public Team getLoser() {
-        String home, away;
-        if (this.overtime) {
-            home = this.getHomeScoreOT();
-            away = this.getAwayScoreOT();
-        } else {
-            home = this.getHomeScore();
-            away = this.getAwayScore();
-        }
-
-        if (StringUtils.isNotBlank(home) && StringUtils.isNotBlank(away)) {
-            final int homeScore = Integer.parseInt(home);
-            final int awayScore = Integer.parseInt(away);
-            if (homeScore > awayScore) {
-                return this.awayTeam;
-            } else {
-                return this.homeTeam;
-            }
-        }
-
-        return null;
-    }
-    
-    public boolean isTippable() {
-        //TODO Refactoring
-        //        final Date now = new Date();
-        //        final Settings settings = AppUtils.findSettings();
-        //        final int secondsBefore = settings.getMinutesBeforeTip() * 60000;
-        //
-        //        if (this.ended) {
-        //            return false;
-        //        } else if (((this.kickoff.getTime() - secondsBefore) > now.getTime()) && (this.homeTeam != null) && (this.awayTeam != null)) {
-        //            return true;
-        //        }
-
-        return false;
     }
 }

@@ -31,8 +31,7 @@ public class StatisticService {
     private DataService dataService;
 
     public void setResultStatistic(final User user) {
-        //TODO Refactoring
-        //ResultStatistic.delete("user = ?", user);
+        dataService.deleteResultsStatisticByUser(user);
 
         final Settings settings = dataService.findSettings();
         final List<GameTip> gameTips = dataService.findGameTipsByUser(user);
@@ -265,11 +264,6 @@ public class StatisticService {
         //                        "ORDER BY counts DESC").getResultList();
         //
         //        return results;
-        return null;
-    }
-
-    public List<GameTipStatistic> getGamTipStatisticsOrderByPlayday() {
-        //TODO Refactoring
         return null;
     }
 }
