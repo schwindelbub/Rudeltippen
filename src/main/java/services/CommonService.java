@@ -115,12 +115,20 @@ public class CommonService extends ViewService {
             } catch (final Exception e) {
                 LOG.error("Failed to get and convert gravatar image. " + e);
             } finally {
-                try {
-                    inputStream.close();
-                    outputStream.close();
-                } catch (IOException e) {
-                    LOG.error("Failed to close stream while getting gravatar image", e);
-                }                
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        LOG.error("Failed to close inputstream while getting gravatar image", e);
+                    } 
+                }
+                if (outputStream != null) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        LOG.error("Failed to close outputstream while getting gravatar image", e);
+                    } 
+                }
             }
         }
         
