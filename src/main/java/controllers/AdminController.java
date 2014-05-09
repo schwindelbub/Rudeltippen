@@ -30,11 +30,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import services.CalculationService;
+import services.CommonService;
 import services.DataService;
 import services.I18nService;
 import services.MailService;
 import services.ValidationService;
-import utils.AppUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -67,8 +67,11 @@ public class AdminController extends RootController {
     @Inject
     private ValidationService validationService;
     
+    @Inject
+    private CommonService commonService;
+    
     public Result results(@PathParam("number") long number) {
-        final Pagination pagination = AppUtils.getPagination(number, "/admin/results/", dataService.findAllPlaydaysOrderByNumber().size());
+        final Pagination pagination = commonService.getPagination(number, "/admin/results/", dataService.findAllPlaydaysOrderByNumber().size());
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
 
         return Results.html().render(playday).render(pagination);
@@ -80,7 +83,7 @@ public class AdminController extends RootController {
     }
 
     public Result storeresults(Context context, FlashScope flashScope) {
-        final Map<String, String> map = AppUtils.convertParamaters(context.getParameters());
+        final Map<String, String> map = commonService.convertParamaters(context.getParameters());
         final Set<String> keys = new HashSet<String>();
         for (final Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();

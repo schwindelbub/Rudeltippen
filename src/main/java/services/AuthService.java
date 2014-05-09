@@ -9,9 +9,8 @@ import ninja.utils.NinjaProperties;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
-
-import utils.AppUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -24,13 +23,19 @@ import com.mchange.v1.util.UnexpectedException;
  */
 @Singleton
 public class AuthService {
-    static final char[] HEX_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    private static final char[] HEX_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
     @Inject
     private NinjaProperties ninjaProperties;
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private CommonService commonService;
+    
+    @Inject
+    private AuthService authService;
 
     /**
      * Encrypt a String with the AES encryption standard using the application secret
@@ -99,8 +104,8 @@ public class AuthService {
     }
 
     public void activateAndSetAvatar(final User user) {
-        final String avatar = AppUtils.getGravatarImage(user.getEmail(), "mm", 128);
-        final String avatarSmall = AppUtils.getGravatarImage(user.getEmail(), "mm", 64);
+        final String avatar = commonService.getGravatarImage(user.getEmail(), "mm", 128);
+        final String avatarSmall = commonService.getGravatarImage(user.getEmail(), "mm", 64);
         if (StringUtils.isNotBlank(avatar)) {
             user.setPictureLarge(avatar);
         }
@@ -116,7 +121,7 @@ public class AuthService {
         boolean authenticated = false;
         User user = dataService.findUserByUsernameOrEmail(username);
         if (user != null) {
-            if (user.getUserpass().equals(AppUtils.hashPassword(username, user.getSalt()))) {
+            if (user.getUserpass().equals(authService.hashPassword(username, user.getSalt()))) {
                 authenticated = true;
             }
         }
@@ -162,5 +167,21 @@ public class AuthService {
         } catch (Exception ex) {
             throw new UnexpectedException(ex);
         }
+    }
+    
+    /**
+     * Hashes a given clear-text password with a given salt using 100000 rounds
+     *
+     * @param userpass The password
+     * @param usersalt The salt
+     * @return SHA512 hashed string
+     */
+    public String hashPassword(final String userpass, final String usersalt) {
+        String hash = "";
+        for (int i = 1; i <= 100000; i++) {
+            hash = DigestUtils.sha512Hex(hash + userpass + usersalt);
+        }
+
+        return hash;
     }
 }

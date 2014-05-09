@@ -12,8 +12,8 @@ import models.User;
 import ninja.Result;
 import ninja.Results;
 import ninja.params.PathParam;
+import services.CommonService;
 import services.DataService;
-import utils.AppUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -28,9 +28,12 @@ public class OverviewController extends RootController {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private CommonService commonService;
 
     public Result playday(@PathParam("number") long number) {
-        final Pagination pagination = AppUtils.getPagination(number, "/overview/playday/", dataService.findAllPlaydaysOrderByNumber().size());
+        final Pagination pagination = commonService.getPagination(number, "/overview/playday/", dataService.findAllPlaydaysOrderByNumber().size());
 
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
         final List<User> users = dataService.findActiveUsers(15);

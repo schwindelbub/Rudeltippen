@@ -18,10 +18,10 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import services.AuthService;
 import services.DataService;
 import services.ImportService;
 import services.SetupService;
-import utils.AppUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -46,6 +46,9 @@ public class SystemController {
     
     @Inject
     private NinjaProperties ninjaProperties;
+    
+    @Inject
+    private AuthService authService;;
 
     public Result setup() {
         if (dataService.appIsInizialized()) {
@@ -96,7 +99,7 @@ public class SystemController {
             user.setSalt(salt);
             user.setEmail("admin@foo.bar");
             user.setUsername("admin");
-            user.setUserpass(AppUtils.hashPassword("admin", salt));
+            user.setUserpass(authService.hashPassword("admin", salt));
             user.setRegistered(new Date());
             user.setExtraPoints(0);
             user.setTipPoints(0);

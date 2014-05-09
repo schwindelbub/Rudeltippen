@@ -19,8 +19,6 @@ import models.WSResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import utils.AppUtils;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -49,7 +47,7 @@ public class CalculationService {
     private ValidationService validationService;
 
     @Inject
-    private ViewService viewService;
+    private CommonService commonService;
 
     public void calculations() {
         calculateBrackets();
@@ -65,7 +63,7 @@ public class CalculationService {
         final List<Playday> playdays = dataService.findAllPlaydaysOrderByNumber();
         final List<User> users = dataService.findAllActiveUsers();
         for (final Playday playday : playdays) {
-            if (viewService.allGamesEnded(playday)) {
+            if (commonService.allGamesEnded(playday)) {
                 final Map<String, Integer> scores = getScores(playday);
                 statisticService.setPlaydayStatistics(playday, scores);
 
@@ -91,7 +89,7 @@ public class CalculationService {
         final List<Extra> extras = dataService.findAllExtras();
         for (final Extra extra : extras) {
             if (extra.getAnswer() == null) {
-                if (AppUtils.allReferencedGamesEnded(extra.getGameReferences())) {
+                if (commonService.allReferencedGamesEnded(extra.getGameReferences())) {
                     final Team team = dataService.findTeamByReference(extra.getExtraReference());
                     if (team != null) {
                         extra.setAnswer(team);
@@ -249,7 +247,7 @@ public class CalculationService {
         final Playday currentPlayday = dataService.findCurrentPlayday();
         final List<Playday> playdays = dataService.findAllPlaydaysOrderByNumber();
         for (final Playday playday : playdays) {
-            if (viewService.allGamesEnded(playday)) {
+            if (commonService.allGamesEnded(playday)) {
                 playday.setCurrent(false);
                 dataService.save(playday);
             } else {
@@ -275,7 +273,7 @@ public class CalculationService {
 
             final List<Bracket> brackets = dataService.findAllBrackets();
             for (final Bracket bracket : brackets) {
-                if (viewService.allGamesEnded(bracket)) {
+                if (commonService.allGamesEnded(bracket)) {
                     final int number = bracket.getNumber();
                     final String bracketString = "B-" + number + "%";
                     final List<Game> games = dataService.findReferencedGames(bracketString);

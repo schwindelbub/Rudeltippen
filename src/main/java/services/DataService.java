@@ -65,7 +65,7 @@ public class DataService {
     private ValidationService validationService;
     
     @Inject
-    private ViewService viewService;
+    private CommonService commonService;
 
     public DataService() {
         MongoClient mongoClient = null;
@@ -243,15 +243,15 @@ public class DataService {
                 if ("B".equals(references[0])) {
                     final Bracket bracket = findBracketByNumber(references[1]);
                     if (bracket != null) {
-                        team = viewService.getTeamByPlace(Integer.parseInt(references[2]), bracket);
+                        team = commonService.getTeamByPlace(Integer.parseInt(references[2]), bracket);
                     }
                 } else if ("G".equals(references[0])) {
                     final Game aGame = findGameByNumber(references[1]);
                     if ((aGame != null) && aGame.isEnded()) {
                         if ("W".equals(references[2])) {
-                            team = viewService.getWinner(aGame);
+                            team = commonService.getWinner(aGame);
                         } else if ("L".equals(references[2])) {
-                            team = viewService.getLoser(aGame);
+                            team = commonService.getLoser(aGame);
                         }
                     }
                 }
@@ -295,7 +295,7 @@ public class DataService {
 
     public void saveGameTip(final Game game, final int homeScore, final int awayScore, User user) {
         GameTip gameTip = findGameTipByGameAndUser(user, game);
-        if (viewService.gameIsTippable(game) && validationService.isValidScore(String.valueOf(homeScore), String.valueOf(awayScore))) {
+        if (commonService.gameIsTippable(game) && validationService.isValidScore(String.valueOf(homeScore), String.valueOf(awayScore))) {
             if (gameTip == null) {
                 gameTip = new GameTip();
                 gameTip.setGame(game);

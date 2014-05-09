@@ -27,11 +27,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import services.AuthService;
+import services.CommonService;
 import services.DataService;
 import services.I18nService;
 import services.MailService;
 import services.ValidationService;
-import utils.AppUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -59,6 +59,9 @@ public class UserController extends RootController {
     
     @Inject
     private ValidationService validationService;
+    
+    @Inject
+    private CommonService commonService;
 
     public Result show(@PathParam("username") String username) {
         final User user = dataService.findUserByUsername(username);
@@ -183,7 +186,7 @@ public class UserController extends RootController {
                 final ConfirmationType confirmationType = ConfirmationType.CHANGEUSERPASS;
                 final Confirmation confirm = new Confirmation();
                 confirm.setConfirmType(confirmationType);
-                confirm.setConfirmValue(authService.encryptAES(AppUtils.hashPassword(userpass, user.getSalt())));
+                confirm.setConfirmValue(authService.encryptAES(authService.hashPassword(userpass, user.getSalt())));
                 confirm.setCreated(new Date());
                 confirm.setToken(token);
                 confirm.setUser(user);
@@ -220,8 +223,8 @@ public class UserController extends RootController {
         File pictureSmall = new File(Constants.MEDIAFOLDER.value() + pictureSmallFilename);
         File pictureLarge = new File(Constants.MEDIAFOLDER.value() + pictureLargeFilename);
 
-        AppUtils.resizeImage(pictureSmall, 64, 64);
-        AppUtils.resizeImage(pictureLarge, 128, 128);
+        commonService.resizeImage(pictureSmall, 64, 64);
+        commonService.resizeImage(pictureLarge, 128, 128);
         
         if (picture.delete()) {
             LOG.warn("User-Picutre could not be deleted after upload.");

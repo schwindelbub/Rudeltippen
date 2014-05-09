@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Resources;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.mongodb.BasicDBObject;
 import com.mongodb.util.JSON;
 
@@ -32,6 +33,7 @@ import com.mongodb.util.JSON;
  * @author skubiak
  *
  */
+@Singleton
 public class ImportService {
     private static final Logger LOG = LoggerFactory.getLogger(ImportService.class);
     

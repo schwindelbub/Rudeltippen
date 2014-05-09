@@ -27,8 +27,6 @@ import org.w3c.dom.NodeList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import utils.AppUtils;
-
 /**
  * 
  * @author svenkubiak
@@ -40,6 +38,9 @@ public class SetupService {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private AuthService authService;
 
     public List<String> getGamesFromWebService(final int playdays, final String leagueShortcut, final String leagueSaison) {
         final Map<String, String> teams = getBundesligaTeams();
@@ -195,7 +196,7 @@ public class SetupService {
             user.setRegistered(new Date());
             user.setActive(true);
             user.setSalt(salt);
-            user.setUserpass(AppUtils.hashPassword("user" + i, salt));
+            user.setUserpass(authService.hashPassword("user" + i, salt));
             dataService.save(user);
         }
     }

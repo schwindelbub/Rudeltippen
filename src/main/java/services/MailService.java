@@ -18,8 +18,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import utils.AppUtils;
-
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
@@ -50,6 +48,9 @@ public class MailService {
     
     @Inject
     private ValidationService validationService;
+    
+    @Inject
+    private CommonService commonService;
 
     public void reminder(final User user, final List<Game> games, final List<Extra> extras) {
         final Settings settings = dataService.findSettings();
@@ -63,7 +64,7 @@ public class MailService {
             content.put("games", games);
             content.put("settings", settings);
             content.put("extras", extras);
-            mail.setBodyHtml(AppUtils.getProcessedTemplate("/src/main/java/view/mails/reminder.ftl", content));
+            mail.setBodyHtml(commonService.getProcessedTemplate("/src/main/java/view/mails/reminder.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -102,7 +103,7 @@ public class MailService {
             content.put("user", user);
             content.put("token", token);
             content.put("message", message);
-            mail.setBodyText(AppUtils.getProcessedTemplate("/src/main/java/view/mails/confirm.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate("/src/main/java/view/mails/confirm.ftl", content));
             
             try {
                 postoffice.send(mail);
@@ -122,7 +123,7 @@ public class MailService {
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("user", user);
             content.put("settings", settings);
-            mail.setBodyText(AppUtils.getProcessedTemplate("/src/main/java/view/mails/newuser.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate("/src/main/java/view/mails/newuser.ftl", content));
             
             try {
                 postoffice.send(mail);
@@ -142,7 +143,7 @@ public class MailService {
 
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("response", response);
-            mail.setBodyText(AppUtils.getProcessedTemplate("/src/main/java/view/mails/error.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate("/src/main/java/view/mails/error.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -163,7 +164,7 @@ public class MailService {
 
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("notification", notification);
-            mail.setBodyText(AppUtils.getProcessedTemplate("/src/main/java/view/mails/notification.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate("/src/main/java/view/mails/notification.ftl", content));
             
             try {
                 postoffice.send(mail);
@@ -184,7 +185,7 @@ public class MailService {
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("games", games);
             content.put("user", user);
-            mail.setBodyHtml(AppUtils.getProcessedTemplate("/src/main/java/view/mails/gametips.ftl", content));
+            mail.setBodyHtml(commonService.getProcessedTemplate("/src/main/java/view/mails/gametips.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -204,7 +205,7 @@ public class MailService {
 
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("message", message);
-            mail.setBodyText(AppUtils.getProcessedTemplate("/src/main/java/view/mails/rudelmail.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate("/src/main/java/view/mails/rudelmail.ftl", content));
             mail.addBcc(bbcRecipients);
 
             try {

@@ -19,11 +19,10 @@ import ninja.session.FlashScope;
 
 import org.apache.commons.lang.StringUtils;
 
+import services.CommonService;
 import services.DataService;
 import services.I18nService;
 import services.ValidationService;
-import services.ViewService;
-import utils.AppUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -46,14 +45,14 @@ public class TipController extends RootController {
     private ValidationService validationService;
 
     @Inject
-    private ViewService viewService;
+    private CommonService commonService;
     
     public Result playday(@PathParam("number") long number) {
-        final Pagination pagination = AppUtils.getPagination(number, "/tips/playday/", dataService.findAllPlaydaysOrderByNumber().size());
+        final Pagination pagination = commonService.getPagination(number, "/tips/playday/", dataService.findAllPlaydaysOrderByNumber().size());
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
 
         final List<Extra> extras = dataService.findAllExtras();
-        final boolean tippable = viewService.extrasAreTipable(extras);
+        final boolean tippable = commonService.extrasAreTipable(extras);
 
         return Results.html().render(playday).render(number).render(pagination).render(extras).render(tippable);
     }
@@ -62,7 +61,7 @@ public class TipController extends RootController {
         int tipped = 0;
         int playday = 1;
         final List<String> keys = new ArrayList<String>();
-        final Map<String, String> map = AppUtils.convertParamaters(context.getParameters());
+        final Map<String, String> map = commonService.convertParamaters(context.getParameters());
         for (final Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();
             if (StringUtils.isNotBlank(key) && key.contains("game_") && (key.contains("_homeScore") || key.contains("_awayScore"))) {
@@ -105,7 +104,7 @@ public class TipController extends RootController {
     }
 
     public Result storeextratips(FlashScope flashScope, Context context) {
-        final Map<String, String> map = AppUtils.convertParamaters(context.getParameters());
+        final Map<String, String> map = commonService.convertParamaters(context.getParameters());
         for (final Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();
 
@@ -123,7 +122,7 @@ public class TipController extends RootController {
                 }
 
                 final Extra extra = dataService.findExtaById(bId);
-                if (viewService.extrasIsTipable(extra)) {
+                if (commonService.extraIsTipable(extra)) {
                     final Team team = dataService.findTeamById(tId);
                     dataService.saveExtraTip(extra, team, context.getAttribute("connectedUser", User.class));
                     flashScope.success(i18nService.get("controller.tipps.bonussaved"));

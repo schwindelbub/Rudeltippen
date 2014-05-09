@@ -28,7 +28,6 @@ import services.DataService;
 import services.I18nService;
 import services.MailService;
 import services.ValidationService;
-import utils.AppUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -44,7 +43,7 @@ import filters.AppFilter;
  *
  */
 @Singleton
-@FilterWith({AppFilter.class})
+@FilterWith(AppFilter.class)
 public class AuthController {
     private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
 
@@ -189,7 +188,7 @@ public class AuthController {
             user.setNotification(true);
             user.setAdmin(false);
             user.setSalt(salt);
-            user.setUserpass(AppUtils.hashPassword(userDTO.userpass, salt));
+            user.setUserpass(authService.hashPassword(userDTO.userpass, salt));
             user.setPoints(0);
             dataService.save(user);
 
@@ -232,7 +231,7 @@ public class AuthController {
         }
 
         final User user = confirmation.getUser();
-        final String password = AppUtils.hashPassword(passwordDTO.userpass, user.getSalt());
+        final String password = authService.hashPassword(passwordDTO.userpass, user.getSalt());
         user.setUserpass(password);
         dataService.delete(user);
 

@@ -6,6 +6,7 @@ import java.util.Locale;
 import models.Bracket;
 import models.Game;
 import models.Team;
+import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
@@ -32,11 +33,10 @@ public class AjaxController extends RootController {
     @Inject
     private DataService dataService;
 
-    //TODO Refactoring
-    public Result webserviceid(@PathParam("gameId") String gameId) {
+    public Result webserviceid(@PathParam("gameId") String gameId, Context context) {
         Game game = dataService.findGameById(gameId);
         if (game != null) {
-            final String webserviceID = null;//params.get("value");
+            final String webserviceID = context.getParameter("value");
             if (StringUtils.isNotBlank(webserviceID)) {
                 game.setWebserviceID(webserviceID);
                 dataService.save(game);
@@ -47,11 +47,10 @@ public class AjaxController extends RootController {
         return Results.badRequest();
     }
 
-    //TODO Refactoring
-    public Result kickoff(@PathParam("gameId") String gameId) {
+    public Result kickoff(@PathParam("gameId") String gameId, Context context) {
         Game game = dataService.findGameById(gameId);
         if (game != null) {
-            final String kickoff = null;//params.get("value");
+            final String kickoff = context.getParameter("value");
             if (StringUtils.isNotBlank(kickoff)) {
                 try {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy - HH:mm", Locale.ENGLISH);
@@ -67,11 +66,10 @@ public class AjaxController extends RootController {
         return Results.badRequest();
     }
 
-    //TODO Refactoring
-    public Result place(@PathParam("teamId") String teamId) {
+    public Result place(@PathParam("teamId") String teamId, Context context) {
         Team team = dataService.findTeamById(teamId);
         if (team != null) {
-            final String place = null;//params.get("value");
+            final String place = context.getParameter("value");
             if (StringUtils.isNotBlank(place)) {
                 team.setPlace(Integer.valueOf(place));
                 dataService.save(team);
