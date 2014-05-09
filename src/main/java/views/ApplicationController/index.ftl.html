@@ -17,14 +17,14 @@
 				<tbody>
 				<#list topUsers as topUser>
 					<tr>
-						<td><a href="/users/show/${topUser.username}"><img src="/assets/img/user_placeholder.gif" width="54" height="54" /></a></td>
+						<td><a href="/users/show/${topUser.username}"><img src="${assetsAt("img/user_placeholder.gif")}" width="54" height="54" /></a></td>
 						<td><b><a href="/users/show/${topUser.username}">${topUser.username}</a></b></td>
 						<td>${topUser.tipPoints}</td>
 						<td>${topUser.extraPoints}</td>
 						<td><b>${topUser.points}</b></td>
 					</tr>
 				</#list>
-				<tr><td colspan="5">&{'user.placandpoints.' + (connectedUser.points == 1 ? 'one' : 'many'), connectedUser.points, connectedUser.place, users}</td></tr>
+				<tr><td colspan="5"><#noescape>${i18n('user.placandpoints.one', connectedUser.points, connectedUser.place, users)}</#noescape></td></tr>
 				</tbody>
 			</table>
 		</div>
@@ -46,19 +46,22 @@
 		              </tr>
 		          </thead>
 		          <tbody>
-		              <#list playday.games as game>
-		                  <tr>
-		                      <td>${game.number}</td>
-		                      <td>${game.kickoff?datetime}</td>
-		                      <td><img src="/assets/img/flags/${game.homeTeam.flag}" class="flag">${i18n(game.homeTeam.name)}</td>
-		                      <td><img src="/assets/img/flags/${game.awayTeam.flag}" class="flag">${i18n(game.awayTeam.name)}</td>
-		                      <td>${ViewUtils.getScore(game)}</td>
-		                      <td>game.getGameTipAndPoints()</td>
-		                  </tr>
-		              </#list>
+					  <#if playday.games?has_content>
+			              <#list playday.games as game>
+			                  <tr>
+			                      <td>${game.number}</td>
+			                      <td>${game.kickoff?datetime}</td>
+			                      <td><img src="/assets/img/flags/${game.homeTeam.flag}" class="flag">${i18n(game.homeTeam.name)}</td>
+			                      <td><img src="/assets/img/flags/${game.awayTeam.flag}" class="flag">${i18n(game.awayTeam.name)}</td>
+			                      <td>${ViewUtils.getScore(game)}</td>
+			                      <td>game.getGameTipAndPoints()</td>
+			                  </tr>
+			              </#list>
+		              <#else>
 		                  <tr>
 		                      <td colspan="6">${i18n('nogamesyet')}</td>
 		                  </tr>
+	                  </#if>
 		          </tbody>
 		      </table>
 	      </div>

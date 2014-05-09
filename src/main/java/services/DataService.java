@@ -2,6 +2,7 @@ package services;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -120,7 +121,7 @@ public class DataService {
     public List<Game> findAllGamesWithNoResult() {
         //TODO Refactoring
         // Game.find("SELECT g FROM Game g WHERE ended != 1 AND ( TIMESTAMPDIFF(MINUTE,kickoff,now()) > 90 ) AND homeTeam_id != '' AND awayTeam_id != '' AND webserviceID != ''").fetch();
-        return null;
+        return Collections.EMPTY_LIST;
     }
 
     public List<Extra> findAllExtrasEndingToday() {
@@ -522,5 +523,9 @@ public class DataService {
 
     public List<UserStatistic> findUserStatisticByUser(User user) {
         return this.datastore.find(UserStatistic.class).field("user").equal(user).order("playday").asList();
+    }
+
+    public List<AbstractJob> findAllAbstractJobs() {
+        return this.datastore.find(AbstractJob.class).asList();
     }
 }

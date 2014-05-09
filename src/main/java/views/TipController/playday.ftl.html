@@ -39,11 +39,11 @@
 		                        <td>${game.homeReferenceName()}</td>
 		                        <td>${game.awayReferenceName()}</td>
 		                    </#if>
-		                    <td align="center">game.getResult()</td>
+		                    <td align="center">${ViewUtils.getResult(game)}</td>
 		                    <#if !game.tippable>
-		                        <td align="right"><input type="text" value="game.getHomeScoreTip" id="game_homeScore_${game_index}" name="game_game.id_homeScore" maxlength="2" class="form-control input-small"></td>
+		                        <td align="right"><input type="text" value="game.getHomeScoreTip" id="game_homeScore_${game_index}" name="game_${game.id}_homeScore" maxlength="2" class="form-control input-small"></td>
 		                        <td align="center">:</td>
-		                        <td align="left"><input type="text" value="game.getAwayScoreTip" id="game_awayScore_${game_index}" name="game_game.id_awayScore" maxlength="2" class="form-control input-small"></td>
+		                        <td align="left"><input type="text" value="game.getAwayScoreTip" id="game_awayScore_${game_index}" name="game_${game.id}_awayScore" maxlength="2" class="form-control input-small"></td>
 		                        <td align="center" colspan="3">game.getGameTipAndPoints</td>
 		                    </#if>
 		                </tr>

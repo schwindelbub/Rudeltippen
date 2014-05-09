@@ -115,7 +115,7 @@ public class Extra {
     }
 
     public boolean isTipable() {
-        if (new Date().getTime() >= this.ending.getTime()) {
+        if (this.ending != null && (new Date().getTime() >= this.ending.getTime())) {
             return false;
         }
 

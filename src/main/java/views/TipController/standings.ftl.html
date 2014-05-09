@@ -17,9 +17,9 @@
 				</thead>
 				<tbody>
 					<#list users as user>
-						<tr <# if user == connectedUser> class="connecteduser" <#/if>>
-							<td>user_index} user.getPlaceTrend().raw()></td>
-							<td><a href="/users/show/${user.username}"><img src="/assets/img/user_placeholder.gif'}" width="54" height="54" /></a></td>
+						<tr <#if user == connectedUser> class="connecteduser" </#if>>
+							<td>${user_index} ${ViewUtils.getPlaceTrend(user)}</td>
+							<td><a href="/users/show/${user.username}"><img src="${assetsAt("img/user_placeholder.gif")}" width="54" height="54" /></a></td>
 							<td><b><a href="/users/show/${user.username}">${user.username}</a></b></td>
 							<td>${user.tipPoints}</td>
 							<td>${user.extraPoints}</td>

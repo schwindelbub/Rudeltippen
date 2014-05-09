@@ -35,11 +35,11 @@
 							<td>${game.number}</td>						
 							<td>${game.kickoff?datetime}</td>
 							<#if (game.homeTeam)?? && (game.awayTeam)??>
-								<td><img src="/assets/img/flags/${game.homeTeam.flag}" class="flag"/>&{game.homeTeam.name}</td>
-								<td><img src="/assets/img/flags/${game.awayTeam.flag}" class="flag"/>&{game.awayTeam.name}</td>
-								<td align="right"><input type="text" class="form-control input-small" maxlength="2" name="game_game.id_homeScore" id="game_homeScore_playday_indexgame_index" value="(game.homeScore)"/></td>
+								<td><img src="/assets/img/flags/${game.homeTeam.flag}" class="flag"/>${i18n(game.homeTeam.name)}</td>
+								<td><img src="/assets/img/flags/${game.awayTeam.flag}" class="flag"/>${i18n(game.awayTeam.name)}</td>
+								<td align="right"><input type="text" class="form-control input-small" maxlength="2" name="game_${game.id}_homeScore" id="game_homeScore_playday_indexgame_index" value="(game.homeScore)"/></td>
 								<td align="center">:</td>
-								<td align="left"><input type="text" class="form-control input-small" maxlength="2" name="game_game.id_awayScore" id="game_awayScore_playday_indexgame_index" value="(game.awayScore)"/></td>
+								<td align="left"><input type="text" class="form-control input-small" maxlength="2" name="game_${game.id}_awayScore" id="game_awayScore_playday_indexgame_index" value="(game.awayScore)"/></td>
 								<#if game.playoff>
 									<td align="right"><input type="text" maxlength="2" class="form-control input-small" id="game_et_homeScore_playday_indexgame_index" name="game_game.id_homeScore_et" value="<#if game.overtimeType == "nv" || game.overtimeType == "ie"> ${game.homeScoreOT} </#if>"/></td>
 									<td align="right">:</td>

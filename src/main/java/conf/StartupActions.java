@@ -86,10 +86,10 @@ public class StartupActions {
             try {
                 scheduler.setJobFactory(appJobFactory);
                 scheduler.scheduleJob(getJobDetail(CleanupJob.class, "cleanupJob"), getTrigger("cleanupJobTrigger", "0 0 2 * * ?"));
-                scheduler.scheduleJob(getJobDetail(GameTipJob.class, "gameTipJob"), getTrigger("gameTipJobTrigger", "*/1 * * * * ?"));
+                scheduler.scheduleJob(getJobDetail(GameTipJob.class, "gameTipJob"), getTrigger("gameTipJobTrigger", "0 */1 * * * ?"));
                 scheduler.scheduleJob(getJobDetail(PlaydayJob.class, "playdayJob"), getTrigger("playdayJobTrigger", "0 0 5 * * ?"));
                 scheduler.scheduleJob(getJobDetail(ReminderJob.class, "reminderJob"), getTrigger("reminderJobTrigger", "0 0 1 * * ?"));
-                scheduler.scheduleJob(getJobDetail(ResultsJob.class, "resultsJob"), getTrigger("resultsJobTrigger", "*/4 * * * * ?"));
+                scheduler.scheduleJob(getJobDetail(ResultsJob.class, "resultsJob"), getTrigger("resultsJobTrigger", "0 */4 * * * ?"));
 
                 scheduler.start();
 

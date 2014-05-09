@@ -286,6 +286,12 @@ public class AdminController extends RootController {
 
         return Results.redirect("/admin/jobs");
     }
+    
+    public Result jobs() {
+        List<AbstractJob> jobs = dataService.findAllAbstractJobs();
+        
+        return Results.html().render("jobs", jobs);
+    }
 
     public Result calculations() {
         calculationService.calculations();
