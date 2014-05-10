@@ -45,10 +45,10 @@ public class MailService {
 
     @Inject
     private DataService dataService;
-    
+
     @Inject
     private ValidationService validationService;
-    
+
     @Inject
     private CommonService commonService;
 
@@ -104,7 +104,7 @@ public class MailService {
             content.put("token", token);
             content.put("message", message);
             mail.setBodyText(commonService.getProcessedTemplate("/src/main/java/view/mails/confirm.ftl", content));
-            
+
             try {
                 postoffice.send(mail);
             } catch (Exception e) {
@@ -124,7 +124,7 @@ public class MailService {
             content.put("user", user);
             content.put("settings", settings);
             mail.setBodyText(commonService.getProcessedTemplate("/src/main/java/view/mails/newuser.ftl", content));
-            
+
             try {
                 postoffice.send(mail);
             } catch (Exception e) {
@@ -165,7 +165,7 @@ public class MailService {
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("notification", notification);
             mail.setBodyText(commonService.getProcessedTemplate("/src/main/java/view/mails/notification.ftl", content));
-            
+
             try {
                 postoffice.send(mail);
             } catch (Exception e) {
@@ -179,7 +179,7 @@ public class MailService {
     public void gametips(final User user, final List<Game> games) {
         final Settings settings = dataService.findSettings();
 
-        if (validationService.isValidEmail(user.getEmail()) && (games.size() > 0)) {
+        if (validationService.isValidEmail(user.getEmail()) && !games.isEmpty()) {
             Mail mail = getMailInstance(settings, user.getEmail(), StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + i18nService.get("overview")));
 
             Map<String, Object> content = new HashMap<String, Object>();

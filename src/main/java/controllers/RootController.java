@@ -14,4 +14,5 @@ import filters.AppFilter;
  */
 @Singleton
 @FilterWith({AppFilter.class, AuthenticationFilter.class})
-public class RootController {}
+public class RootController {
+}

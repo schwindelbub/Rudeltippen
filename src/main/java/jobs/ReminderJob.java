@@ -73,7 +73,7 @@ public class ReminderJob implements Job {
                         }
                     }
 
-                    if ((reminderGames.size() > 0) || (reminderBonus.size() > 0)) {
+                    if (!reminderGames.isEmpty() || !reminderBonus.isEmpty()) {
                         mailService.reminder(user, reminderGames, reminderBonus);
                         LOG.info("Reminder send to: " + user.getEmail());
                     }

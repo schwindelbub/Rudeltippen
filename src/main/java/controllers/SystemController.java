@@ -37,16 +37,16 @@ public class SystemController {
 
     @Inject
     private DataService dataService;
-    
+
     @Inject
     private ImportService importService;
-    
+
     @Inject
     private SetupService setupService;
-    
+
     @Inject
     private NinjaProperties ninjaProperties;
-    
+
     @Inject
     private AuthService authService;
 
@@ -74,7 +74,7 @@ public class SystemController {
             final List<Game> prePlayoffGames = dataService.findAllNonPlayoffGames();
             final List<Game> playoffGames = dataService.findAllPlayoffGames();
             boolean hasPlayoffs = false;
-            if ((playoffGames != null) && (playoffGames.size() > 0)) {
+            if (playoffGames != null && !playoffGames.isEmpty()) {
                 hasPlayoffs = true;
             }
 

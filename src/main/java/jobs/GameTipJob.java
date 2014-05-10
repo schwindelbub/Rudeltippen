@@ -50,7 +50,7 @@ public class GameTipJob implements Job {
                 final List<User> users = dataService.findAllNotifiableUsers();
                 final List<Game> games = dataService.findAllNotifiableGames();
 
-                if (games != null && games.size() > 0) {
+                if (games != null && !games.isEmpty()) {
                     for (final User user : users) {
                         mailService.gametips(user, games);
                     }

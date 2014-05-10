@@ -13,6 +13,8 @@ import ninja.Results;
 import ninja.params.PathParam;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import services.DataService;
 
@@ -29,6 +31,7 @@ import filters.AuthorizationFilter;
 @Singleton
 @FilterWith(AuthorizationFilter.class)
 public class AjaxController extends RootController {
+    private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
 
     @Inject
     private DataService dataService;
@@ -57,10 +60,11 @@ public class AjaxController extends RootController {
                     game.setKickoff(simpleDateFormat.parse(kickoff));
                     game.setUpdateble(false);
                     dataService.save(game);
+
+                    return Results.ok();
                 } catch (Exception e) {
-                    return Results.badRequest();
+                    LOG.error("Failed to save kickoff", e);
                 }
-                return Results.ok();
             }
         }
         return Results.badRequest();

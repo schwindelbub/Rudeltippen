@@ -1,5 +1,7 @@
 package models.statistic;
 
+import java.io.Serializable;
+
 import models.Playday;
 import models.User;
 
@@ -14,7 +16,9 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "userstatistics", noClassnameStored = true)
-public class UserStatistic {
+public class UserStatistic implements Serializable {
+    private static final long serialVersionUID = -1721254237172590008L;
+
     @Id
     private ObjectId id;
 

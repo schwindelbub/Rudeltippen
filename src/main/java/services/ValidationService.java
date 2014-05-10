@@ -111,7 +111,7 @@ public class ValidationService {
     public void validateSettingsDTO(SettingsDTO settingsDTO, Validation validation) {
         // TODO Auto-generated method stub
     }
-    
+
     /**
      * Checks if the given filesize is lower or equal than configured in application.conf
      * 
@@ -208,6 +208,6 @@ public class ValidationService {
     }
 
     public boolean isValidPassword(String userpass) {
-        return (StringUtils.isNotBlank(userpass) && userpass.length() >= 8 && userpass.length() <= 32);
+        return StringUtils.isNotBlank(userpass) && userpass.length() >= 8 && userpass.length() <= 32;
     }
 }

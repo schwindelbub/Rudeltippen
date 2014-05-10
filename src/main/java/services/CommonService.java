@@ -48,13 +48,13 @@ import freemarker.template.Template;
 @Singleton
 public class CommonService extends ViewService {
     private static final Logger LOG = LoggerFactory.getLogger(CommonService.class);
-    
+
     @Inject
     private I18nService i18nService;
-    
+
     @Inject
     private DataService dataService;
-    
+
     /**
      * Checks if all games in given list have ended
      *
@@ -63,7 +63,7 @@ public class CommonService extends ViewService {
      */
     public boolean allReferencedGamesEnded(final List<Game> games) {
         boolean ended = true;
-        if ((games != null) && (games.size() > 0)) {
+        if (games != null && !games.isEmpty()) {
             for (final Game game : games) {
                 if (!game.isEnded()) {
                     ended = false;
@@ -103,40 +103,42 @@ public class CommonService extends ViewService {
             try {
                 inputStream = response.getEntity().getContent();
                 outputStream = new FileOutputStream(file);
-                
+
                 final byte byteBuffer[] = new byte[1024];
                 int length;
                 while ((length = inputStream.read(byteBuffer)) > 0) {
                     outputStream.write(byteBuffer, 0, length);
                 }
-                
+
                 FileUtils.copyFile(file, new File(Constants.MEDIAFOLDER.value() + filename));
-                file.delete();
+                if (!file.delete()) {
+                    LOG.error("Failed to delete image when handling response from gravatar");
+                }
             } catch (final Exception e) {
-                LOG.error("Failed to get and convert gravatar image. " + e);
+                LOG.error("Failed to get and convert gravatar image", e);
             } finally {
                 if (inputStream != null) {
                     try {
                         inputStream.close();
                     } catch (IOException e) {
                         LOG.error("Failed to close inputstream while getting gravatar image", e);
-                    } 
+                    }
                 }
                 if (outputStream != null) {
                     try {
                         outputStream.close();
                     } catch (IOException e) {
                         LOG.error("Failed to close outputstream while getting gravatar image", e);
-                    } 
+                    }
                 }
             }
         }
-        
+
         return filename;
     }
 
     /**
-     * Calculates the pagination 
+     * Calculates the pagination
      * 
      * @param number The number of pages
      * @param url The urls to set to the links
@@ -172,7 +174,7 @@ public class CommonService extends ViewService {
 
         return pagination;
     }
-    
+
     public BufferedImage resizeImage(File file, int width, int height){
         BufferedImage originalImage = null;
         try {
@@ -180,47 +182,47 @@ public class CommonService extends ViewService {
         } catch (IOException e) {
             LOG.error("Failed to read image for resizing", e);
         }
-        
+
         BufferedImage resizedImage = null;
         if (originalImage != null) {
             int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
-            
+
             resizedImage = new BufferedImage(width, height, type);
             Graphics2D graphics2D = resizedImage.createGraphics();
             graphics2D.drawImage(originalImage, 0, 0, width, height, null);
             graphics2D.dispose();
         }
-     
+
         return resizedImage;
     }
-    
+
     public Map<String, String> convertParamaters(Map<String, String[]> parameters) {
         Map<String, String> map = new HashMap<String, String>();
         Iterator<Map.Entry<String, String[]>> entries = parameters.entrySet().iterator();
         while (entries.hasNext()) {
             Map.Entry<String, String[]> entry = entries.next();
-            
+
             if (entry.getValue() != null && entry.getValue().length > 0) {
-                map.put(entry.getKey(), entry.getValue()[0]);  
+                map.put(entry.getKey(), entry.getValue()[0]);
             }
         }
-        
+
         return map;
     }
-    
+
     public String getProcessedTemplate(String name, Map<String, Object> content) {
-        Writer writer = new StringWriter(); 
+        Writer writer = new StringWriter();
         Configuration configuration = new Configuration();
         try {
             Template template = configuration.getTemplate(name);
-            template.process(content, writer); 
+            template.process(content, writer);
         } catch (Exception e) {
             LOG.error("Failed to create template for: " + name, e);
         }
-        
+
         return writer.toString();
     }
-    
+
     public boolean extraIsTipable(Extra extra) {
         if (extra.getEnding() != null && (new Date().getTime() >= extra.getEnding().getTime())) {
             return false;
@@ -360,7 +362,7 @@ public class CommonService extends ViewService {
 
         return false;
     }
-    
+
     public boolean playdayIsTippable(Playday playday) {
         for (final Game game : playday.getGames()){
             if (gameIsTippable(game)) {
@@ -378,7 +380,7 @@ public class CommonService extends ViewService {
         }
         return true;
     }
-    
+
     public boolean allGamesEnded(Bracket bracket) {
         for (final Game game : bracket.getGames()) {
             if (!game.isEnded()) {
@@ -400,7 +402,7 @@ public class CommonService extends ViewService {
 
         return null;
     }
-    
+
     public Team getWinner(Game game) {
         String home, away;
         if (game.isOvertime()) {

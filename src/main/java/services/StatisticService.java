@@ -81,8 +81,8 @@ public class StatisticService {
                 gameStatistic.setPlayday(playday);
             }
 
-            gameStatistic.setGameResult((String) entry.getKey());
-            gameStatistic.setResultCount((Integer) entry.getValue());
+            gameStatistic.setGameResult(entry.getKey());
+            gameStatistic.setResultCount(entry.getValue());
             dataService.save(gameStatistic);
         }
     }
@@ -181,8 +181,8 @@ public class StatisticService {
                 playdayStatistic = new PlaydayStatistic();
                 playdayStatistic.setPlayday(playday);
             }
-            playdayStatistic.setGameResult((String) entry.getKey());
-            playdayStatistic.setResultCount((Integer) entry.getValue());
+            playdayStatistic.setGameResult(entry.getKey());
+            playdayStatistic.setResultCount(entry.getValue());
             dataService.save(playdayStatistic);
         }
     }
@@ -201,7 +201,6 @@ public class StatisticService {
         //        return results;
         return null;
     }
-
 
     public Object [] getPlaydayStatistics(Playday playday) {
         //TODO Refactoring

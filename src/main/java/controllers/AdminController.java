@@ -63,13 +63,13 @@ public class AdminController extends RootController {
 
     @Inject
     private I18nService i18nService;
-    
+
     @Inject
     private ValidationService validationService;
-    
+
     @Inject
     private CommonService commonService;
-    
+
     public Result results(@PathParam("number") long number) {
         final Pagination pagination = commonService.getPagination(number, "/admin/results/", dataService.findAllPlaydaysOrderByNumber().size());
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
@@ -113,7 +113,7 @@ public class AdminController extends RootController {
         flashScope.put("warning", i18nService.get("controller.games.tippsstored", null));
 
         int playday = 1;
-        if ((keys != null) && (keys.size() >= 1)) {
+        if (keys != null && !keys.isEmpty()) {
             if (StringUtils.isNotBlank(gamekey)) {
                 gamekey = gamekey.replace("_et", "");
                 final Game game = dataService.findGameById(gamekey);
@@ -128,7 +128,7 @@ public class AdminController extends RootController {
 
     public Result updatesettings (FlashScope flashScope, @JSR303Validation SettingsDTO settingsDTO, Validation validation) {
         validationService.validateSettingsDTO(settingsDTO, validation);
-        
+
         if (!validation.hasBeanViolations()) {
             final Settings settings = dataService.findSettings();
             settings.setGameName(settingsDTO.name);
@@ -262,7 +262,7 @@ public class AdminController extends RootController {
     public Result send(FlashScope flashScope, Context context) {
         String subject = context.getParameter("subject");
         String message = context.getParameter("message");
-        
+
         if (StringUtils.isNotBlank(subject) && StringUtils.isNotBlank(message)) {
             final List<String> recipients = new ArrayList<String>();
             final List<User> users = dataService.findAllActiveUsers();
@@ -272,7 +272,7 @@ public class AdminController extends RootController {
 
             String[] recipientsArray = new String[users.size()];
             recipientsArray = recipients.toArray(recipientsArray);
-            
+
             User connectedUser = context.getAttribute("connectedUser", User.class);
             mailService.rudelmail(subject, message, recipientsArray, connectedUser.getEmail());
             flashScope.success(i18nService.get("info.rudelmail.send"));
@@ -292,10 +292,10 @@ public class AdminController extends RootController {
 
         return Results.redirect("/admin/jobs");
     }
-    
+
     public Result jobs() {
         List<AbstractJob> jobs = dataService.findAllAbstractJobs();
-        
+
         return Results.html().render("jobs", jobs);
     }
 
