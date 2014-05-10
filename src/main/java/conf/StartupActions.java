@@ -17,6 +17,7 @@ import jobs.ResultJob;
 import models.AbstractJob;
 import models.enums.Constants;
 import ninja.lifecycle.Start;
+import ninja.utils.NinjaConstant;
 
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -50,6 +51,10 @@ public class StartupActions {
 
     @Start(order=100)
     public void startup() {
+        if (NinjaConstant.MODE_TEST.equals(System.getProperty(NinjaConstant.MODE_KEY_NAME))) {
+            return;
+        }
+
         initJobs();
         scheduleJobs();
     }
