@@ -29,15 +29,33 @@ public class Extra {
 
     @Reference
     private Team answer;
-    
+
     private String question;
     private String questionShort;
     private String extraReference;
 
     private int points;
-    
+
     private Date ending;
-    
+
+    private boolean reminder;
+
+    public List<ExtraTip> getExtraTips() {
+        return extraTips;
+    }
+
+    public void setExtraTips(List<ExtraTip> extraTips) {
+        this.extraTips = extraTips;
+    }
+
+    public boolean isReminder() {
+        return reminder;
+    }
+
+    public void setReminder(boolean reminder) {
+        this.reminder = reminder;
+    }
+
     public ObjectId getId() {
         return id;
     }

@@ -7,10 +7,10 @@ import java.util.Map.Entry;
 
 import models.Extra;
 import models.Game;
-import models.Pagination;
 import models.Playday;
 import models.Team;
 import models.User;
+import models.pagination.Pagination;
 import ninja.Context;
 import ninja.Result;
 import ninja.Results;

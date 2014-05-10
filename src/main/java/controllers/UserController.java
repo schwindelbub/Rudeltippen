@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import models.Confirmation;
-import models.ConfirmationType;
-import models.Constants;
 import models.ExtraTip;
 import models.GameTip;
 import models.Settings;
 import models.User;
+import models.enums.ConfirmationType;
+import models.enums.Constants;
 import models.statistic.UserStatistic;
 import ninja.Context;
 import ninja.Result;

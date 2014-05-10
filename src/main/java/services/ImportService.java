@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 import models.Bracket;
-import models.Constants;
 import models.Extra;
 import models.Game;
 import models.Playday;
 import models.Team;
+import models.enums.Constants;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;

@@ -4,7 +4,8 @@ import java.util.List;
 
 import models.AbstractJob;
 import models.Game;
-import models.WSResults;
+import models.enums.Constants;
+import models.ws.WSResults;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -25,27 +26,27 @@ import com.google.inject.Singleton;
  *
  */
 @Singleton
-public class ResultsJob implements Job {
+public class ResultJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(GameTipJob.class);
 
     @Inject
     private DataService dataService;
-    
+
     @Inject
     private CalculationService calculationService;
 
     @Inject
     private ResultService resultService;
-    
-    public ResultsJob() {
+
+    public ResultJob() {
     }
 
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
         if (resultService.isJobInstance()) {
-            AbstractJob job = dataService.findAbstractJobByName("ResultsJob");
+            AbstractJob job = dataService.findAbstractJobByName(Constants.RESULTJOB.value());
             if (job != null && job.isActive()) {
-                LOG.info("Started Job: ResultsJob");
+                LOG.info("Started Job: " + Constants.RESULTJOB.value());
                 final List<Game> games = dataService.findAllGamesWithNoResult();
                 for (final Game game : games) {
                     final WSResults wsResults = resultService.getResultsFromWebService(game);
@@ -53,7 +54,7 @@ public class ResultsJob implements Job {
                         calculationService.setGameScoreFromWebService(game, wsResults);
                     }
                 }
-                LOG.info("Finished Job: ResultsJob");
+                LOG.info("Finished Job: " + Constants.RESULTJOB.value());
             }
         }
     }

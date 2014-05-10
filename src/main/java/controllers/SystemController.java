@@ -4,10 +4,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import models.Constants;
 import models.Game;
 import models.Settings;
 import models.User;
+import models.enums.Constants;
 import ninja.Context;
 import ninja.Result;
 import ninja.Results;

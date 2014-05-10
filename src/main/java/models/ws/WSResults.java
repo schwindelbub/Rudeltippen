@@ -1,4 +1,4 @@
-package models;
+package models.ws;
 
 import java.util.Map;
 

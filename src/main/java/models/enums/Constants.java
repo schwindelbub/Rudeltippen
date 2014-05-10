@@ -1,4 +1,4 @@
-package models;
+package models.enums;
 
 /**
  * 
@@ -18,7 +18,11 @@ public enum Constants {
     USERNAMEPATTERN("[a-zA-Z0-9-_]+"),
     USERNAME("username"),
     COOKIENAME("rudelremember"),
-    MEDIAFOLDER("src/main/java/assets/media/");
+    MEDIAFOLDER("src/main/java/assets/media/"),
+    GAMETIPJOB("GameTipJob"),
+    KICKOFFJOB("KickoffJob"),
+    REMINDERJOB("ReminderJob"),
+    RESULTJOB("ResultJob");
 
     private String value;
 

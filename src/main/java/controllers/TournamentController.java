@@ -3,8 +3,8 @@ package controllers;
 import java.util.List;
 
 import models.Bracket;
-import models.Pagination;
 import models.Playday;
+import models.pagination.Pagination;
 import ninja.Result;
 import ninja.Results;
 import ninja.params.PathParam;

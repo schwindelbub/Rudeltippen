@@ -5,8 +5,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import models.Confirmation;
-import models.Constants;
 import models.User;
+import models.enums.Constants;
 import ninja.validation.ConstraintViolation;
 import ninja.validation.FieldViolation;
 import ninja.validation.Validation;

@@ -13,8 +13,8 @@ import models.Playday;
 import models.Settings;
 import models.Team;
 import models.User;
-import models.WSResult;
-import models.WSResults;
+import models.ws.WSResult;
+import models.ws.WSResults;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

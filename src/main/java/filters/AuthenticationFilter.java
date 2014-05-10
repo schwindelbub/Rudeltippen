@@ -1,7 +1,7 @@
 package filters;
 
-import models.Constants;
 import models.User;
+import models.enums.Constants;
 import ninja.Context;
 import ninja.Cookie;
 import ninja.Filter;

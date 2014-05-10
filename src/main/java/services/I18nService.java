@@ -2,7 +2,7 @@ package services;
 
 import org.apache.commons.lang.StringUtils;
 
-import models.Constants;
+import models.enums.Constants;
 import ninja.i18n.Messages;
 import ninja.utils.NinjaProperties;
 

@@ -9,6 +9,7 @@ import models.ExtraTip;
 import models.Game;
 import models.GameTip;
 import models.User;
+import models.enums.Constants;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -37,21 +38,21 @@ public class ReminderJob implements Job {
 
     @Inject
     private MailService mailService;
-    
+
     @Inject
     private ResultService resultService;
-    
+
     public ReminderJob() {
     }
 
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
         if (resultService.isJobInstance()) {
-            AbstractJob job = dataService.findAbstractJobByName("PlaydayJob");
+            AbstractJob job = dataService.findAbstractJobByName(Constants.REMINDERJOB.value());
             if (job != null && job.isActive()) {
-                LOG.info("Started Job: ReminderJob");
-                final List<Extra> nextExtras = dataService.findAllExtrasEndingToday();
-                final List<Game> nextGames = dataService.findAllGamesEndingToday();
+                LOG.info("Started Job: " + Constants.REMINDERJOB.value());
+                final List<Extra> nextExtras = dataService.findAllExtrasEnding();
+                final List<Game> nextGames = dataService.findAllGamesEnding();
                 final List<User> users = dataService.findAllRemindableUsers();
 
                 for (final User user : users) {
@@ -77,7 +78,18 @@ public class ReminderJob implements Job {
                         LOG.info("Reminder send to: " + user.getEmail());
                     }
                 }
-                LOG.info("Finshed Job: ReminderJob");
+
+                for (final Game game : nextGames) {
+                    game.setReminder(true);
+                    dataService.save(game);
+                }
+
+                for (final Extra extra : nextExtras) {
+                    extra.setReminder(true);
+                    dataService.save(extra);
+                }
+
+                LOG.info("Finshed Job: " + Constants.REMINDERJOB.value());
             }
         }
     }

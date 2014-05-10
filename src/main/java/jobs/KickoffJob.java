@@ -8,6 +8,7 @@ import java.util.TimeZone;
 import models.AbstractJob;
 import models.Game;
 import models.Playday;
+import models.enums.Constants;
 
 import org.apache.commons.lang.StringUtils;
 import org.quartz.Job;
@@ -31,7 +32,8 @@ import com.google.inject.Singleton;
  *
  */
 @Singleton
-public class PlaydayJob implements Job {
+public class KickoffJob implements Job {
+    private static final String KICKOFF_FORMAT = "yyyy-MM-dd kk:mm:ss";
     private static final Logger LOG = LoggerFactory.getLogger(GameTipJob.class);
 
     @Inject
@@ -39,22 +41,22 @@ public class PlaydayJob implements Job {
 
     @Inject
     private SetupService setupService;
-    
+
     @Inject
     private ResultService resultService;
 
     @Inject
     private I18nService i18nService;
 
-    public PlaydayJob() {
+    public KickoffJob() {
     }
 
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
         if (resultService.isJobInstance()) {
-            AbstractJob job = dataService.findAbstractJobByName("GameTipJob");
+            AbstractJob job = dataService.findAbstractJobByName(Constants.KICKOFFJOB.value());
             if (job != null && job.isActive()) {
-                LOG.info("Started Job: PlaydayJob");
+                LOG.info("Started Job: " + Constants.KICKOFFJOB.value());
                 int number = dataService.findCurrentPlayday().getNumber();
                 for (int i=0; i <= 3; i++) {
                     final Playday playday = dataService.findPlaydaybByNumber(number);
@@ -65,7 +67,7 @@ public class PlaydayJob implements Job {
                             if (StringUtils.isNotBlank(matchID) && game.isUpdateble()) {
                                 final Document document = resultService.getDocumentFromWebService(matchID);
                                 final Date kickoff = setupService.getKickoffFromDocument(document);
-                                final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+                                final SimpleDateFormat df = new SimpleDateFormat(KICKOFF_FORMAT);
                                 df.setTimeZone(TimeZone.getTimeZone(i18nService.getCurrentTimeZone()));
 
                                 game.setKickoff(kickoff);
@@ -77,7 +79,7 @@ public class PlaydayJob implements Job {
                     }
                     number++;
                 }
-                LOG.info("Finished Job: PlaydayJob");
+                LOG.info("Finished Job: " + Constants.KICKOFFJOB.value());
             }
         }
     }

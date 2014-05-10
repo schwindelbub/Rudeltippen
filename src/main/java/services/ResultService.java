@@ -7,12 +7,12 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import models.Constants;
 import models.Game;
 import models.Settings;
 import models.User;
-import models.WSResult;
-import models.WSResults;
+import models.enums.Constants;
+import models.ws.WSResult;
+import models.ws.WSResults;
 import ninja.utils.NinjaProperties;
 
 import org.apache.commons.lang.StringUtils;

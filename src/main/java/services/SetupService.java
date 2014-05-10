@@ -12,8 +12,8 @@ import java.util.TimeZone;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import models.Constants;
 import models.User;
+import models.enums.Constants;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;

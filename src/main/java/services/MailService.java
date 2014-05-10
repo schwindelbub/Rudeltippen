@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import models.ConfirmationType;
 import models.Extra;
 import models.Game;
 import models.Settings;
 import models.User;
+import models.enums.ConfirmationType;
 import ninja.postoffice.Mail;
 import ninja.postoffice.Postoffice;
 import ninja.utils.NinjaProperties;

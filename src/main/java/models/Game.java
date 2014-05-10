@@ -32,7 +32,7 @@ public class Game {
 
     @Reference("game_gametips")
     private List<GameTip> gameTips;
-    
+
     private Date kickoff;
 
     private String overtimeType;
@@ -47,13 +47,22 @@ public class Game {
     private int number;
     private int homePoints;
     private int awayPoints;
-    
+
     private boolean overtime;
     private boolean playoff;
     private boolean ended;
     private boolean informed;
     private boolean updateble;
-    
+    private boolean reminder;
+
+    public boolean isReminder() {
+        return reminder;
+    }
+
+    public void setReminder(boolean reminder) {
+        this.reminder = reminder;
+    }
+
     public ObjectId getId() {
         return id;
     }

@@ -10,12 +10,12 @@ import java.util.List;
 import javax.inject.Singleton;
 
 import jobs.AppJobFactory;
-import jobs.CleanupJob;
 import jobs.GameTipJob;
-import jobs.PlaydayJob;
+import jobs.KickoffJob;
 import jobs.ReminderJob;
-import jobs.ResultsJob;
+import jobs.ResultJob;
 import models.AbstractJob;
+import models.enums.Constants;
 import ninja.lifecycle.Start;
 
 import org.quartz.JobDetail;
@@ -56,11 +56,10 @@ public class StartupActions {
 
     private void initJobs() {
         List<String> jobNames = new ArrayList<String>();
-        jobNames.add("CleanupJob");
-        jobNames.add("GameTipJob");
-        jobNames.add("PlaydayJob");
-        jobNames.add("ReminderJob");
-        jobNames.add("ResultsJob");
+        jobNames.add(Constants.GAMETIPJOB.value());
+        jobNames.add(Constants.KICKOFFJOB.value());
+        jobNames.add(Constants.REMINDERJOB.value());
+        jobNames.add(Constants.RESULTJOB.value());
 
         for (String jobName : jobNames) {
             AbstractJob abstractJob = dataService.findAbstractJobByName(jobName);
@@ -85,11 +84,10 @@ public class StartupActions {
         if (scheduler != null) {
             try {
                 scheduler.setJobFactory(appJobFactory);
-                scheduler.scheduleJob(getJobDetail(CleanupJob.class, "cleanupJob"), getTrigger("cleanupJobTrigger", "0 0 2 * * ?"));
-                scheduler.scheduleJob(getJobDetail(GameTipJob.class, "gameTipJob"), getTrigger("gameTipJobTrigger", "0 */1 * * * ?"));
-                scheduler.scheduleJob(getJobDetail(PlaydayJob.class, "playdayJob"), getTrigger("playdayJobTrigger", "0 0 5 * * ?"));
-                scheduler.scheduleJob(getJobDetail(ReminderJob.class, "reminderJob"), getTrigger("reminderJobTrigger", "0 0 1 * * ?"));
-                scheduler.scheduleJob(getJobDetail(ResultsJob.class, "resultsJob"), getTrigger("resultsJobTrigger", "0 */4 * * * ?"));
+                scheduler.scheduleJob(getJobDetail(GameTipJob.class, Constants.GAMETIPJOB.value()), getTrigger("gameTipJobTrigger", "0 */1 * * * ?"));
+                scheduler.scheduleJob(getJobDetail(KickoffJob.class, Constants.KICKOFFJOB.value()), getTrigger("kickoffJobTrigger", "0 0 5 * * ?"));
+                scheduler.scheduleJob(getJobDetail(ReminderJob.class, Constants.REMINDERJOB.value()), getTrigger("reminderJobTrigger", "0 0 */1 * * ?"));
+                scheduler.scheduleJob(getJobDetail(ResultJob.class, Constants.RESULTJOB.value()), getTrigger("resultsJobTrigger", "0 */4 * * * ?"));
 
                 scheduler.start();
 

@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.UUID;
 
 import models.Confirmation;
-import models.ConfirmationType;
-import models.Constants;
 import models.Settings;
 import models.User;
+import models.enums.ConfirmationType;
+import models.enums.Constants;
 import ninja.Cookie;
 import ninja.FilterWith;
 import ninja.Result;

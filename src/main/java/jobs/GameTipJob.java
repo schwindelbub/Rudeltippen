@@ -5,6 +5,7 @@ import java.util.List;
 import models.AbstractJob;
 import models.Game;
 import models.User;
+import models.enums.Constants;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -33,19 +34,19 @@ public class GameTipJob implements Job {
 
     @Inject
     private MailService mailService;
-    
+
     @Inject
     private ResultService resultService;
-    
+
     public GameTipJob() {
     }
 
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
         if (resultService.isJobInstance()) {
-            AbstractJob job = dataService.findAbstractJobByName("GameTipJob");
+            AbstractJob job = dataService.findAbstractJobByName(Constants.GAMETIPJOB.value());
             if (job != null && job.isActive()) {
-                LOG.info("Started Job: GameTipJob");
+                LOG.info("Started Job: " + Constants.GAMETIPJOB.value());
                 final List<User> users = dataService.findAllNotifiableUsers();
                 final List<Game> games = dataService.findAllNotifiableGames();
 
@@ -60,7 +61,7 @@ public class GameTipJob implements Job {
                     }
                 }
 
-                LOG.info("Finished Job: GameTipJob");
+                LOG.info("Finished Job: " + Constants.GAMETIPJOB.value());
             }
         }
     }

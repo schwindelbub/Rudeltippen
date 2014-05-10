@@ -19,16 +19,16 @@ import java.util.UUID;
 import javax.imageio.ImageIO;
 
 import models.Bracket;
-import models.Constants;
 import models.Extra;
 import models.ExtraTip;
 import models.Game;
 import models.GameTip;
-import models.Pagination;
 import models.Playday;
 import models.Settings;
 import models.Team;
 import models.User;
+import models.enums.Constants;
+import models.pagination.Pagination;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
