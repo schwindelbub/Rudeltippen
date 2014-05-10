@@ -1,43 +1,17 @@
 package services;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import main.TestFactory;
 import models.Extra;
 import models.Game;
 import models.User;
 import models.enums.ConfirmationType;
-import ninja.NinjaTest;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import com.mongodb.MongoClient;
-
-import de.flapdoodle.embed.mongo.MongodExecutable;
-import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
-import de.flapdoodle.embed.mongo.config.Net;
-import de.flapdoodle.embed.mongo.distribution.Version;
-
-public class TestMailService extends NinjaTest {
-    private static final MongodStarter starter = MongodStarter.getDefaultInstance();
-    private static int port = 28018;
-    private static MongodExecutable mongodExecutable;
-
-    @Before
-    public void init() throws IOException {
-        mongodExecutable = starter.prepare(new MongodConfigBuilder()
-        .version(Version.Main.V2_5)
-        .net(new Net(port, false))
-        .build());
-
-        mongodExecutable.start();
-
-        DataService ds = getInjector().getInstance(DataService.class);
-        ds.setMongoClient(new MongoClient("localhost", port));
-    }
+public class TestMailService extends TestFactory {
 
     @Test
     public void testReminder() {

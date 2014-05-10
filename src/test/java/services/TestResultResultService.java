@@ -1,19 +1,21 @@
 package services;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
+import main.TestFactory;
 import models.Game;
 import models.ws.WSResult;
 import models.ws.WSResults;
-import ninja.NinjaTest;
 
 import org.junit.Test;
 
 import com.google.inject.Injector;
 
-public class TestResultResultService extends NinjaTest {
+public class TestResultResultService extends TestFactory {
 
     @Test
     public void testWebServiceUpdate() {

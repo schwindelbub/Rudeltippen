@@ -1,48 +1,24 @@
 package services;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import main.TestFactory;
 import models.Extra;
 import models.Game;
-import ninja.NinjaTest;
 
-import org.junit.Before;
 import org.junit.Test;
 
-import com.mongodb.MongoClient;
-
-import de.flapdoodle.embed.mongo.MongodExecutable;
-import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
-import de.flapdoodle.embed.mongo.config.Net;
-import de.flapdoodle.embed.mongo.distribution.Version;
-
-public class TestCommonService extends NinjaTest {
-    private static final MongodStarter starter = MongodStarter.getDefaultInstance();
-    private static int port = 28018;
-    private static MongodExecutable mongodExecutable;
-
-    @Before
-    public void init() throws IOException {
-        mongodExecutable = starter.prepare(new MongodConfigBuilder()
-        .version(Version.Main.V2_5)
-        .net(new Net(port, false))
-        .build());
-
-        mongodExecutable.start();
-
-        DataService ds = getInjector().getInstance(DataService.class);
-        ds.setMongoClient(new MongoClient("localhost", port));
-    }
+public class TestCommonService extends TestFactory {
 
     @Test
     public void testHashPassword() {
-        assertEquals(getInjector().getInstance(AuthService.class).hashPassword("user22", "foo"), "bc423bd3c40919ed73f470d4182e2292f368607225f12f48599b9e9d2bea97586e0d930792e5381f1ebb75177abd75fc1a2ef879b2f275535d14e550c8d17b8b");
+        assertEquals(getInjector().getInstance(AuthService.class).hashPassword("user22", "foo"), "a8fdb91c4a4a16033d9ac410fbdb3cd6fdc17611a3c72a90e6dd746062714662a85e161cde0b098335aa87624e6c6bee84582cf72dfc2c8f5f916803b0c5906f");
     }
 
     @Test

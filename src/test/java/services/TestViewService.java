@@ -1,15 +1,16 @@
 package services;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
 
+import main.TestFactory;
 import models.User;
-import ninja.NinjaTest;
 
 import org.junit.Test;
 
-public class TestViewService extends NinjaTest {
+public class TestViewService extends TestFactory {
 
     @Test
     public void testGetPlaceTrend() {
