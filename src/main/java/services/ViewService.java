@@ -5,6 +5,8 @@ import java.util.List;
 
 import models.Game;
 import models.GameTip;
+import models.Playday;
+import models.Settings;
 import models.Team;
 import models.User;
 
@@ -224,5 +226,27 @@ public class ViewService {
         }
 
         return trend;
+    }
+    
+    public boolean gameIsTippable(Game game) {
+        final Date now = new Date();
+        final Settings settings = dataService.findSettings();
+        final int secondsBefore = settings.getMinutesBeforeTip() * 60000;
+
+        if (game.isEnded()) {
+            return false;
+        } else if (((game.getKickoff().getTime() - secondsBefore) > now.getTime()) && (game.getHomeTeam() != null) && (game.getAwayTeam() != null)) {
+            return true;
+        }
+
+        return false;
+    }
+    public boolean playdayIsTippable(Playday playday) {
+        for (final Game game : playday.getGames()){
+            if (gameIsTippable(game)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

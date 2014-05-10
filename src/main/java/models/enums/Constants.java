@@ -22,7 +22,8 @@ public enum Constants {
     GAMETIPJOB("GameTipJob"),
     KICKOFFJOB("KickoffJob"),
     REMINDERJOB("ReminderJob"),
-    RESULTJOB("ResultJob");
+    RESULTJOB("ResultJob"),
+    CONNECTEDUSER("connectedUser");
 
     private String value;
 

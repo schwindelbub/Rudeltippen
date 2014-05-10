@@ -10,6 +10,7 @@ import models.Game;
 import models.Playday;
 import models.Team;
 import models.User;
+import models.enums.Constants;
 import models.pagination.Pagination;
 import ninja.Context;
 import ninja.Result;
@@ -86,7 +87,7 @@ public class TipController extends RootController {
                     continue;
                 }
 
-                dataService.saveGameTip(game, Integer.parseInt(homeScore), Integer.parseInt(awayScore), context.getAttribute("connectedUser", User.class));
+                dataService.saveGameTip(game, Integer.parseInt(homeScore), Integer.parseInt(awayScore), context.getAttribute(Constants.CONNECTEDUSER.value(), User.class));
                 keys.add(key);
                 tipped++;
 
@@ -124,7 +125,7 @@ public class TipController extends RootController {
                 final Extra extra = dataService.findExtaById(bId);
                 if (commonService.extraIsTipable(extra)) {
                     final Team team = dataService.findTeamById(tId);
-                    dataService.saveExtraTip(extra, team, context.getAttribute("connectedUser", User.class));
+                    dataService.saveExtraTip(extra, team, context.getAttribute(Constants.CONNECTEDUSER.value(), User.class));
                     flashScope.success(i18nService.get("controller.tipps.bonussaved"));
                 }
             }

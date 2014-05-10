@@ -49,11 +49,11 @@ public class AuthenticationFilter implements Filter {
 
         if (context.getSession() != null && context.getSession().get(Constants.USERNAME.value()) != null) {
             User connectedUser = dataService.findUserByUsernameOrEmail(context.getSession().get(Constants.USERNAME.value()));
-            context.setAttribute("connectedUser", connectedUser);
+            context.setAttribute(Constants.CONNECTEDUSER.value(), connectedUser);
 
             Result result = filterChain.next(context);
-            result.render("connectedUser", connectedUser);
-            result.render("viewService", viewService);
+            result.render(Constants.CONNECTEDUSER.value(), connectedUser);
+            result.render("ViewService", viewService);
             result.render("currentPlayday", dataService.findCurrentPlayday());
             
             return result;

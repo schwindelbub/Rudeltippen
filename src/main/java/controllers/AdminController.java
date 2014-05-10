@@ -15,6 +15,7 @@ import models.Playday;
 import models.Settings;
 import models.User;
 import models.enums.ConfirmationType;
+import models.enums.Constants;
 import models.pagination.Pagination;
 import ninja.Context;
 import ninja.FilterWith;
@@ -163,7 +164,7 @@ public class AdminController extends RootController {
     }
 
     public Result changeactive(@PathParam("userid") String userId, Context context, FlashScope flashScope) {
-        final User connectedUser = context.getAttribute("connectedUser", User.class);
+        final User connectedUser = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
         final User user = dataService.findUserById(userId);
 
         if (user != null) {
@@ -197,7 +198,7 @@ public class AdminController extends RootController {
     }
 
     public Result changeadmin(@PathParam("userid") String userId, FlashScope flashScope, Context context) {
-        final User connectedUser = context.getAttribute("connectedUser", User.class);
+        final User connectedUser = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
         final User user = dataService.findUserById(userId);
 
         if (user != null) {
@@ -273,7 +274,7 @@ public class AdminController extends RootController {
             String[] recipientsArray = new String[users.size()];
             recipientsArray = recipients.toArray(recipientsArray);
 
-            User connectedUser = context.getAttribute("connectedUser", User.class);
+            User connectedUser = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
             mailService.rudelmail(subject, message, recipientsArray, connectedUser.getEmail());
             flashScope.success(i18nService.get("info.rudelmail.send"));
         } else {

@@ -1,6 +1,8 @@
 package controllers;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +25,9 @@ import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import ninja.session.Session;
 
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,10 +127,10 @@ public class UserController extends RootController {
     }
 
     public Result profile(Context context) {
-        final User user = context.getAttribute("connectedUser", User.class);
+        final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
         final Settings settings = dataService.findSettings();
 
-        return Results.html().render("users", user).render(settings);
+        return Results.html().render("user", user).render(settings);
     }
 
     public Result updateusername(Session session, Context context, FlashScope flashScope) {
@@ -134,7 +139,7 @@ public class UserController extends RootController {
         if (!validationService.isValidUsername(username)) {
             flashScope.error(i18nService.get("controller.users.usernamexists"));
         } else {
-            final User user = context.getAttribute("connectedUser", User.class);
+            final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
             user.setUsername(username);
             dataService.save(user);
 
@@ -155,7 +160,7 @@ public class UserController extends RootController {
             flashScope.error(i18nService.get("controller.users.invalidemail"));
         } else {
             final String token = UUID.randomUUID().toString();
-            final User user = context.getAttribute("connectedUser", User.class);
+            final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
             if (user != null) {
                 final ConfirmationType confirmationType = ConfirmationType.CHANGEUSERNAME;
                 final Confirmation confirmation = new Confirmation();
@@ -181,7 +186,7 @@ public class UserController extends RootController {
             flashScope.error(i18nService.get("controller.users.passwordisinvalid"));
         } else {
             final String token = UUID.randomUUID().toString();
-            final User user = context.getAttribute("connectedUser", User.class);
+            final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
             if (user != null) {
                 final ConfirmationType confirmationType = ConfirmationType.CHANGEUSERPASS;
                 final Confirmation confirm = new Confirmation();
@@ -200,12 +205,18 @@ public class UserController extends RootController {
         return Results.redirect("/users/profile");
     }
 
-    public Result updatenotifications(Context context, FlashScope flashScope, final boolean reminder, final boolean notification, final boolean sendstandings, final boolean sendgametips) {
-        final User user = context.getAttribute("conntectedUser", User.class);
-        user.setReminder(reminder);
-        user.setNotification(notification);
-        user.setSendStandings(sendstandings);
-        user.setSendGameTips(sendgametips);
+    public Result updatenotifications(Context context, FlashScope flashScope) {
+        final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
+        
+        String reminder = context.getParameter("reminder");
+        String notification = context.getParameter("notification");
+        String sendstandings = context.getParameter("sendstandings");
+        String sendgametips = context.getParameter("sendgametips");
+        
+        user.setReminder(("1").equals(reminder));
+        user.setNotification(("1").equals(notification));
+        user.setSendStandings(("1").equals(sendstandings));
+        user.setSendGameTips(("1").equals(sendgametips));
         dataService.save(user);
 
         flashScope.success(i18nService.get("controller.profile.notifications"));
@@ -214,23 +225,34 @@ public class UserController extends RootController {
         return Results.redirect("/users/profile");
     }
 
-    public Result updatepicture(final File picture, FlashScope flashScope, Context context) {
-        final User user = context.getAttribute("connectedUser", User.class);
+    public Result updatepicture(FlashScope flashScope, Context context) {
+        String pictureLargeFilename = UUID.randomUUID().toString() + ".jpg";
+        String pictureSmallFilename = UUID.randomUUID().toString() + ".jpg";
+
+        if (context.isMultipart()) {
+            FileItemIterator fileItemIterator = context.getFileItemIterator();
+            try {
+                while (fileItemIterator.hasNext()) {
+                    FileItemStream item = fileItemIterator.next();
+
+                    InputStream inputStream = item.openStream();
+                    if (!item.isFormField()) {
+                        IOUtils.copy(inputStream, new FileOutputStream(new File(Constants.MEDIAFOLDER.value() + pictureLargeFilename)));
+                        IOUtils.copy(inputStream, new FileOutputStream(new File(Constants.MEDIAFOLDER.value() + pictureSmallFilename)));
+                    }
+                }
+            } catch (Exception e) {
+                LOG.error("Failed to upload user picture", e);
+            }
+        }
         
-        String pictureLargeFilename = UUID.randomUUID().toString();
-        String pictureSmallFilename = UUID.randomUUID().toString();
+        final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
         
         File pictureSmall = new File(Constants.MEDIAFOLDER.value() + pictureSmallFilename);
         File pictureLarge = new File(Constants.MEDIAFOLDER.value() + pictureLargeFilename);
 
         commonService.resizeImage(pictureSmall, 64, 64);
         commonService.resizeImage(pictureLarge, 128, 128);
-        
-        if (picture.delete()) {
-            LOG.warn("User-Picutre could not be deleted after upload.");
-        } else {
-            LOG.info("User-Picture deleted after upload.");
-        }
         
         user.setPicture(pictureSmallFilename);
         user.setPictureLarge(pictureLargeFilename);
@@ -243,7 +265,7 @@ public class UserController extends RootController {
     }
 
     public Result deletepicture(Context context, FlashScope flashScope) {
-        User user = context.getAttribute("connectedUser", User.class);
+        User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
         user.setPicture(null);
         user.setPictureLarge(null);
         dataService.save(user);

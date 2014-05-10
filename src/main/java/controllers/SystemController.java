@@ -107,6 +107,9 @@ public class SystemController {
             user.setActive(true);
             user.setAdmin(true);
             user.setReminder(true);
+            user.setNotification(true);
+            user.setSendGameTips(true);
+            user.setSendStandings(true);
             user.setCorrectResults(0);
             user.setCorrectDifferences(0);
             user.setCorrectTrends(0);

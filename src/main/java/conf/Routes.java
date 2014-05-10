@@ -48,6 +48,11 @@ public class Routes implements ApplicationRoutes {
         router.POST().route("/auth/reset").with(AuthController.class, "reset");
         router.POST().route("/auth/authenticate").with(AuthController.class, "authenticate");
         router.POST().route("/auth/create").with(AuthController.class, "create");
+        router.POST().route("/users/updateusername").with(UserController.class, "updateusername");
+        router.POST().route("/users/updatepassword").with(UserController.class, "updatepassword");
+        router.POST().route("/users/updateemail").with(UserController.class, "updateemail");
+        router.POST().route("/users/updatenotifications").with(UserController.class, "updatenotifications");
+        router.POST().route("/users/updatepicture").with(UserController.class, "updatepicture");
         router.GET().route("/setup").with(SystemController.class, "setup");
         router.GET().route("/statistics").with(ApplicationController.class, "statistics");
         router.GET().route("/system/init").with(SystemController.class, "init");
