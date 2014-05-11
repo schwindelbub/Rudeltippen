@@ -1,5 +1,6 @@
 package models;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -14,7 +15,9 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "extras", noClassnameStored = true)
-public class Extra {
+public class Extra implements Serializable {
+    private static final long serialVersionUID = 4289210466754449470L;
+
     @Id
     private ObjectId id;
 

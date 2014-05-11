@@ -1,5 +1,6 @@
 package models;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.bson.types.ObjectId;
@@ -13,7 +14,9 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "gametips", noClassnameStored = true)
-public class GameTip {
+public class GameTip implements Serializable {
+    private static final long serialVersionUID = -8038881739647141796L;
+
     @Id
     private ObjectId id;
 
@@ -26,13 +29,13 @@ public class GameTip {
     private int homeScore;
     private int awayScore;
     private int points;
-    
+
     private Date placed;
 
     public ObjectId getId() {
         return id;
     }
-    
+
     public User getUser() {
         return user;
     }

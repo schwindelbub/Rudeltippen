@@ -1,5 +1,7 @@
 package models;
 
+import java.io.Serializable;
+
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -10,7 +12,9 @@ import org.mongodb.morphia.annotations.Id;
  *
  */
 @Entity(value = "jobs", noClassnameStored = true)
-public class AbstractJob {
+public class AbstractJob implements Serializable {
+    private static final long serialVersionUID = -181239072023766955L;
+
     @Id
     private ObjectId id;
 

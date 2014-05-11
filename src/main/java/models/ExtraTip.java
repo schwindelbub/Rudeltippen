@@ -1,5 +1,7 @@
 package models;
 
+import java.io.Serializable;
+
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -11,7 +13,9 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "extratips", noClassnameStored = true)
-public class ExtraTip {
+public class ExtraTip implements Serializable {
+    private static final long serialVersionUID = -2648500340981679571L;
+
     @Id
     private ObjectId id;
 
@@ -29,7 +33,7 @@ public class ExtraTip {
     public ObjectId getId() {
         return id;
     }
-    
+
     public User getUser() {
         return user;
     }

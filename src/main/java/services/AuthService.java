@@ -7,6 +7,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import models.User;
+import models.enums.Constants;
 import ninja.utils.NinjaProperties;
 
 import org.apache.commons.codec.DecoderException;
@@ -59,11 +60,11 @@ public class AuthService {
      */
     public String encryptAES(String value, String privateKey) {
         try {
-            byte[] raw = privateKey.getBytes("UTF-8");
+            byte[] raw = privateKey.getBytes(Constants.DEFAULT_ENCODING.value());
             SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
-            return byteToHexString(cipher.doFinal(value.getBytes()));
+            return byteToHexString(cipher.doFinal(value.getBytes(Constants.DEFAULT_ENCODING.value())));
         } catch (Exception ex) {
             throw new UnexpectedException(ex);
         }
@@ -86,7 +87,7 @@ public class AuthService {
      */
     public String decryptAES(String value, String privateKey) {
         try {
-            byte[] raw = privateKey.getBytes("UTF-8");
+            byte[] raw = privateKey.getBytes(Constants.DEFAULT_ENCODING.value());
             SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, skeySpec);
@@ -138,7 +139,7 @@ public class AuthService {
      */
     public String sign(String message) {
         try {
-            return sign(message, ninjaProperties.get("application.secret").getBytes("UTF-8"));
+            return sign(message, ninjaProperties.get("application.secret").getBytes(Constants.DEFAULT_ENCODING.value()));
         } catch (UnsupportedEncodingException e) {
             LOG.error("Failed to sign message", e);
         }
@@ -161,7 +162,7 @@ public class AuthService {
             Mac mac = Mac.getInstance("HmacSHA1");
             SecretKeySpec signingKey = new SecretKeySpec(key, "HmacSHA1");
             mac.init(signingKey);
-            byte[] messageBytes = message.getBytes("utf-8");
+            byte[] messageBytes = message.getBytes(Constants.DEFAULT_ENCODING.value());
             byte[] result = mac.doFinal(messageBytes);
             int len = result.length;
             char[] hexChars = new char[len * 2];

@@ -1,5 +1,6 @@
 package models;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -13,7 +14,9 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "brackets", noClassnameStored = true)
-public class Bracket {
+public class Bracket implements Serializable {
+    private static final long serialVersionUID = -7837267515132967024L;
+
     @Id
     private ObjectId id;
 
@@ -26,7 +29,7 @@ public class Bracket {
     private List<Game> games;
 
     private int number;
-    
+
     private boolean updateble;
 
     public ObjectId getId() {

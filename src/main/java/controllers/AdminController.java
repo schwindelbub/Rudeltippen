@@ -52,6 +52,13 @@ import filters.AuthorizationFilter;
 @FilterWith(AuthorizationFilter.class)
 public class AdminController extends RootController {
     private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
+    private static final String ADMIN_USERS = "/admin/users";
+    private static final String AWAY_SCORE_ET = "_awayScore_et";
+    private static final String HOME_SCORE_ET = "_homeScore_et";
+    private static final String GAME = "game_";
+    private static final String AWAY_SCORE = "_awayScore";
+    private static final String HOME_SCORE = "_homeScore";
+    private static final String ADMIN_RESULTS = "/admin/results/";
 
     @Inject
     private DataService dataService;
@@ -72,7 +79,7 @@ public class AdminController extends RootController {
     private CommonService commonService;
 
     public Result results(@PathParam("number") long number) {
-        final Pagination pagination = commonService.getPagination(number, "/admin/results/", dataService.findAllPlaydaysOrderByNumber().size());
+        final Pagination pagination = commonService.getPagination(number, ADMIN_RESULTS, dataService.findAllPlaydaysOrderByNumber().size());
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
 
         return Results.html().render(playday).render(pagination);
@@ -88,12 +95,12 @@ public class AdminController extends RootController {
         final Set<String> keys = new HashSet<String>();
         for (final Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();
-            if (StringUtils.isNotBlank(key) && key.contains("game_") && (key.contains("_homeScore") || key.contains("_awayScore"))) {
-                key = key.replace("game_", "")
-                        .replace("_homeScore", "")
-                        .replace("_awayScore", "")
-                        .replace("_homeScore_et", "")
-                        .replace("_awayScore_et", "")
+            if (StringUtils.isNotBlank(key) && key.contains(GAME) && (key.contains(HOME_SCORE) || key.contains(AWAY_SCORE))) {
+                key = key.replace(GAME, "")
+                        .replace(HOME_SCORE, "")
+                        .replace(AWAY_SCORE, "")
+                        .replace(HOME_SCORE_ET, "")
+                        .replace(AWAY_SCORE_ET, "")
                         .trim();
                 keys.add(key);
             }
@@ -102,16 +109,16 @@ public class AdminController extends RootController {
         String gamekey = null;
         for (final String key : keys) {
             gamekey = key;
-            final String homeScore = map.get("game_" + key + "_homeScore");
-            final String awayScore = map.get("game_" + key + "_awayScore");
+            final String homeScore = map.get(GAME + key + HOME_SCORE);
+            final String awayScore = map.get(GAME + key + AWAY_SCORE);
             final String extratime = map.get("extratime_" + key);
-            final String homeScoreExtratime = map.get("game_" + key + "_homeScore_et");
-            final String awayScoreExtratime = map.get("game_" + key + "_awayScore_et");
+            final String homeScoreExtratime = map.get(GAME + key + HOME_SCORE_ET);
+            final String awayScoreExtratime = map.get(GAME + key + AWAY_SCORE_ET);
             calculationService.setGameScore(key, homeScore, awayScore, extratime, homeScoreExtratime, awayScoreExtratime);
         }
 
         calculationService.calculations();
-        flashScope.put("warning", i18nService.get("controller.games.tippsstored", null));
+        flashScope.put(Constants.FLASHWARNING.value(), i18nService.get("controller.games.tippsstored", null));
 
         int playday = 1;
         if (keys != null && !keys.isEmpty() && StringUtils.isNotBlank(gamekey)) {
@@ -122,7 +129,7 @@ public class AdminController extends RootController {
             }
         }
 
-        return Results.redirect("/admin/results/" + playday);
+        return Results.redirect(ADMIN_RESULTS + playday);
     }
 
     public Result updatesettings (FlashScope flashScope, @JSR303Validation SettingsDTO settingsDTO, Validation validation) {
@@ -186,13 +193,13 @@ public class AdminController extends RootController {
                 flashScope.success(message);
                 LOG.info("User " + user.getEmail() + " has been " + activate + " - by " + connectedUser.getEmail());
             } else {
-                flashScope.put("warning", i18nService.get("warning.change.active"));
+                flashScope.put(Constants.FLASHWARNING.value(), i18nService.get("warning.change.active"));
             }
         } else {
             flashScope.error(i18nService.get("error.loading.user"));
         }
 
-        return Results.redirect("/admin/users");
+        return Results.redirect(ADMIN_USERS);
     }
 
     public Result changeadmin(@PathParam("userid") String userId, FlashScope flashScope, Context context) {
@@ -216,13 +223,13 @@ public class AdminController extends RootController {
                 flashScope.success(message);
                 LOG.info("User " + user.getEmail() + " " + admin + " - by " + connectedUser.getEmail());
             } else {
-                flashScope.put("warning", i18nService.get("warning.change.admin"));
+                flashScope.put(Constants.FLASHWARNING.value(), i18nService.get("warning.change.admin"));
             }
         } else {
             flashScope.error(i18nService.get("error.loading.user"));
         }
 
-        return Results.redirect("/admin/users");
+        return Results.redirect(ADMIN_USERS);
     }
 
     public Result deleteuser(@PathParam("userid") String userId, FlashScope flashScope, Context context) {
@@ -238,13 +245,13 @@ public class AdminController extends RootController {
 
                 calculationService.calculations();
             } else {
-                flashScope.put("warning", i18nService.get("warning.delete.user"));
+                flashScope.put(Constants.FLASHWARNING.value(), i18nService.get("warning.delete.user"));
             }
         } else {
             flashScope.error(i18nService.get("error.loading.user"));
         }
 
-        return Results.redirect("/admin/users");
+        return Results.redirect(ADMIN_USERS);
     }
 
     public Result rudelmail() {

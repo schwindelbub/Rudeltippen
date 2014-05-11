@@ -1,5 +1,6 @@
 package models;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import models.enums.ConfirmationType;
@@ -15,7 +16,9 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "confirmations", noClassnameStored = true)
-public class Confirmation {
+public class Confirmation implements Serializable {
+    private static final long serialVersionUID = -5965149177345129285L;
+
     @Id
     private ObjectId id;
 
@@ -24,9 +27,9 @@ public class Confirmation {
 
     private String token;
     private String confirmValue;
-    
+
     private ConfirmationType confirmType;
-    
+
     private Date created;
 
     public ObjectId getId() {

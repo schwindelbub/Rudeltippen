@@ -1,5 +1,7 @@
 package models;
 
+import java.io.Serializable;
+
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -11,7 +13,9 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "teams", noClassnameStored = true)
-public class Team {
+public class Team implements Serializable {
+    private static final long serialVersionUID = -4180104576028390547L;
+
     @Id
     private ObjectId id;
 
@@ -20,7 +24,7 @@ public class Team {
 
     private String flag;
     private String name;
-    
+
     private int points;
     private int goalsFor;
     private int goalsAgainst;
@@ -31,7 +35,7 @@ public class Team {
     private int gamesLost;
     private int place;
     private int previousPlace;
-    
+
     public ObjectId getId() {
         return id;
     }
