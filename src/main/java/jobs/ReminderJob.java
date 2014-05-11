@@ -73,24 +73,31 @@ public class ReminderJob implements Job {
                         }
                     }
 
-                    if (!reminderGames.isEmpty() || !reminderBonus.isEmpty()) {
-                        mailService.reminder(user, reminderGames, reminderBonus);
-                        LOG.info("Reminder send to: " + user.getEmail());
-                    }
+                    sendNotification(user, reminderGames, reminderBonus);
                 }
 
-                for (final Game game : nextGames) {
-                    game.setReminder(true);
-                    dataService.save(game);
-                }
-
-                for (final Extra extra : nextExtras) {
-                    extra.setReminder(true);
-                    dataService.save(extra);
-                }
-
+                disableReminder(nextExtras, nextGames);
                 LOG.info("Finshed Job: " + Constants.REMINDERJOB.value());
             }
+        }
+    }
+
+    private void sendNotification(final User user, final List<Game> reminderGames, final List<Extra> reminderBonus) {
+        if (!reminderGames.isEmpty() || !reminderBonus.isEmpty()) {
+            mailService.reminder(user, reminderGames, reminderBonus);
+            LOG.info("Reminder send to: " + user.getEmail());
+        }
+    }
+
+    private void disableReminder(final List<Extra> nextExtras, final List<Game> nextGames) {
+        for (final Game game : nextGames) {
+            game.setReminder(true);
+            dataService.save(game);
+        }
+
+        for (final Extra extra : nextExtras) {
+            extra.setReminder(true);
+            dataService.save(extra);
         }
     }
 }

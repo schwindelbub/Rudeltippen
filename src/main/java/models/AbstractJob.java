@@ -15,8 +15,12 @@ public class AbstractJob {
     private ObjectId id;
 
     private String name;
-    
+
     private boolean active;
+
+    public ObjectId getId() {
+        return id;
+    }
 
     public String getName() {
         return name;

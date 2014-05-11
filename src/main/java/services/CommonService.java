@@ -83,22 +83,12 @@ public class CommonService extends ViewService {
     /**
      * Returns the filename from a Gravatar image
      * 
-     * @param email The email adress to check
+     * @param email The email address to check
      * @param type Return a default image if no email is available
      * @return The image filename
      */
     public String getGravatarImage(final String email, final String type, int size) {
-        if ((size <= 0) || (size > 128)) {
-            size = 64;
-        }
-
-        String url = "https://secure.gravatar.com/avatar/" + DigestUtils.md5Hex(email) + ".jpg?s=" + size + "&r=pg&d=" + type;
-        HttpResponse response = null;
-        try {
-            response = Request.Get(url).execute().returnResponse();
-        } catch (IOException e) {
-            LOG.error("Failed to get response from gravator", e);
-        }
+        HttpResponse response = executeGravatarRequest(email, type, size);
 
         final String filename = UUID.randomUUID().toString();
         if (response != null && response.getStatusLine().getStatusCode() == 200) {
@@ -140,6 +130,18 @@ public class CommonService extends ViewService {
         }
 
         return filename;
+    }
+
+    private HttpResponse executeGravatarRequest(final String email, final String type, int size) {
+        String url = "https://secure.gravatar.com/avatar/" + DigestUtils.md5Hex(email) + ".jpg?s=" + size + "&r=pg&d=" + type;
+        HttpResponse response = null;
+        try {
+            response = Request.Get(url).execute().returnResponse();
+        } catch (IOException e) {
+            LOG.error("Failed to get response from gravator", e);
+        }
+
+        return response;
     }
 
     /**
@@ -207,7 +209,7 @@ public class CommonService extends ViewService {
                 height = (int) (width / ratio);
             }
 
-            if(keepRatio) {
+            if (keepRatio) {
                 height = (int) (width / ratio);
                 if(height > maxHeight) {
                     height = maxHeight;
@@ -235,39 +237,43 @@ public class CommonService extends ViewService {
             graphics.fillRect(0, 0, width, height);
             graphics.drawImage(srcSized, 0, 0, null);
 
-            ImageWriter writer = ImageIO.getImageWritersByMIMEType(mimeType).next();
-            ImageWriteParam params = writer.getDefaultWriteParam();
+            writeResizedImage(targetImage, mimeType, dest);
+        }
+    }
 
-            FileImageOutputStream fileImageOutputStream = null;
+    private void writeResizedImage(File targetImage, String mimeType, BufferedImage dest) {
+        ImageWriter writer = ImageIO.getImageWritersByMIMEType(mimeType).next();
+        ImageWriteParam params = writer.getDefaultWriteParam();
+
+        FileImageOutputStream fileImageOutputStream = null;
+        try {
+            fileImageOutputStream = new FileImageOutputStream(targetImage);
+        } catch (IOException e) {
+            LOG.error("Failed to create outputstream for resizing image", e);
+        }
+
+        if (fileImageOutputStream != null) {
+            writer.setOutput(fileImageOutputStream);
+            IIOImage image = new IIOImage(dest, null, null);
+
             try {
-                fileImageOutputStream = new FileImageOutputStream(targetImage);
+                writer.write(null, image, params);
             } catch (IOException e) {
-                LOG.error("Failed to create outputstream for resizing image", e);
+                LOG.error("Failed to write outputstream for resizing image", e);
             }
 
-            if (fileImageOutputStream != null) {
-                writer.setOutput(fileImageOutputStream);
-                IIOImage image = new IIOImage(dest, null, null);
-
-                try {
-                    writer.write(null, image, params);
-                } catch (IOException e) {
-                    LOG.error("Failed to write outputstream for resizing image", e);
-                }
-
-                try {
-                    fileImageOutputStream.flush();
-                } catch (IOException e) {
-                    LOG.error("Failed to flush outputstream for resizing image", e);
-                }
-
-                try {
-                    fileImageOutputStream.close();
-                } catch (IOException e) {
-                    LOG.error("Failed to close outputstream for resizing image", e);
-                }
-                writer.dispose();
+            try {
+                fileImageOutputStream.flush();
+            } catch (IOException e) {
+                LOG.error("Failed to flush outputstream for resizing image", e);
             }
+
+            try {
+                fileImageOutputStream.close();
+            } catch (IOException e) {
+                LOG.error("Failed to close outputstream for resizing image", e);
+            }
+            writer.dispose();
         }
     }
 

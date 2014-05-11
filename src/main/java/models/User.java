@@ -1,5 +1,6 @@
 package models;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -17,7 +18,9 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "users", noClassnameStored = true)
-public class User {
+public class User implements Serializable {
+    private static final long serialVersionUID = 5381913315282528298L;
+
     @Id
     private ObjectId id;
 
@@ -35,14 +38,14 @@ public class User {
 
     @Reference(value = "user_resultstatistics", lazy = true)
     private List<ResultStatistic> resultStatistic;
-    
+
     private String userpass;
     private String username;
     private String email;
     private String salt;
     private String picture;
     private String pictureLarge;
-    
+
     private Date registered;
 
     private boolean reminder;
@@ -51,7 +54,7 @@ public class User {
     private boolean notification;
     private boolean sendStandings;
     private boolean sendGameTips;
-    
+
     private int tipPoints;
     private int extraPoints;
     private int points;
@@ -61,7 +64,7 @@ public class User {
     private int correctDifferences;
     private int correctTrends;
     private int correctExtraTips;
-    
+
     public ObjectId getId() {
         return id;
     }

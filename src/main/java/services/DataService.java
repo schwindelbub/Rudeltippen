@@ -255,19 +255,19 @@ public class DataService {
         Team team = null;
         if (StringUtils.isNotBlank(reference)) {
             final String[] references = reference.split("-");
-            if ((references != null) && (references.length == 3)) {
-                if ("B".equals(references[0])) {
+            if (references != null && references.length == 3) {
+                if (("B").equals(references[0])) {
                     final Bracket bracket = findBracketByNumber(references[1]);
                     if (bracket != null) {
                         team = commonService.getTeamByPlace(Integer.parseInt(references[2]), bracket);
                     }
-                } else if ("G".equals(references[0])) {
-                    final Game aGame = findGameByNumber(references[1]);
-                    if ((aGame != null) && aGame.isEnded()) {
-                        if ("W".equals(references[2])) {
-                            team = commonService.getWinner(aGame);
-                        } else if ("L".equals(references[2])) {
-                            team = commonService.getLoser(aGame);
+                } else if (("G").equals(references[0])) {
+                    final Game game = findGameByNumber(references[1]);
+                    if ((game != null) && game.isEnded()) {
+                        if (("W").equals(references[2])) {
+                            team = commonService.getWinner(game);
+                        } else if (("L").equals(references[2])) {
+                            team = commonService.getLoser(game);
                         }
                     }
                 }

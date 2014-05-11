@@ -1,5 +1,7 @@
 package services;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -11,6 +13,8 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -23,6 +27,7 @@ import com.mchange.v1.util.UnexpectedException;
  */
 @Singleton
 public class AuthService {
+    private static final Logger LOG = LoggerFactory.getLogger(AuthService.class);
     private static final char[] HEX_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
     @Inject
@@ -54,7 +59,7 @@ public class AuthService {
      */
     public String encryptAES(String value, String privateKey) {
         try {
-            byte[] raw = privateKey.getBytes();
+            byte[] raw = privateKey.getBytes("UTF-8");
             SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
@@ -81,7 +86,7 @@ public class AuthService {
      */
     public String decryptAES(String value, String privateKey) {
         try {
-            byte[] raw = privateKey.getBytes();
+            byte[] raw = privateKey.getBytes("UTF-8");
             SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, skeySpec);
@@ -104,7 +109,7 @@ public class AuthService {
     }
 
     public void activateAndSetAvatar(final User user) {
-        final String avatar = commonService.getGravatarImage(user.getEmail(), "mm", 128);
+        final String avatar = commonService.getGravatarImage(user.getEmail(), "mm", 256);
         final String avatarSmall = commonService.getGravatarImage(user.getEmail(), "mm", 64);
         if (StringUtils.isNotBlank(avatar)) {
             user.setPictureLarge(avatar);
@@ -129,9 +134,16 @@ public class AuthService {
 
     /**
      * Sign a message using the application secret key (HMAC-SHA1)
+     * @throws UnsupportedEncodingException
      */
     public String sign(String message) {
-        return sign(message, ninjaProperties.get("application.secret").getBytes());
+        try {
+            return sign(message, ninjaProperties.get("application.secret").getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            LOG.error("Failed to sign message", e);
+        }
+
+        return null;
     }
 
     /**
@@ -139,7 +151,6 @@ public class AuthService {
      * @param message The message to sign
      * @param key The key to use
      * @return The signed message (in hexadecimal)
-     * @throws java.lang.Exception
      */
     public String sign(String message, byte[] key) {
         if (key.length == 0) {
@@ -162,9 +173,11 @@ public class AuthService {
                 hexChars[charIndex++] = HEX_CHARS[bite & 0xf];
             }
             return new String(hexChars);
-        } catch (Exception ex) {
-            throw new UnexpectedException(ex);
+        } catch (Exception e) {
+            LOG.error("Failed to sign message", e);
         }
+
+        return null;
     }
 
     /**
