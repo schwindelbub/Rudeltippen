@@ -179,7 +179,7 @@ public class AuthService {
             }
             return new String(hexChars);
         } catch (Exception e) {
-            LOG.error("Failed to sign message", e);
+            LOG.error("Failed to sign message with key", e);
         }
 
         return null;

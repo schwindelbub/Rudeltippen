@@ -28,7 +28,6 @@ import models.statistic.ResultStatistic;
 import models.statistic.UserStatistic;
 import ninja.cache.NinjaCache;
 
-import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
@@ -49,6 +48,9 @@ import com.mongodb.MongoClient;
 @Singleton
 public class DataService {
     private static final Logger LOG = LoggerFactory.getLogger(DataService.class);
+    private static final String POINTS = "points";
+    private static final String GAME_RESULT = "gameResult";
+    private static final String KICKOFF = "kickoff";
     private static final String ENDED = "ended";
     private static final String CURRENT = "current";
     private static final String GAME = "game";
@@ -127,7 +129,11 @@ public class DataService {
         DateTime dateTime = new DateTime();
         dateTime.plusMinutes(1);
 
-        return this.datastore.find(Game.class).field("informed").equal(false).field("kickoff").lessThanOrEq(dateTime.toDate()).asList();
+        return this.datastore.find(Game.class)
+                .field("informed")
+                .equal(false).field(KICKOFF)
+                .lessThanOrEq(dateTime.toDate())
+                .asList();
     }
 
     public Playday findPlaydaybByNumber(int number) {
@@ -141,21 +147,27 @@ public class DataService {
         return this.datastore.find(Game.class)
                 .field(ENDED).equal(false)
                 .field("webserviceID").exists()
-                .field("kickoff").lessThanOrEq(dateTime.toDate()).asList();
+                .field(KICKOFF).lessThanOrEq(dateTime.toDate()).asList();
     }
 
     public List<Extra> findAllExtrasEnding() {
         DateTime dateTime = new DateTime();
         dateTime.plusDays(1);
 
-        return this.datastore.find(Extra.class).field(REMINDER).equal(false).field("ending").lessThanOrEq(dateTime.toDate()).asList();
+        return this.datastore.find(Extra.class)
+                .field(REMINDER).equal(false)
+                .field("ending").lessThanOrEq(dateTime.toDate())
+                .asList();
     }
 
     public List<Game> findAllGamesEnding() {
         DateTime dateTime = new DateTime();
         dateTime.plusDays(1);
 
-        return this.datastore.find(Game.class).field(REMINDER).equal(false).field("kickoff").lessThanOrEq(dateTime.toDate()).asList();
+        return this.datastore.find(Game.class)
+                .field(REMINDER).equal(false)
+                .field(KICKOFF).lessThanOrEq(dateTime.toDate())
+                .asList();
     }
 
     public List<User> findAllRemindableUsers() {
@@ -199,7 +211,7 @@ public class DataService {
     }
 
     public GameStatistic findGameStatisticByPlaydayAndResult(Playday playday, Object key) {
-        return this.datastore.find(GameStatistic.class).field(PLAYDAY).equal(playday).field("gameResult").equal(key).get();
+        return this.datastore.find(GameStatistic.class).field(PLAYDAY).equal(playday).field(GAME_RESULT).equal(key).get();
     }
 
     public GameTipStatistic findGameTipStatisticByPlayday(Playday playday) {
@@ -215,7 +227,7 @@ public class DataService {
     }
 
     public List<UserStatistic> findUserStatisticByPlaydayOrderByPoints(Playday playday) {
-        return this.datastore.find(UserStatistic.class).field(PLAYDAY).equal(playday).order("points").asList();
+        return this.datastore.find(UserStatistic.class).field(PLAYDAY).equal(playday).order(POINTS).asList();
     }
 
     public List<GameTip> findGameTipByGame(Game game) {
@@ -223,7 +235,7 @@ public class DataService {
     }
 
     public PlaydayStatistic findPlaydayStatisticByPlaydayAndResult(Playday playday, Object key) {
-        return this.datastore.find(PlaydayStatistic.class).field(PLAYDAY).equal(playday).field("gameResult").equal(key).get();
+        return this.datastore.find(PlaydayStatistic.class).field(PLAYDAY).equal(playday).field(GAME_RESULT).equal(key).get();
     }
 
     public User findUserByEmail(String email) {
@@ -252,32 +264,6 @@ public class DataService {
         return this.datastore.find(User.class).field(PLACE).equal(place).get();
     }
 
-    public Team findTeamByReference(final String reference) {
-        Team team = null;
-        if (StringUtils.isNotBlank(reference)) {
-            final String[] references = reference.split("-");
-            if (references != null && references.length == 3) {
-                if (("B").equals(references[0])) {
-                    final Bracket bracket = findBracketByNumber(references[1]);
-                    if (bracket != null) {
-                        team = commonService.getTeamByPlace(Integer.parseInt(references[2]), bracket);
-                    }
-                } else if (("G").equals(references[0])) {
-                    final Game game = findGameByNumber(references[1]);
-                    if ((game != null) && game.isEnded()) {
-                        if (("W").equals(references[2])) {
-                            team = commonService.getWinner(game);
-                        } else if (("L").equals(references[2])) {
-                            team = commonService.getLoser(game);
-                        }
-                    }
-                }
-            }
-        }
-
-        return team;
-    }
-
     public Game findGameByNumber(String number) {
         return this.datastore.find(Game.class).field(NUMBER).equal(number).get();
     }
@@ -293,8 +279,6 @@ public class DataService {
         game.setHomeScore(homeScore);
         game.setAwayScore(awayScore);
         if (validationService.isValidScore(homeScoreExtratime, awayScoreExtratime )) {
-            homeScoreExtratime = homeScoreExtratime.trim();
-            awayScoreExtratime = awayScoreExtratime.trim();
             game.setOvertimeType(extratime);
             game.setHomeScoreOT(homeScoreExtratime);
             game.setAwayScoreOT(awayScoreExtratime);
@@ -422,7 +406,10 @@ public class DataService {
     }
 
     public List<User> findAllActiveUsersOrdered() {
-        return this.datastore.find(User.class).field(ACTIVE).equal(true).order("points, correctResults, correctDifferences, correctTrends, correctExtraTips").asList();
+        return this.datastore.find(User.class)
+                .field(ACTIVE).equal(true)
+                .order("points, correctResults, correctDifferences, correctTrends, correctExtraTips")
+                .asList();
     }
 
     public List<Bracket> findAllBrackets() {
@@ -542,7 +529,7 @@ public class DataService {
     }
 
     public List<ExtraTip> findExtraTipsByUser(User user) {
-        return this.datastore.find(ExtraTip.class).field(USER).equal(user).field("points").greaterThan(0).asList();
+        return this.datastore.find(ExtraTip.class).field(USER).equal(user).field(POINTS).greaterThan(0).asList();
     }
 
     public List<UserStatistic> findUserStatisticByUser(User user) {

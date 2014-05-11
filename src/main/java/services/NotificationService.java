@@ -17,6 +17,7 @@ import models.User;
  */
 @Singleton
 public class NotificationService {
+    private static final String POINTS = "points";
 
     @Inject
     private I18nService i18nService;
@@ -90,9 +91,9 @@ public class NotificationService {
             List<User> users = dataService.findTopThreeUsers();
             for (final User user : users) {
                 if (count < 3) {
-                    buffer.append(user.getUsername() + " (" + user.getPoints() + " " + i18nService.get("points") + ")\n");
+                    buffer.append(user.getUsername() + " (" + user.getPoints() + " " + i18nService.get(POINTS) + ")\n");
                 } else {
-                    buffer.append(user.getUsername() + " (" + user.getPoints() + " " + i18nService.get("points") + ")");
+                    buffer.append(user.getUsername() + " (" + user.getPoints() + " " + i18nService.get(POINTS) + ")");
                 }
                 count++;
             }

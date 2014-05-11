@@ -89,7 +89,7 @@ public class CalculationService {
         final List<Extra> extras = dataService.findAllExtras();
         for (final Extra extra : extras) {
             if (extra.getAnswer() == null && commonService.allReferencedGamesEnded(extra.getGameReferences())) {
-                final Team team = dataService.findTeamByReference(extra.getExtraReference());
+                final Team team = commonService.getTeamByReference(extra.getExtraReference());
                 if (team != null) {
                     extra.setAnswer(team);
                     dataService.save(extra);
@@ -272,8 +272,8 @@ public class CalculationService {
                     final String bracketString = "B-" + number + "%";
                     final List<Game> games = dataService.findReferencedGames(bracketString);
                     for (final Game game : games) {
-                        homeTeam = dataService.findTeamByReference(game.getHomeReference());
-                        awayTeam = dataService.findTeamByReference(game.getAwayReference());
+                        homeTeam = commonService.getTeamByReference(game.getHomeReference());
+                        awayTeam = commonService.getTeamByReference(game.getAwayReference());
                         game.setHomeTeam(homeTeam);
                         game.setAwayTeam(awayTeam);
                         dataService.save(game);
@@ -283,8 +283,8 @@ public class CalculationService {
 
             final List<Game> playoffGames = dataService.findGamesByPlayoffAndEndedAndBracket();
             for (final Game game : playoffGames) {
-                homeTeam = dataService.findTeamByReference(game.getHomeReference());
-                awayTeam = dataService.findTeamByReference(game.getAwayReference());
+                homeTeam = commonService.getTeamByReference(game.getHomeReference());
+                awayTeam = commonService.getTeamByReference(game.getAwayReference());
                 game.setHomeTeam(homeTeam);
                 game.setAwayTeam(awayTeam);
                 dataService.save(game);

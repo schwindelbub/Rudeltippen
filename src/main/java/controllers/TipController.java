@@ -89,20 +89,15 @@ public class TipController extends RootController {
                 final String homeScore = map.get(GAME + key + HOME_SCORE);
                 final String awayScore = map.get(GAME + key + AWAY_SCORE);
 
-                if (!validationService.isValidScore(homeScore, awayScore)) {
-                    continue;
-                }
-
                 final Game game = dataService.findGameById(key);
-                if (game == null) {
-                    continue;
+
+                if (!validationService.isValidScore(homeScore, awayScore) && game != null) {
+                    dataService.saveGameTip(game, Integer.parseInt(homeScore), Integer.parseInt(awayScore), context.getAttribute(Constants.CONNECTEDUSER.get(), User.class));
+                    keys.add(key);
+                    tipped++;
+
+                    playday = game.getPlayday().getNumber();
                 }
-
-                dataService.saveGameTip(game, Integer.parseInt(homeScore), Integer.parseInt(awayScore), context.getAttribute(Constants.CONNECTEDUSER.get(), User.class));
-                keys.add(key);
-                tipped++;
-
-                playday = game.getPlayday().getNumber();
             }
         }
 

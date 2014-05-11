@@ -52,6 +52,7 @@ import filters.AuthorizationFilter;
 @FilterWith(AuthorizationFilter.class)
 public class AdminController extends RootController {
     private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
+    private static final String ERROR_LOADING_USER = "error.loading.user";
     private static final String ADMIN_USERS = "/admin/users";
     private static final String AWAY_SCORE_ET = "_awayScore_et";
     private static final String HOME_SCORE_ET = "_homeScore_et";
@@ -191,12 +192,12 @@ public class AdminController extends RootController {
                 }
                 dataService.save(user);
                 flashScope.success(message);
-                LOG.info("User " + user.getEmail() + " has been " + activate + " - by " + connectedUser.getEmail());
+                LOG.info("User " + user.getEmail() + " " + activate + " - by " + connectedUser.getEmail());
             } else {
                 flashScope.put(Constants.FLASHWARNING.get(), i18nService.get("warning.change.active"));
             }
         } else {
-            flashScope.error(i18nService.get("error.loading.user"));
+            flashScope.error(i18nService.get(ERROR_LOADING_USER));
         }
 
         return Results.redirect(ADMIN_USERS);
@@ -226,7 +227,7 @@ public class AdminController extends RootController {
                 flashScope.put(Constants.FLASHWARNING.get(), i18nService.get("warning.change.admin"));
             }
         } else {
-            flashScope.error(i18nService.get("error.loading.user"));
+            flashScope.error(i18nService.get(ERROR_LOADING_USER));
         }
 
         return Results.redirect(ADMIN_USERS);
@@ -241,14 +242,14 @@ public class AdminController extends RootController {
                 final String username = user.getEmail();
                 dataService.delete(user);
                 flashScope.success(i18nService.get("info.delete.user", new Object[]{username}));
-                LOG.info("User " + username + " has been deleted - by " + connectedUser.getEmail());
+                LOG.info("User " + username + " deleted - by " + connectedUser.getEmail());
 
                 calculationService.calculations();
             } else {
                 flashScope.put(Constants.FLASHWARNING.get(), i18nService.get("warning.delete.user"));
             }
         } else {
-            flashScope.error(i18nService.get("error.loading.user"));
+            flashScope.error(i18nService.get(ERROR_LOADING_USER));
         }
 
         return Results.redirect(ADMIN_USERS);

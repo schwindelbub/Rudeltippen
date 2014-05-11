@@ -167,8 +167,6 @@ public class MailService {
 
     public void notifications(final String subject, String notification, final User user) {
         final Settings settings = dataService.findSettings();
-        notification = StringEscapeUtils.unescapeHtml(notification);
-
         if (validationService.isValidEmail(user.getEmail()) && StringUtils.isNotEmpty(notification)) {
             Mail mail = getMailInstance(settings, user.getEmail(), StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + subject));
 

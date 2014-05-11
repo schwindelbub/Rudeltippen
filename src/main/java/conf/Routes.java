@@ -18,6 +18,7 @@ import controllers.UserController;
  *
  */
 public class Routes implements ApplicationRoutes {
+    private static final String PLAYDAY = "playday";
     private static final String SERVE_STATIC = "serveStatic";
 
     @Override
@@ -36,14 +37,14 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/admin/deleteuser/{userid}").with(AdminController.class, "deleteuser");
         router.GET().route("/admin/results/{number}").with(AdminController.class, "results");
         router.GET().route("/admin/tournament").with(AdminController.class, "tournament");
-        router.GET().route("/overview/playday/{number}").with(OverviewController.class, "playday");
+        router.GET().route("/overview/playday/{number}").with(OverviewController.class, PLAYDAY);
         router.GET().route("/overview/extras").with(OverviewController.class, "extras");
         router.GET().route("/rules").with(ApplicationController.class, "rules");
         router.GET().route("/tournament/brackets").with(TournamentController.class, "brackets");
         router.GET().route("/users/profile").with(UserController.class, "profile");
         router.GET().route("/users/show/{username}").with(UserController.class, "show");
-        router.GET().route("/tournament/playday/{number}").with(TournamentController.class, "playday");
-        router.GET().route("/tips/playday/{number}").with(TipController.class, "playday");
+        router.GET().route("/tournament/playday/{number}").with(TournamentController.class, PLAYDAY);
+        router.GET().route("/tips/playday/{number}").with(TipController.class, PLAYDAY);
         router.GET().route("/tips/standings").with(TipController.class, "standings");
         router.POST().route("/tips/storetips").with(TipController.class, "storetips");
         router.POST().route("/auth/renew").with(AuthController.class, "renew");

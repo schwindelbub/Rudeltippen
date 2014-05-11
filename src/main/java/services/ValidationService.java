@@ -143,8 +143,6 @@ public class ValidationService {
     public boolean isValidScore(String homeScore, String awayScore) {
         boolean valid = false;
         if (StringUtils.isNotBlank(homeScore) && StringUtils.isNotBlank(awayScore)) {
-            homeScore = homeScore.trim();
-            awayScore = awayScore.trim();
             int home, away;
             try {
                 home = Integer.parseInt(homeScore);

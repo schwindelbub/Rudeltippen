@@ -156,12 +156,6 @@ public class CommonService extends ViewService {
         final Pagination pagination = new Pagination();
 
         final long offsetEnd = totalPlaydays;
-        if (number <= 0) {
-            number = 1;
-        } else if (number > offsetEnd) {
-            number = offsetEnd;
-        }
-
         long offsetStart = number - 3;
         long offset = number + 3;
 
@@ -229,16 +223,20 @@ public class CommonService extends ViewService {
                 mimeType = "image/gif";
             }
 
-            BufferedImage dest = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            Image srcSized = source.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-
-            Graphics graphics = dest.getGraphics();
-            graphics.setColor(Color.WHITE);
-            graphics.fillRect(0, 0, width, height);
-            graphics.drawImage(srcSized, 0, 0, null);
-
-            writeResizedImage(targetImage, mimeType, dest);
+            BufferedImage bufferedImage = doResize(width, height, source);
+            writeResizedImage(targetImage, mimeType, bufferedImage);
         }
+    }
+
+    private BufferedImage doResize(int width, int height, BufferedImage source) {
+        BufferedImage dest = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Image srcSized = source.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+
+        Graphics graphics = dest.getGraphics();
+        graphics.setColor(Color.WHITE);
+        graphics.fillRect(0, 0, width, height);
+        graphics.drawImage(srcSized, 0, 0, null);
+        return dest;
     }
 
     private void writeResizedImage(File targetImage, String mimeType, BufferedImage dest) {
@@ -512,5 +510,31 @@ public class CommonService extends ViewService {
         }
 
         return tippable;
+    }
+
+    public Team getTeamByReference(final String reference) {
+        Team team = null;
+        final String[] references = reference.split("-");
+        if (references != null && references.length == 3) {
+            if (("B").equals(references[0])) {
+                final Bracket bracket = dataService.findBracketByNumber(references[1]);
+                if (bracket != null) {
+                    team = getTeamByPlace(Integer.parseInt(references[2]), bracket);
+                }
+            }
+
+            if (("G").equals(references[0])) {
+                final Game game = dataService.findGameByNumber(references[1]);
+                if (game != null && game.isEnded()) {
+                    if (("W").equals(references[2])) {
+                        team = getWinner(game);
+                    } else if (("L").equals(references[2])) {
+                        team = getLoser(game);
+                    }
+                }
+            }
+        }
+
+        return team;
     }
 }
