@@ -61,7 +61,12 @@ public class TipController extends RootController {
         final List<Extra> extras = dataService.findAllExtras();
         final boolean tippable = commonService.extrasAreTipable(extras);
 
-        return Results.html().render(playday).render(number).render(pagination).render(extras).render(tippable);
+        return Results.html()
+                .render("playday", playday)
+                .render("number", number)
+                .render("pagination", pagination)
+                .render("extras", extras)
+                .render("tippable", tippable);
     }
 
     public Result storetips(FlashScope flashScope, Context context) {

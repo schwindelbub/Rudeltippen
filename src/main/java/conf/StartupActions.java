@@ -90,7 +90,7 @@ public class StartupActions {
             try {
                 scheduler.setJobFactory(appJobFactory);
                 scheduler.scheduleJob(getJobDetail(GameTipJob.class, Constants.GAMETIPJOB.get()), getTrigger("gameTipJobTrigger", "0 */1 * * * ?"));
-                scheduler.scheduleJob(getJobDetail(KickoffJob.class, Constants.KICKOFFJOB.get()), getTrigger("kickoffJobTrigger", "0 0 5 * * ?"));
+                scheduler.scheduleJob(getJobDetail(KickoffJob.class, Constants.KICKOFFJOB.get()), getTrigger("kickoffJobTrigger", "0 0 4 * * ?"));
                 scheduler.scheduleJob(getJobDetail(ReminderJob.class, Constants.REMINDERJOB.get()), getTrigger("reminderJobTrigger", "0 0 */1 * * ?"));
                 scheduler.scheduleJob(getJobDetail(ResultJob.class, Constants.RESULTJOB.get()), getTrigger("resultsJobTrigger", "0 */4 * * * ?"));
 

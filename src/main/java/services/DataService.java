@@ -29,6 +29,7 @@ import models.statistic.UserStatistic;
 import ninja.cache.NinjaCache;
 
 import org.apache.commons.lang.StringUtils;
+import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
@@ -429,7 +430,7 @@ public class DataService {
     }
 
     public Game findGameById(String gameId) {
-        return this.datastore.get(Game.class, gameId);
+        return this.datastore.get(Game.class, new ObjectId(gameId));
     }
 
     public List<Bracket> findAllUpdatableBrackets() {

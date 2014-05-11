@@ -3,6 +3,8 @@ package services;
 import java.util.Date;
 import java.util.List;
 
+import models.Extra;
+import models.ExtraTip;
 import models.Game;
 import models.GameTip;
 import models.Playday;
@@ -107,7 +109,7 @@ public class ViewService {
 
         final Date now = new Date();
         String difference = null;
-        if (date.after(now)) {
+        if (date != null && date.after(now)) {
             final long delta = (date.getTime() - now.getTime()) / 1000;
             if (delta < 60) {
                 difference = i18nService.get("in.second", new Object[]{delta});
@@ -136,13 +138,10 @@ public class ViewService {
 
     public String getHomeScoreTip(final Game game, User user) {
         String homeScore = "";
-        final List<GameTip> gameTips = game.getGameTips();
 
-        for (final GameTip gameTip : gameTips) {
-            if (gameTip.getUser().equals(user)) {
-                homeScore = String.valueOf(gameTip.getHomeScore());
-                break;
-            }
+        GameTip gameTip = dataService.findGameTipByGameAndUser(user, game);
+        if (gameTip != null) {
+            homeScore = String.valueOf(gameTip.getHomeScore());
         }
 
         return homeScore;
@@ -150,13 +149,10 @@ public class ViewService {
 
     public String getAwayScoreTip(final Game game, User user) {
         String awayScore = "";
-        final List<GameTip> gameTips = game.getGameTips();
 
-        for (final GameTip gameTip : gameTips) {
-            if (gameTip.getUser().equals(user)) {
-                awayScore = String.valueOf(gameTip.getAwayScore());
-                break;
-            }
+        GameTip gameTip = dataService.findGameTipByGameAndUser(user, game);
+        if (gameTip != null) {
+            awayScore = String.valueOf(gameTip.getAwayScore());
         }
 
         return awayScore;
@@ -249,5 +245,16 @@ public class ViewService {
             }
         }
         return false;
+    }
+
+    public String getAnswer(final Extra extra, User user) {
+        final ExtraTip extraTip = dataService.findExtraTipByExtraAndUser(extra, user);
+        String answer = "-";
+
+        if ((extraTip != null) && (extraTip.getAnswer() != null)) {
+            answer = i18nService.get(extraTip.getAnswer().getName());
+        }
+
+        return answer;
     }
 }

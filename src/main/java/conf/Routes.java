@@ -45,6 +45,7 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/tournament/playday/{number}").with(TournamentController.class, "playday");
         router.GET().route("/tips/playday/{number}").with(TipController.class, "playday");
         router.GET().route("/tips/standings").with(TipController.class, "standings");
+        router.POST().route("/tips/storetips").with(TipController.class, "storetips");
         router.POST().route("/auth/renew").with(AuthController.class, "renew");
         router.POST().route("/auth/reset").with(AuthController.class, "reset");
         router.POST().route("/auth/authenticate").with(AuthController.class, "authenticate");

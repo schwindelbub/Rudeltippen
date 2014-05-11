@@ -393,17 +393,6 @@ public class CommonService extends ViewService {
         return id;
     }
 
-    public String getAnswer(final Extra extra, User user) {
-        final ExtraTip extraTip = dataService.findExtraTipByExtraAndUser(extra, user);
-        String answer = "";
-
-        if ((extraTip != null) && (extraTip.getAnswer() != null)) {
-            answer = i18nService.get(extraTip.getAnswer().getName());
-        }
-
-        return answer;
-    }
-
     public String getExtraTipAnswer(final ExtraTip extraTip) {
         String answer = "-";
         if (extraTip.getAnswer() != null) {
