@@ -21,10 +21,10 @@ public class AppFilter implements Filter {
 
     @Inject
     private DataService dataService;
-    
+
     @Inject
     private Lang lang;
-    
+
     @Inject
     private I18nService i18nService;
 
@@ -32,11 +32,11 @@ public class AppFilter implements Filter {
     public Result filter(FilterChain filterChain, Context context) {
         Result result = filterChain.next(context);
         lang.setLanguage(i18nService.getDefaultLanguage(), result);
-        
+
         if (!dataService.appIsInizialized()) {
             return Results.redirect("/setup");
         }
-        
+
         return result;
     }
 }
