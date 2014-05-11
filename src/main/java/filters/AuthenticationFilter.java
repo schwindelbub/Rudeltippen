@@ -29,7 +29,7 @@ public class AuthenticationFilter implements Filter {
 
     @Inject
     private DataService dataService;
-    
+
     @Inject
     private ViewService viewService;
 
@@ -40,10 +40,8 @@ public class AuthenticationFilter implements Filter {
             final String sign = cookie.getValue().substring(0, cookie.getValue().indexOf("-"));
             final String username = cookie.getValue().substring(cookie.getValue().indexOf("-") + 1);
 
-            if (StringUtils.isNotBlank(sign) && StringUtils.isNotBlank(username) && authService.sign(username).equals(sign)) {
-                if (context.getSession() != null) {
-                    context.getSession().put(Constants.USERNAME.value(), username);
-                }
+            if (StringUtils.isNotBlank(sign) && StringUtils.isNotBlank(username) && authService.sign(username).equals(sign) && context.getSession() != null) {
+                context.getSession().put(Constants.USERNAME.value(), username);
             }
         }
 
@@ -55,10 +53,10 @@ public class AuthenticationFilter implements Filter {
             result.render(Constants.CONNECTEDUSER.value(), connectedUser);
             result.render("ViewService", viewService);
             result.render("currentPlayday", dataService.findCurrentPlayday());
-            
+
             return result;
         }
-        
+
         return Results.redirect("/auth/login");
     }
 }

@@ -114,13 +114,11 @@ public class AdminController extends RootController {
         flashScope.put("warning", i18nService.get("controller.games.tippsstored", null));
 
         int playday = 1;
-        if (keys != null && !keys.isEmpty()) {
-            if (StringUtils.isNotBlank(gamekey)) {
-                gamekey = gamekey.replace("_et", "");
-                final Game game = dataService.findGameById(gamekey);
-                if ((game != null) && (game.getPlayday() != null)) {
-                    playday = game.getPlayday().getNumber();
-                }
+        if (keys != null && !keys.isEmpty() && StringUtils.isNotBlank(gamekey)) {
+            gamekey = gamekey.replace("_et", "");
+            final Game game = dataService.findGameById(gamekey);
+            if ((game != null) && (game.getPlayday() != null)) {
+                playday = game.getPlayday().getNumber();
             }
         }
 

@@ -30,6 +30,10 @@ public class GameTipStatistic implements Serializable {
     private int correctDiffs;
     private int avgPoints;
 
+    public ObjectId getId() {
+        return id;
+    }
+
     public Playday getPlayday() {
         return playday;
     }

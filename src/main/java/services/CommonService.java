@@ -180,64 +180,94 @@ public class CommonService extends ViewService {
         return pagination;
     }
 
-    public void resizeImage(File originalImage, File to, int w, int h, boolean keepRatio) {
+    public void resizeImage(File sourceImage, File targetImage, int width, int height, boolean keepRatio) {
+        BufferedImage source = null;
         try {
-            BufferedImage source = ImageIO.read(originalImage);
-            int owidth = source.getWidth();
-            int oheight = source.getHeight();
-            double ratio = (double) owidth / oheight;
+            source = ImageIO.read(sourceImage);
+        } catch (IOException e) {
+            LOG.error("IOException while trying to create source image for resizing", e);
+        }
 
-            int maxWidth = w;
-            int maxHeight = h;
+        if (source != null) {
+            int originalWidth = source.getWidth();
+            int originalHeight = source.getHeight();
+            double ratio = (double) originalWidth / originalHeight;
 
-            if (w < 0 && h < 0) {
-                w = owidth;
-                h = oheight;
+            int maxWidth = width;
+            int maxHeight = height;
+
+            if (width < 0 && height < 0) {
+                width = originalWidth;
+                height = originalHeight;
             }
-            if (w < 0 && h > 0) {
-                w = (int) (h * ratio);
+            if (width < 0 && height > 0) {
+                width = (int) (height * ratio);
             }
-            if (w > 0 && h < 0) {
-                h = (int) (w / ratio);
+            if (width > 0 && height < 0) {
+                height = (int) (width / ratio);
             }
 
             if(keepRatio) {
-                h = (int) (w / ratio);
-                if(h > maxHeight) {
-                    h = maxHeight;
-                    w = (int) (h * ratio);
+                height = (int) (width / ratio);
+                if(height > maxHeight) {
+                    height = maxHeight;
+                    width = (int) (height * ratio);
                 }
-                if(w > maxWidth) {
-                    w = maxWidth;
-                    h = (int) (w / ratio);
+                if(width > maxWidth) {
+                    width = maxWidth;
+                    height = (int) (width / ratio);
                 }
             }
 
             String mimeType = "image/jpeg";
-            if (to.getName().endsWith(".png")) {
+            if (targetImage.getName().endsWith(".png")) {
                 mimeType = "image/png";
             }
-            if (to.getName().endsWith(".gif")) {
+            if (targetImage.getName().endsWith(".gif")) {
                 mimeType = "image/gif";
             }
 
-            BufferedImage dest = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
-            Image srcSized = source.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+            BufferedImage dest = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Image srcSized = source.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+
             Graphics graphics = dest.getGraphics();
             graphics.setColor(Color.WHITE);
-            graphics.fillRect(0, 0, w, h);
+            graphics.fillRect(0, 0, width, height);
             graphics.drawImage(srcSized, 0, 0, null);
+
             ImageWriter writer = ImageIO.getImageWritersByMIMEType(mimeType).next();
             ImageWriteParam params = writer.getDefaultWriteParam();
-            FileImageOutputStream toFs = new FileImageOutputStream(to);
-            writer.setOutput(toFs);
-            IIOImage image = new IIOImage(dest, null, null);
-            writer.write(null, image, params);
-            toFs.flush();
-            toFs.close();
-            writer.dispose();
-        } catch (Exception e) {
-            LOG.error("Failed to resize image", e);
+
+            FileImageOutputStream fileImageOutputStream = null;
+            try {
+                fileImageOutputStream = new FileImageOutputStream(targetImage);
+            } catch (IOException e) {
+                LOG.error("Failed to create outputstream for resizing image", e);
+            }
+
+            if (fileImageOutputStream != null) {
+                writer.setOutput(fileImageOutputStream);
+                IIOImage image = new IIOImage(dest, null, null);
+
+                try {
+                    writer.write(null, image, params);
+                } catch (IOException e) {
+                    LOG.error("Failed to write outputstream for resizing image", e);
+                }
+
+                try {
+                    fileImageOutputStream.flush();
+                } catch (IOException e) {
+                    LOG.error("Failed to flush outputstream for resizing image", e);
+                }
+
+                try {
+                    fileImageOutputStream.close();
+                } catch (IOException e) {
+                    LOG.error("Failed to close outputstream for resizing image", e);
+                }
+                writer.dispose();
+            }
         }
     }
 

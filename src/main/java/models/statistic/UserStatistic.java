@@ -39,6 +39,10 @@ public class UserStatistic implements Serializable {
     private int playdayPoints;
     private int playdayPlace;
 
+    public ObjectId getId() {
+        return id;
+    }
+
     public Playday getPlayday() {
         return this.playday;
     }

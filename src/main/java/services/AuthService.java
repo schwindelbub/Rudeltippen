@@ -30,10 +30,10 @@ public class AuthService {
 
     @Inject
     private DataService dataService;
-    
+
     @Inject
     private CommonService commonService;
-    
+
     @Inject
     private AuthService authService;
 
@@ -120,10 +120,8 @@ public class AuthService {
     public boolean authenticate(String username, String userpass) {
         boolean authenticated = false;
         User user = dataService.findUserByUsernameOrEmail(username);
-        if (user != null) {
-            if (user.getUserpass().equals(authService.hashPassword(username, user.getSalt()))) {
-                authenticated = true;
-            }
+        if (user != null && user.getUserpass().equals(authService.hashPassword(username, user.getSalt()))) {
+            authenticated = true;
         }
 
         return authenticated;
@@ -168,7 +166,7 @@ public class AuthService {
             throw new UnexpectedException(ex);
         }
     }
-    
+
     /**
      * Hashes a given clear-text password with a given salt using 100000 rounds
      *

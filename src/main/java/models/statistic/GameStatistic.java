@@ -28,6 +28,10 @@ public class GameStatistic implements Serializable {
 
     private int resultCount;
 
+    public ObjectId getId() {
+        return id;
+    }
+
     public Playday getPlayday() {
         return playday;
     }

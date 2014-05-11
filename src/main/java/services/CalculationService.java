@@ -33,7 +33,7 @@ public class CalculationService {
 
     @Inject
     private DataService dataService;
-    
+
     @Inject
     private ResultService resultService;
 
@@ -42,7 +42,7 @@ public class CalculationService {
 
     @Inject
     private NotificationService notificationService;
-    
+
     @Inject
     private ValidationService validationService;
 
@@ -88,13 +88,11 @@ public class CalculationService {
 
         final List<Extra> extras = dataService.findAllExtras();
         for (final Extra extra : extras) {
-            if (extra.getAnswer() == null) {
-                if (commonService.allReferencedGamesEnded(extra.getGameReferences())) {
-                    final Team team = dataService.findTeamByReference(extra.getExtraReference());
-                    if (team != null) {
-                        extra.setAnswer(team);
-                        dataService.save(extra);
-                    }
+            if (extra.getAnswer() == null && commonService.allReferencedGamesEnded(extra.getGameReferences())) {
+                final Team team = dataService.findTeamByReference(extra.getExtraReference());
+                if (team != null) {
+                    extra.setAnswer(team);
+                    dataService.save(extra);
                 }
             }
         }
@@ -181,42 +179,38 @@ public class CalculationService {
             int goalsFor = 0;
             int goalsAgainst = 0;
             for (final Game game : homeGames) {
-                if (!game.isPlayoff()) {
-                    if (validationService.isValidScore(game.getHomeScore(), game.getAwayScore())) {
-                        final int points = game.getHomePoints();
-                        homePoints = homePoints + points;
-                        gamesPlayed++;
+                if (!game.isPlayoff() && validationService.isValidScore(game.getHomeScore(), game.getAwayScore())) {
+                    final int points = game.getHomePoints();
+                    homePoints = homePoints + points;
+                    gamesPlayed++;
 
-                        if (points == pointsWin) {
-                            gamesWon++;
-                        } else if (points == pointsDraw) {
-                            gamesDraw++;
-                        } else if (points == 0) {
-                            gamesLost++;
-                        }
-                        goalsFor = goalsFor + Integer.parseInt(game.getHomeScore());
-                        goalsAgainst = goalsAgainst + Integer.parseInt(game.getAwayScore());
+                    if (points == pointsWin) {
+                        gamesWon++;
+                    } else if (points == pointsDraw) {
+                        gamesDraw++;
+                    } else if (points == 0) {
+                        gamesLost++;
                     }
+                    goalsFor = goalsFor + Integer.parseInt(game.getHomeScore());
+                    goalsAgainst = goalsAgainst + Integer.parseInt(game.getAwayScore());
                 }
             }
 
             for (final Game game : awayGames) {
-                if (!game.isPlayoff()) {
-                    if (validationService.isValidScore(game.getHomeScore(), game.getAwayScore())) {
-                        final int points = game.getAwayPoints();
-                        awayPoints = awayPoints + points;
-                        gamesPlayed++;
+                if (!game.isPlayoff() && validationService.isValidScore(game.getHomeScore(), game.getAwayScore())) {
+                    final int points = game.getAwayPoints();
+                    awayPoints = awayPoints + points;
+                    gamesPlayed++;
 
-                        if (points == pointsWin) {
-                            gamesWon++;
-                        } else if (points == pointsDraw) {
-                            gamesDraw++;
-                        } else if (points == 0) {
-                            gamesLost++;
-                        }
-                        goalsFor = goalsFor + Integer.parseInt(game.getAwayScore());
-                        goalsAgainst = goalsAgainst + Integer.parseInt(game.getHomeScore());
+                    if (points == pointsWin) {
+                        gamesWon++;
+                    } else if (points == pointsDraw) {
+                        gamesDraw++;
+                    } else if (points == 0) {
+                        gamesLost++;
                     }
+                    goalsFor = goalsFor + Integer.parseInt(game.getAwayScore());
+                    goalsAgainst = goalsAgainst + Integer.parseInt(game.getHomeScore());
                 }
             }
             team.setPoints(homePoints + awayPoints);
@@ -369,7 +363,7 @@ public class CalculationService {
         setGameScore(String.valueOf(game.getId()), homeScore, awayScore, extratime, homeScoreExtratime, awayScoreExtratime);
         calculations();
     }
-    
+
     public int getPointsToFirstPlace(User connectedUser) {
         final User user = dataService.findUserByPlace(1);
 

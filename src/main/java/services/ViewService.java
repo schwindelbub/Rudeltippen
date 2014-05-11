@@ -20,13 +20,13 @@ import com.google.inject.Singleton;
  */
 @Singleton
 public class ViewService {
-    
+
     @Inject
     private DataService dataService;
-    
+
     @Inject
     private I18nService i18nService;
-    
+
     public String getScore(final Game game) {
         String score = "- : -";
         if (game.isEnded()) {
@@ -44,13 +44,11 @@ public class ViewService {
         String tip = "-";
         final GameTip gameTip = dataService.findGameTipByGameAndUser(user, game);
 
-        if (gameTip != null) {
-            if (gameTip.getGame() != null) {
-                if (gameTip.getGame().isEnded()) {
-                    tip = gameTip.getHomeScore() + " : " + gameTip.getAwayScore() + " (" + gameTip.getPoints() + ")";
-                } else {
-                    tip = gameTip.getHomeScore() + " : " + gameTip.getAwayScore();
-                }
+        if (gameTip != null && gameTip.getGame() != null) {
+            if (gameTip.getGame().isEnded()) {
+                tip = gameTip.getHomeScore() + " : " + gameTip.getAwayScore() + " (" + gameTip.getPoints() + ")";
+            } else {
+                tip = gameTip.getHomeScore() + " : " + gameTip.getAwayScore();
             }
         }
 
@@ -98,11 +96,11 @@ public class ViewService {
     }
 
     public String difference (final Date date) {
-        final int MIN = 60;
-        final int HOUR = MIN * 60;
-        final int DAY = HOUR * 24;
-        final int MONTH = DAY * 30;
-        final int YEAR = DAY * 365;
+        final int min = 60;
+        final int hour = min * 60;
+        final int day = hour * 24;
+        final int month = day * 30;
+        final int year = day * 365;
 
         final Date now = new Date();
         String difference = null;
@@ -110,20 +108,20 @@ public class ViewService {
             final long delta = (date.getTime() - now.getTime()) / 1000;
             if (delta < 60) {
                 difference = i18nService.get("in.second", new Object[]{delta});
-            } else if (delta < HOUR) {
-                final long minutes = delta / MIN;
+            } else if (delta < hour) {
+                final long minutes = delta / min;
                 difference = i18nService.get("in.minute", new Object[]{minutes});
-            } else if (delta < DAY) {
-                final long hours = delta / HOUR;
+            } else if (delta < day) {
+                final long hours = delta / hour;
                 difference = i18nService.get("in.hour", new Object[]{hours});
-            } else if (delta < MONTH) {
-                final long days = delta / DAY;
+            } else if (delta < month) {
+                final long days = delta / day;
                 difference = i18nService.get("in.day", new Object[]{days});
-            } else if (delta < YEAR) {
-                final long months = delta / MONTH;
+            } else if (delta < year) {
+                final long months = delta / month;
                 difference = i18nService.get("in.month", new Object[]{months});
             } else {
-                final long years = delta / YEAR;
+                final long years = delta / year;
                 difference = i18nService.get("in.year", new Object[]{years});
             }
         } else {
@@ -184,11 +182,11 @@ public class ViewService {
 
         return tip;
     }
-    
+
     private Date getTippEnding(Game game) {
         final long time = game.getKickoff().getTime();
         final int offset = dataService.findSettings().getMinutesBeforeTip() * 60000 ;
-        
+
         return new Date (time - offset);
     }
 
@@ -227,7 +225,7 @@ public class ViewService {
 
         return trend;
     }
-    
+
     public boolean gameIsTippable(Game game) {
         final Date now = new Date();
         final Settings settings = dataService.findSettings();

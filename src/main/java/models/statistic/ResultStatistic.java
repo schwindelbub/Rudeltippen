@@ -31,6 +31,10 @@ public class ResultStatistic implements Serializable {
     private int correctDiffs;
     private int points;
 
+    public ObjectId getId() {
+        return id;
+    }
+
     public User getUser() {
         return user;
     }
