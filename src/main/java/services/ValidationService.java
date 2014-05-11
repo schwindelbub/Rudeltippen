@@ -28,6 +28,12 @@ import dtos.UserDTO;
  */
 @Singleton
 public class ValidationService {
+    private static final String USERPASS = "userpass";
+
+    private static final String EMAIL = "email";
+
+    private static final String USERNAME = "username";
+
     private static final Logger LOG = LoggerFactory.getLogger(ValidationService.class);
 
     @Inject
@@ -80,31 +86,31 @@ public class ValidationService {
 
     public void validateUserDTO(UserDTO userDTO, Validation validation) {
         if (!isValidUsername(userDTO.username)) {
-            validation.addBeanViolation(createBeanValidation("username", i18nService.get("validation.username.size")));
+            validation.addBeanViolation(createBeanValidation(USERNAME, i18nService.get("validation.username.size")));
         }
 
         if (usernameExists(userDTO.username)) {
-            validation.addBeanViolation(createBeanValidation("username", i18nService.get("validation.username.exists")));
+            validation.addBeanViolation(createBeanValidation(USERNAME, i18nService.get("validation.username.exists")));
         }
 
         if (!isValidEmail(userDTO.email)) {
-            validation.addBeanViolation(createBeanValidation("email", i18nService.get("validation.email.invalid")));
+            validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.invalid")));
         }
 
         if (emailExists(userDTO.email)) {
-            validation.addBeanViolation(createBeanValidation("email", i18nService.get("validation.email.exsits")));
+            validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.exsits")));
         }
 
         if (!match(userDTO.email, userDTO.emailConfirmation)) {
-            validation.addBeanViolation(createBeanValidation("email", i18nService.get("validation.email.notmatch")));
+            validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.notmatch")));
         }
 
         if (!isValidPassword(userDTO.userpass)) {
-            validation.addBeanViolation(createBeanValidation("userpass", i18nService.get("validation.password.invalid")));
+            validation.addBeanViolation(createBeanValidation(USERPASS, i18nService.get("validation.password.invalid")));
         }
 
         if (!match(userDTO.userpass, userDTO.userpassConfirmation)) {
-            validation.addBeanViolation(createBeanValidation("userpass", i18nService.get("validation.password.notmatch")));
+            validation.addBeanViolation(createBeanValidation(USERPASS, i18nService.get("validation.password.notmatch")));
         }
     }
 
@@ -163,7 +169,7 @@ public class ValidationService {
      */
     public boolean isValidEmail(final String email) {
         boolean valid = false;
-        final Pattern p = Pattern.compile(Constants.EMAILPATTERN.value());
+        final Pattern p = Pattern.compile(Constants.EMAILPATTERN.get());
         final Matcher m = p.matcher(email);
 
         if (StringUtils.isNotBlank(email) && m.matches()) {
@@ -181,7 +187,7 @@ public class ValidationService {
      */
     public boolean isValidUsername(final String username) {
         boolean valid = false;
-        final Pattern p = Pattern.compile(Constants.USERNAMEPATTERN.value());
+        final Pattern p = Pattern.compile(Constants.USERNAMEPATTERN.get());
         final Matcher m = p.matcher(username);
 
         if (StringUtils.isNotBlank(username) && username.length() >= 3 && username.length() <= 32 && m.matches()) {
@@ -192,7 +198,7 @@ public class ValidationService {
     }
 
     public boolean isValidConfirmationToken(String token) {
-        final Pattern p = Pattern.compile(Constants.CONFIRMATIONPATTERN.value());
+        final Pattern p = Pattern.compile(Constants.CONFIRMATIONPATTERN.get());
         final Matcher m = p.matcher(token);
 
         return m.matches();

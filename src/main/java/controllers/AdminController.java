@@ -118,7 +118,7 @@ public class AdminController extends RootController {
         }
 
         calculationService.calculations();
-        flashScope.put(Constants.FLASHWARNING.value(), i18nService.get("controller.games.tippsstored", null));
+        flashScope.put(Constants.FLASHWARNING.get(), i18nService.get("controller.games.tippsstored", null));
 
         int playday = 1;
         if (keys != null && !keys.isEmpty() && StringUtils.isNotBlank(gamekey)) {
@@ -169,7 +169,7 @@ public class AdminController extends RootController {
     }
 
     public Result changeactive(@PathParam("userid") String userId, Context context, FlashScope flashScope) {
-        final User connectedUser = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
+        final User connectedUser = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
         final User user = dataService.findUserById(userId);
 
         if (user != null) {
@@ -193,7 +193,7 @@ public class AdminController extends RootController {
                 flashScope.success(message);
                 LOG.info("User " + user.getEmail() + " has been " + activate + " - by " + connectedUser.getEmail());
             } else {
-                flashScope.put(Constants.FLASHWARNING.value(), i18nService.get("warning.change.active"));
+                flashScope.put(Constants.FLASHWARNING.get(), i18nService.get("warning.change.active"));
             }
         } else {
             flashScope.error(i18nService.get("error.loading.user"));
@@ -203,7 +203,7 @@ public class AdminController extends RootController {
     }
 
     public Result changeadmin(@PathParam("userid") String userId, FlashScope flashScope, Context context) {
-        final User connectedUser = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
+        final User connectedUser = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
         final User user = dataService.findUserById(userId);
 
         if (user != null) {
@@ -223,7 +223,7 @@ public class AdminController extends RootController {
                 flashScope.success(message);
                 LOG.info("User " + user.getEmail() + " " + admin + " - by " + connectedUser.getEmail());
             } else {
-                flashScope.put(Constants.FLASHWARNING.value(), i18nService.get("warning.change.admin"));
+                flashScope.put(Constants.FLASHWARNING.get(), i18nService.get("warning.change.admin"));
             }
         } else {
             flashScope.error(i18nService.get("error.loading.user"));
@@ -245,7 +245,7 @@ public class AdminController extends RootController {
 
                 calculationService.calculations();
             } else {
-                flashScope.put(Constants.FLASHWARNING.value(), i18nService.get("warning.delete.user"));
+                flashScope.put(Constants.FLASHWARNING.get(), i18nService.get("warning.delete.user"));
             }
         } else {
             flashScope.error(i18nService.get("error.loading.user"));
@@ -279,7 +279,7 @@ public class AdminController extends RootController {
             String[] recipientsArray = new String[users.size()];
             recipientsArray = recipients.toArray(recipientsArray);
 
-            User connectedUser = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
+            User connectedUser = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
             mailService.rudelmail(subject, message, recipientsArray, connectedUser.getEmail());
             flashScope.success(i18nService.get("info.rudelmail.send"));
         } else {

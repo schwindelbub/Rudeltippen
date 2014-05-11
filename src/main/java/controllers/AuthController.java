@@ -46,6 +46,9 @@ import filters.AppFilter;
 @FilterWith(AppFilter.class)
 public class AuthController {
     private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
+    private static final String VALIDATION = "validation";
+    private static final String AUTH_LOGIN = "/auth/login";
+    private static final String INVALIDTOKEN = "controller.users.invalidtoken";
 
     @Inject
     private DataService dataService;
@@ -61,14 +64,14 @@ public class AuthController {
 
     @Inject
     private I18nService i18nService;
-    
+
     public Result password(@PathParam("token") String token, FlashScope flashScope) {
         final Confirmation confirmation = dataService.findConfirmationByToken(token);
         if (confirmation == null) {
-            flashScope.put("warningmessage", i18nService.get("controller.users.invalidtoken"));
-            return Results.redirect("/auth/login");
+            flashScope.put(Constants.FLASHWARNING.get(), i18nService.get(INVALIDTOKEN));
+            return Results.redirect(AUTH_LOGIN);
         }
-        
+
         return Results.html().render(token);
     }
 
@@ -79,7 +82,7 @@ public class AuthController {
 
     public Result reset(@PathParam("email") String email, FlashScope flashScope) {
         if (validationService.isValidEmail(email)) {
-            flashScope.put("errormessage", i18nService.get("controller.auth.resenderror"));
+            flashScope.error(i18nService.get("controller.auth.resenderror"));
 
             return Results.redirect("/auth/forgotton");
         } else {
@@ -96,9 +99,9 @@ public class AuthController {
                 dataService.save(confirmation);
 
                 mailService.confirm(user, token, confirmType);
-                flashScope.put("infomessage", i18nService.get("confirm.message"));
+                flashScope.success(i18nService.get("confirm.message"));
 
-                return Results.redirect("/auth/login");
+                return Results.redirect(AUTH_LOGIN);
             }
         }
         return Results.redirect("/");
@@ -108,7 +111,7 @@ public class AuthController {
         Confirmation confirmation = null;
 
         if (!validationService.isValidConfirmationToken(token)) {
-            flashScope.put("warningmessage", i18nService.get("controller.users.invalidtoken"));
+            flashScope.put(Constants.FLASHWARNING.get(), i18nService.get(INVALIDTOKEN));
         } else {
             confirmation = dataService.findConfirmationByToken(token);
         }
@@ -131,7 +134,7 @@ public class AuthController {
                         final String newusername = authService.decryptAES(confirmation.getConfirmValue());
                         user.setEmail(newusername);
                         dataService.save(user);
-                        session.remove(Constants.USERNAME.value());
+                        session.remove(Constants.USERNAME.get());
                         flashScope.success(i18nService.get("controller.users.changedusername"));
                         dataService.delete(confirmation);
 
@@ -147,13 +150,13 @@ public class AuthController {
                     }
                 }
             } else {
-                flashScope.put("warningmessage", i18nService.get("controller.users.invalidtoken"));
+                flashScope.put(Constants.FLASHWARNING.get(), i18nService.get(INVALIDTOKEN));
             }
         } else {
-            flashScope.put("warningmessage", i18nService.get("controller.users.invalidtoken"));
+            flashScope.put(Constants.FLASHWARNING.get(), i18nService.get(INVALIDTOKEN));
         }
 
-        return Results.redirect("/auth/login");
+        return Results.redirect(AUTH_LOGIN);
     }
 
     public Result register() {
@@ -174,7 +177,7 @@ public class AuthController {
         validationService.validateUserDTO(userDTO, validation);
 
         if (validation.hasBeanViolations()) {
-            return Results.html().render("user", userDTO).render("validation", validation).template("/views/AuthController/register.ftl.html");
+            return Results.html().render("user", userDTO).render(VALIDATION, validation).template("/views/AuthController/register.ftl.html");
         } else {
             final String salt = DigestUtils.sha512Hex(UUID.randomUUID().toString());
             final User user = new User();
@@ -221,13 +224,13 @@ public class AuthController {
 
     public Result renew(@JSR303Validation PasswordDTO passwordDTO, Validation validation, FlashScope flashScope) {
         if (validation.hasBeanViolations()) {
-            return Results.html().render("passwordDTO", passwordDTO).render("validation", validation).template("/views/AuthController/rendew.ftl.html");
+            return Results.html().render("passwordDTO", passwordDTO).render(VALIDATION, validation).template("/views/AuthController/rendew.ftl.html");
         }
 
         final Confirmation confirmation = dataService.findConfirmationByToken(passwordDTO.token);
         if (confirmation == null) {
-            flashScope.put("warningmessage", i18nService.get("controller.users.invalidtoken"));
-            return Results.redirect("/auth/login");
+            flashScope.put(Constants.FLASHWARNING.get(), i18nService.get(INVALIDTOKEN));
+            return Results.redirect(AUTH_LOGIN);
         }
 
         final User user = confirmation.getUser();
@@ -236,17 +239,17 @@ public class AuthController {
         dataService.delete(user);
 
         dataService.delete(confirmation);
-        flashScope.put("infomessage", i18nService.get("controller.auth.passwordreset"));
+        flashScope.success(i18nService.get("controller.auth.passwordreset"));
 
-        return Results.redirect("/auth/login");
+        return Results.redirect(AUTH_LOGIN);
     }
 
     public Result authenticate(Session session, @JSR303Validation LoginDTO loginDTO, Validation validation, FlashScope flashScope) {
         if (validation.hasBeanViolations()) {
-            return Results.html().render("login", loginDTO).render("validation", validation).template("/views/AuthController/login.ftl.html");
+            return Results.html().render("login", loginDTO).render(VALIDATION, validation).template("/views/AuthController/login.ftl.html");
         } else {
             if (authService.authenticate(loginDTO.username, loginDTO.userpass)) {
-                session.put(Constants.USERNAME.value(), loginDTO.username);
+                session.put(Constants.USERNAME.get(), loginDTO.username);
                 if (loginDTO.remember) {
                     String signedUsername = authService.sign(loginDTO.username) + "-" + loginDTO.username;
                     Cookie.builder("rememberme", signedUsername).setSecure(true).setHttpOnly(true).build();
@@ -256,13 +259,13 @@ public class AuthController {
             }
         }
 
-        return Results.redirect("/auth/login");
+        return Results.redirect(AUTH_LOGIN);
     }
 
     public Result logout(Session session, FlashScope flashScope){
         session.clear();
-        flashScope.put("infomessage", i18nService.get("controller.auth.logout"));
+        flashScope.success(i18nService.get("controller.auth.logout"));
 
-        return Results.redirect("/auth/login");
+        return Results.redirect(AUTH_LOGIN);
     }
 }

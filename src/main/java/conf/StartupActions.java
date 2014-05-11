@@ -61,10 +61,10 @@ public class StartupActions {
 
     private void initJobs() {
         List<String> jobNames = new ArrayList<String>();
-        jobNames.add(Constants.GAMETIPJOB.value());
-        jobNames.add(Constants.KICKOFFJOB.value());
-        jobNames.add(Constants.REMINDERJOB.value());
-        jobNames.add(Constants.RESULTJOB.value());
+        jobNames.add(Constants.GAMETIPJOB.get());
+        jobNames.add(Constants.KICKOFFJOB.get());
+        jobNames.add(Constants.REMINDERJOB.get());
+        jobNames.add(Constants.RESULTJOB.get());
 
         for (String jobName : jobNames) {
             AbstractJob abstractJob = dataService.findAbstractJobByName(jobName);
@@ -89,10 +89,10 @@ public class StartupActions {
         if (scheduler != null) {
             try {
                 scheduler.setJobFactory(appJobFactory);
-                scheduler.scheduleJob(getJobDetail(GameTipJob.class, Constants.GAMETIPJOB.value()), getTrigger("gameTipJobTrigger", "0 */1 * * * ?"));
-                scheduler.scheduleJob(getJobDetail(KickoffJob.class, Constants.KICKOFFJOB.value()), getTrigger("kickoffJobTrigger", "0 0 5 * * ?"));
-                scheduler.scheduleJob(getJobDetail(ReminderJob.class, Constants.REMINDERJOB.value()), getTrigger("reminderJobTrigger", "0 0 */1 * * ?"));
-                scheduler.scheduleJob(getJobDetail(ResultJob.class, Constants.RESULTJOB.value()), getTrigger("resultsJobTrigger", "0 */4 * * * ?"));
+                scheduler.scheduleJob(getJobDetail(GameTipJob.class, Constants.GAMETIPJOB.get()), getTrigger("gameTipJobTrigger", "0 */1 * * * ?"));
+                scheduler.scheduleJob(getJobDetail(KickoffJob.class, Constants.KICKOFFJOB.get()), getTrigger("kickoffJobTrigger", "0 0 5 * * ?"));
+                scheduler.scheduleJob(getJobDetail(ReminderJob.class, Constants.REMINDERJOB.get()), getTrigger("reminderJobTrigger", "0 0 */1 * * ?"));
+                scheduler.scheduleJob(getJobDetail(ResultJob.class, Constants.RESULTJOB.get()), getTrigger("resultsJobTrigger", "0 */4 * * * ?"));
 
                 scheduler.start();
 

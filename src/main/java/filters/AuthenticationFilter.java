@@ -35,22 +35,22 @@ public class AuthenticationFilter implements Filter {
 
     @Override
     public Result filter(FilterChain filterChain, Context context) {
-        Cookie cookie = context.getCookie(Constants.COOKIENAME.value());
+        Cookie cookie = context.getCookie(Constants.COOKIENAME.get());
         if (cookie != null && cookie.getValue().indexOf("-") > 0) {
             final String sign = cookie.getValue().substring(0, cookie.getValue().indexOf("-"));
             final String username = cookie.getValue().substring(cookie.getValue().indexOf("-") + 1);
 
             if (StringUtils.isNotBlank(sign) && StringUtils.isNotBlank(username) && authService.sign(username).equals(sign) && context.getSession() != null) {
-                context.getSession().put(Constants.USERNAME.value(), username);
+                context.getSession().put(Constants.USERNAME.get(), username);
             }
         }
 
-        if (context.getSession() != null && context.getSession().get(Constants.USERNAME.value()) != null) {
-            User connectedUser = dataService.findUserByUsernameOrEmail(context.getSession().get(Constants.USERNAME.value()));
-            context.setAttribute(Constants.CONNECTEDUSER.value(), connectedUser);
+        if (context.getSession() != null && context.getSession().get(Constants.USERNAME.get()) != null) {
+            User connectedUser = dataService.findUserByUsernameOrEmail(context.getSession().get(Constants.USERNAME.get()));
+            context.setAttribute(Constants.CONNECTEDUSER.get(), connectedUser);
 
             Result result = filterChain.next(context);
-            result.render(Constants.CONNECTEDUSER.value(), connectedUser);
+            result.render(Constants.CONNECTEDUSER.get(), connectedUser);
             result.render("ViewService", viewService);
             result.render("currentPlayday", dataService.findCurrentPlayday());
 

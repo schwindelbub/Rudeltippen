@@ -77,9 +77,9 @@ public class ResultService {
         Document document = null;
         try {
             HttpResponse httpResponse = Request
-                    .Post(Constants.WS_URL.value())
-                    .setHeader("Content-Type", Constants.WS_COTENT_TYPE.value())
-                    .setHeader("charset", Constants.DEFAULT_ENCODING.value())
+                    .Post(Constants.WS_URL.get())
+                    .setHeader("Content-Type", Constants.WS_COTENT_TYPE.get())
+                    .setHeader("charset", Constants.ENCODING.get())
                     .bodyString(buffer.toString(), ContentType.TEXT_XML)
                     .execute()
                     .returnResponse();

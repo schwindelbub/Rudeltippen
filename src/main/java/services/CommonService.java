@@ -105,7 +105,7 @@ public class CommonService extends ViewService {
                     outputStream.write(byteBuffer, 0, length);
                 }
 
-                FileUtils.copyFile(file, new File(Constants.MEDIAFOLDER.value() + filename));
+                FileUtils.copyFile(file, new File(Constants.MEDIAFOLDER.get() + filename));
                 if (!file.delete()) {
                     LOG.error("Failed to delete image when handling response from gravatar");
                 }

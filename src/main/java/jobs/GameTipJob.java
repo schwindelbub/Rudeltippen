@@ -44,9 +44,9 @@ public class GameTipJob implements Job {
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
         if (resultService.isJobInstance()) {
-            AbstractJob job = dataService.findAbstractJobByName(Constants.GAMETIPJOB.value());
+            AbstractJob job = dataService.findAbstractJobByName(Constants.GAMETIPJOB.get());
             if (job != null && job.isActive()) {
-                LOG.info("Started Job: " + Constants.GAMETIPJOB.value());
+                LOG.info("Started Job: " + Constants.GAMETIPJOB.get());
                 final List<User> users = dataService.findAllNotifiableUsers();
                 final List<Game> games = dataService.findAllNotifiableGames();
 
@@ -61,7 +61,7 @@ public class GameTipJob implements Job {
                     }
                 }
 
-                LOG.info("Finished Job: " + Constants.GAMETIPJOB.value());
+                LOG.info("Finished Job: " + Constants.GAMETIPJOB.get());
             }
         }
     }

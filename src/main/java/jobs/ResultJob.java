@@ -44,18 +44,22 @@ public class ResultJob implements Job {
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
         if (resultService.isJobInstance()) {
-            AbstractJob job = dataService.findAbstractJobByName(Constants.RESULTJOB.value());
+            AbstractJob job = dataService.findAbstractJobByName(Constants.RESULTJOB.get());
             if (job != null && job.isActive()) {
-                LOG.info("Started Job: " + Constants.RESULTJOB.value());
+                LOG.info("Started Job: " + Constants.RESULTJOB.get());
                 final List<Game> games = dataService.findAllGamesWithNoResult();
                 for (final Game game : games) {
-                    final WSResults wsResults = resultService.getResultsFromWebService(game);
-                    if ((wsResults != null) && wsResults.isUpdated()) {
-                        calculationService.setGameScoreFromWebService(game, wsResults);
-                    }
+                    setGameScore(game);
                 }
-                LOG.info("Finished Job: " + Constants.RESULTJOB.value());
+                LOG.info("Finished Job: " + Constants.RESULTJOB.get());
             }
+        }
+    }
+
+    private void setGameScore(final Game game) {
+        final WSResults wsResults = resultService.getResultsFromWebService(game);
+        if ((wsResults != null) && wsResults.isUpdated()) {
+            calculationService.setGameScoreFromWebService(game, wsResults);
         }
     }
 }

@@ -10,7 +10,7 @@ public enum Constants {
     DEFAULT_DATEFORMAT("dd.MM.yyyy"),
     DEFAULT_TIMEFORMAT("kk:mm"),
     DEFAULT_TIMEZONE("Europe/Berlin"),
-    DEFAULT_ENCODING("UTF-8"),
+    ENCODING("UTF-8"),
     WS_COTENT_TYPE("application/soap+xml"),
     WS_URL("http://www.openligadb.de/Webservices/Sportsdata.asmx"),
     CONFIRMATIONPATTERN("\\w{8,8}-\\w{4,4}-\\w{4,4}-\\w{4,4}-\\w{12,12}"),
@@ -33,7 +33,7 @@ public enum Constants {
         this.value = value;
     }
 
-    public String value() {
+    public String get() {
         return value;
     }
 }

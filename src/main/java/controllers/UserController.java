@@ -49,6 +49,9 @@ import com.google.inject.Singleton;
 @Singleton
 public class UserController extends RootController {
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
+    private static final String CONFIRM_MESSAGE = "confirm.message";
+    private static final String USERS_PROFILE = "/users/profile";
+    private static final String USERNAME = "username";
 
     @Inject
     private DataService dataService;
@@ -68,7 +71,7 @@ public class UserController extends RootController {
     @Inject
     private CommonService commonService;
 
-    public Result show(@PathParam("username") String username) {
+    public Result show(@PathParam(USERNAME) String username) {
         final User user = dataService.findUserByUsername(username);
 
         if (user != null) {
@@ -127,31 +130,31 @@ public class UserController extends RootController {
     }
 
     public Result profile(Context context) {
-        final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
+        final User user = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
         final Settings settings = dataService.findSettings();
 
         return Results.html().render("user", user).render(settings);
     }
 
     public Result updateusername(Session session, Context context, FlashScope flashScope) {
-        String username = context.getParameter("username");
+        String username = context.getParameter(USERNAME);
 
         if (!validationService.isValidUsername(username)) {
             flashScope.error(i18nService.get("controller.users.invalidusername"));
         } else if (validationService.usernameExists(username)) {
             flashScope.error(i18nService.get("controller.users.usernamexists"));
         } else {
-            final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
+            final User user = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
             user.setUsername(username);
             dataService.save(user);
 
             flashScope.success(i18nService.get("controller.profile.updateusername"));
             LOG.info("username updated: " + user.getEmail() + " / " + username);
 
-            session.put("username", username);
+            session.put(USERNAME, username);
         }
 
-        return Results.redirect("/users/profile");
+        return Results.redirect(USERS_PROFILE);
     }
 
     public Result updateemail(Context context, FlashScope flashScope) {
@@ -166,7 +169,7 @@ public class UserController extends RootController {
             flashScope.error(i18nService.get("validation.email.notmatch"));
         } else {
             final String token = UUID.randomUUID().toString();
-            final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
+            final User user = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
             if (user != null) {
                 final ConfirmationType confirmationType = ConfirmationType.CHANGEUSERNAME;
                 final Confirmation confirmation = new Confirmation();
@@ -177,11 +180,11 @@ public class UserController extends RootController {
                 confirmation.setUser(user);
                 dataService.save(confirmation);
                 mailService.confirm(user, token, confirmationType);
-                flashScope.success(i18nService.get("confirm.message"));
+                flashScope.success(i18nService.get(CONFIRM_MESSAGE));
             }
         }
 
-        return Results.redirect("/users/profile");
+        return Results.redirect(USERS_PROFILE);
     }
 
     public Result updatepassword(Context context, FlashScope flashScope) {
@@ -194,7 +197,7 @@ public class UserController extends RootController {
             flashScope.error(i18nService.get("validation.password.notmatch"));
         } else {
             final String token = UUID.randomUUID().toString();
-            final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
+            final User user = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
             if (user != null) {
                 final ConfirmationType confirmationType = ConfirmationType.CHANGEUSERPASS;
                 final Confirmation confirm = new Confirmation();
@@ -205,16 +208,16 @@ public class UserController extends RootController {
                 confirm.setUser(user);
                 dataService.save(confirm);
                 mailService.confirm(user, token, confirmationType);
-                flashScope.success(i18nService.get("confirm.message"));
+                flashScope.success(i18nService.get(CONFIRM_MESSAGE));
                 LOG.info("Password updated: " + user.getEmail());
             }
         }
 
-        return Results.redirect("/users/profile");
+        return Results.redirect(USERS_PROFILE);
     }
 
     public Result updatenotifications(Context context, FlashScope flashScope) {
-        final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
+        final User user = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
 
         String reminder = context.getParameter("reminder");
         String notification = context.getParameter("notification");
@@ -230,11 +233,11 @@ public class UserController extends RootController {
         flashScope.success(i18nService.get("controller.profile.notifications"));
         LOG.info("Notifications updated: " + user.getEmail());
 
-        return Results.redirect("/users/profile");
+        return Results.redirect(USERS_PROFILE);
     }
 
     public Result updatepicture(FlashScope flashScope, Context context) {
-        File upload = new File(Constants.MEDIAFOLDER.value() + UUID.randomUUID().toString());
+        File upload = new File(Constants.MEDIAFOLDER.get() + UUID.randomUUID().toString());
         if (context.isMultipart()) {
             FileItemIterator fileItemIterator = context.getFileItemIterator();
             try {
@@ -254,13 +257,13 @@ public class UserController extends RootController {
         String pictureLargeFilename = UUID.randomUUID().toString() + ".jpg";
         String pictureSmallFilename = UUID.randomUUID().toString() + ".jpg";
 
-        File pictureSmall = new File(Constants.MEDIAFOLDER.value() + pictureSmallFilename);
-        File pictureLarge = new File(Constants.MEDIAFOLDER.value() + pictureLargeFilename);
+        File pictureSmall = new File(Constants.MEDIAFOLDER.get() + pictureSmallFilename);
+        File pictureLarge = new File(Constants.MEDIAFOLDER.get() + pictureLargeFilename);
 
         commonService.resizeImage(upload, pictureSmall, 64, 64, true);
         commonService.resizeImage(upload, pictureLarge, 256, 256, true);
 
-        User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
+        User user = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
         user.setPicture(pictureSmallFilename);
         user.setPictureLarge(pictureLargeFilename);
         dataService.save(user);
@@ -272,17 +275,17 @@ public class UserController extends RootController {
         flashScope.success(i18nService.get("controller.profile.updatepicture"));
         LOG.info("Picture updated: " + user.getEmail());
 
-        return Results.redirect("/users/profile");
+        return Results.redirect(USERS_PROFILE);
     }
 
     public Result deletepicture(Context context, FlashScope flashScope) {
-        User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
+        User user = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
         user.setPicture(null);
         user.setPictureLarge(null);
         dataService.save(user);
 
         flashScope.success(i18nService.get("controller.profile.deletedpicture"));
 
-        return Results.redirect("/users/profile");
+        return Results.redirect(USERS_PROFILE);
     }
 }

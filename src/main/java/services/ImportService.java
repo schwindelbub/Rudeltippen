@@ -36,7 +36,11 @@ import com.mongodb.util.JSON;
 @Singleton
 public class ImportService {
     private static final Logger LOG = LoggerFactory.getLogger(ImportService.class);
-    
+    private static final String BRACKET = "bracket";
+    private static final String PLAYOFF = "playoff";
+    private static final String UPDATEBLE = "updateble";
+    private static final String NUMBER = "number";
+
     @Inject
     private DataService dataService;
 
@@ -46,7 +50,7 @@ public class ImportService {
         Map<String, Playday> playdays = loadPlaydays();
         loadGames(playdays, teams, brackets);
         loadExtras(teams);
-        
+
         setReferences();
     }
 
@@ -55,16 +59,16 @@ public class ImportService {
         for (Bracket bracket : brackets) {
             List<Game> games = dataService.findGamesByBracket(bracket);
             List<Team> teams = dataService.findTeamsByBracket(bracket);
-            
+
             bracket.setGames(games);
             bracket.setTeams(teams);
             dataService.save(bracket);
         }
-        
+
         List<Playday> playdays = dataService.findAllPlaydaysOrderByNumber();
         for (Playday playday : playdays) {
             List<Game> games = dataService.findGamesByPlayday(playday);
-            
+
             playday.setGames(games);
             dataService.save(playday);
         }
@@ -78,13 +82,13 @@ public class ImportService {
             BasicDBObject basicDBObject = (BasicDBObject) JSON.parse(line);
             Bracket bracket = new Bracket();
             bracket.setName(basicDBObject.getString("name"));
-            bracket.setNumber(basicDBObject.getInt("number"));
-            bracket.setUpdateble(basicDBObject.getBoolean("updateble"));
+            bracket.setNumber(basicDBObject.getInt(NUMBER));
+            bracket.setUpdateble(basicDBObject.getBoolean(UPDATEBLE));
             dataService.save(bracket);
-            
+
             brackets.put(basicDBObject.getString("id"), bracket);
         }
-        
+
         return brackets;
     }
 
@@ -104,15 +108,15 @@ public class ImportService {
 
     private void loadGames(Map<String, Playday> playdays, Map<String, Team> teams, Map<String, Bracket> brackets) {
         List<String> lines = readLines("games.json");
-        
+
         for (String line : lines) {
             BasicDBObject basicDBObject = (BasicDBObject) JSON.parse(line);
             Game game = new Game();
-            game.setBracket(brackets.get(basicDBObject.getString("bracket")));
-            game.setNumber(basicDBObject.getInt("number"));
-            game.setPlayoff(basicDBObject.getBoolean("playoff"));
+            game.setBracket(brackets.get(basicDBObject.getString(BRACKET)));
+            game.setNumber(basicDBObject.getInt(NUMBER));
+            game.setPlayoff(basicDBObject.getBoolean(PLAYOFF));
             game.setEnded(basicDBObject.getBoolean("ended"));
-            game.setUpdateble(basicDBObject.getBoolean("updateble"));
+            game.setUpdateble(basicDBObject.getBoolean(UPDATEBLE));
             game.setWebserviceID(basicDBObject.getString("webserviceID"));
             game.setHomeTeam(teams.get(basicDBObject.getString("homeTeam")));
             game.setHomeReference(basicDBObject.getString("homeReference"));
@@ -126,13 +130,13 @@ public class ImportService {
 
     private Date parseDate(String date, String format) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
-        
+
         try {
             return simpleDateFormat.parse(date);
         } catch (ParseException e) {
             LOG.error("Failed to pased date", e);
         }
-        
+
         return null;
     }
 
@@ -145,13 +149,13 @@ public class ImportService {
             Playday playday = new Playday();
             playday.setName(basicDBObject.getString("name"));
             playday.setCurrent(basicDBObject.getBoolean("current"));
-            playday.setCurrent(basicDBObject.getBoolean("playoff"));
-            playday.setNumber(basicDBObject.getInt("number"));
+            playday.setCurrent(basicDBObject.getBoolean(PLAYOFF));
+            playday.setNumber(basicDBObject.getInt(NUMBER));
             dataService.save(playday);
-            
+
             playdays.put(basicDBObject.getString("id"), playday);
         }
-        
+
         return playdays;
     }
 
@@ -168,12 +172,12 @@ public class ImportService {
             team.setGamesWon(basicDBObject.getInt("gamesWon"));
             team.setGamesDraw(basicDBObject.getInt("gamesDraw"));
             team.setGamesLost(basicDBObject.getInt("gamesLost"));
-            team.setBracket(brackets.get(basicDBObject.getString("bracket")));
+            team.setBracket(brackets.get(basicDBObject.getString(BRACKET)));
             dataService.save(team);
-            
+
             teams.put(basicDBObject.getString("id"), team);
         }
-        
+
         return teams;
     }
 
@@ -181,7 +185,7 @@ public class ImportService {
         URL url = Resources.getResource(filename);
         List<String> lines = null;
         try {
-            lines = IOUtils.readLines(new FileInputStream(new File(url.getPath())), Constants.DEFAULT_ENCODING.value());
+            lines = IOUtils.readLines(new FileInputStream(new File(url.getPath())), Constants.ENCODING.get());
         } catch (IOException e) {
             LOG.error("Failed to read lines", e);
         }

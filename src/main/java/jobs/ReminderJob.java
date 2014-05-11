@@ -48,9 +48,9 @@ public class ReminderJob implements Job {
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
         if (resultService.isJobInstance()) {
-            AbstractJob job = dataService.findAbstractJobByName(Constants.REMINDERJOB.value());
+            AbstractJob job = dataService.findAbstractJobByName(Constants.REMINDERJOB.get());
             if (job != null && job.isActive()) {
-                LOG.info("Started Job: " + Constants.REMINDERJOB.value());
+                LOG.info("Started Job: " + Constants.REMINDERJOB.get());
                 final List<Extra> nextExtras = dataService.findAllExtrasEnding();
                 final List<Game> nextGames = dataService.findAllGamesEnding();
                 final List<User> users = dataService.findAllRemindableUsers();
@@ -77,7 +77,7 @@ public class ReminderJob implements Job {
                 }
 
                 disableReminder(nextExtras, nextGames);
-                LOG.info("Finshed Job: " + Constants.REMINDERJOB.value());
+                LOG.info("Finshed Job: " + Constants.REMINDERJOB.get());
             }
         }
     }

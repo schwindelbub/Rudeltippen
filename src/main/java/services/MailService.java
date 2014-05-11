@@ -70,7 +70,7 @@ public class MailService {
             content.put(I18N, i18nService);
             content.put(SETTINGS, settings);
             content.put("extras", extras);
-            mail.setBodyHtml(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "reminder.ftl", content));
+            mail.setBodyHtml(commonService.getProcessedTemplate(Constants.MAILFOLDER.get() + "reminder.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -111,7 +111,7 @@ public class MailService {
             content.put("user", user);
             content.put("token", token);
             content.put(MESSAGE, message);
-            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "confirm.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.get() + "confirm.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -132,7 +132,7 @@ public class MailService {
             content.put("user", user);
             content.put(I18N, i18nService);
             content.put(SETTINGS, settings);
-            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "newuser.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.get() + "newuser.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -153,7 +153,7 @@ public class MailService {
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("response", response);
             content.put(I18N, i18nService);
-            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "error.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.get() + "error.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -174,7 +174,7 @@ public class MailService {
 
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("notification", notification);
-            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "notification.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.get() + "notification.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -196,7 +196,7 @@ public class MailService {
             content.put(I18N, i18nService);
             content.put(GAMES, games);
             content.put("user", user);
-            mail.setBodyHtml(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "gametips.ftl", content));
+            mail.setBodyHtml(commonService.getProcessedTemplate(Constants.MAILFOLDER.get() + "gametips.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -216,7 +216,7 @@ public class MailService {
 
             Map<String, Object> content = new HashMap<String, Object>();
             content.put(MESSAGE, message);
-            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "rudelmail.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.get() + "rudelmail.ftl", content));
             mail.addBcc(bbcRecipients);
 
             try {

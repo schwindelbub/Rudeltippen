@@ -54,9 +54,9 @@ public class KickoffJob implements Job {
     @Override
     public void execute(JobExecutionContext arg0) throws JobExecutionException {
         if (resultService.isJobInstance()) {
-            AbstractJob job = dataService.findAbstractJobByName(Constants.KICKOFFJOB.value());
+            AbstractJob job = dataService.findAbstractJobByName(Constants.KICKOFFJOB.get());
             if (job != null && job.isActive()) {
-                LOG.info("Started Job: " + Constants.KICKOFFJOB.value());
+                LOG.info("Started Job: " + Constants.KICKOFFJOB.get());
                 int number = dataService.findCurrentPlayday().getNumber();
                 for (int i=0; i <= 3; i++) {
                     final Playday playday = dataService.findPlaydaybByNumber(number);
@@ -79,7 +79,7 @@ public class KickoffJob implements Job {
                     }
                     number++;
                 }
-                LOG.info("Finished Job: " + Constants.KICKOFFJOB.value());
+                LOG.info("Finished Job: " + Constants.KICKOFFJOB.get());
             }
         }
     }

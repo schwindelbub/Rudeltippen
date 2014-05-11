@@ -43,7 +43,7 @@ public class TestFactory extends NinjaTest {
             dataService.dropDatabase();
 
             Settings settings = new Settings();
-            settings.setAppName(Constants.APPNAME.value());
+            settings.setAppName(Constants.APPNAME.get());
             settings.setPointsGameWin(3);
             settings.setPointsGameDraw(1);
             settings.setAppSalt(DigestUtils.sha512Hex(UUID.randomUUID().toString()));

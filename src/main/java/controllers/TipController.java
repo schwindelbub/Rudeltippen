@@ -35,21 +35,27 @@ import com.google.inject.Singleton;
  */
 @Singleton
 public class TipController extends RootController {
+    private static final String TEAM_ID = "_teamId";
+    private static final String BONUS = "bonus_";
+    private static final String AWAY_SCORE = "_awayScore";
+    private static final String HOME_SCORE = "_homeScore";
+    private static final String GAME = "game_";
+    private static final String TIPS_PLAYDAY = "/tips/playday/";
 
     @Inject
     private DataService dataService;
-    
+
     @Inject
     private I18nService i18nService;
-    
+
     @Inject
     private ValidationService validationService;
 
     @Inject
     private CommonService commonService;
-    
+
     public Result playday(@PathParam("number") long number) {
-        final Pagination pagination = commonService.getPagination(number, "/tips/playday/", dataService.findAllPlaydaysOrderByNumber().size());
+        final Pagination pagination = commonService.getPagination(number, TIPS_PLAYDAY, dataService.findAllPlaydaysOrderByNumber().size());
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
 
         final List<Extra> extras = dataService.findAllExtras();
@@ -65,18 +71,18 @@ public class TipController extends RootController {
         final Map<String, String> map = commonService.convertParamaters(context.getParameters());
         for (final Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();
-            if (StringUtils.isNotBlank(key) && key.contains("game_") && (key.contains("_homeScore") || key.contains("_awayScore"))) {
-                key = key.replace("game_", "");
-                key = key.replace("_awayScore", "");
-                key = key.replace("_homeScore", "");
+            if (StringUtils.isNotBlank(key) && key.contains(GAME) && (key.contains(HOME_SCORE) || key.contains(AWAY_SCORE))) {
+                key = key.replace(GAME, "");
+                key = key.replace(AWAY_SCORE, "");
+                key = key.replace(HOME_SCORE, "");
                 key = key.trim();
 
                 if (keys.contains(key)) {
                     continue;
                 }
 
-                final String homeScore = map.get("game_" + key + "_homeScore");
-                final String awayScore = map.get("game_" + key + "_awayScore");
+                final String homeScore = map.get(GAME + key + HOME_SCORE);
+                final String awayScore = map.get(GAME + key + AWAY_SCORE);
 
                 if (!validationService.isValidScore(homeScore, awayScore)) {
                     continue;
@@ -87,7 +93,7 @@ public class TipController extends RootController {
                     continue;
                 }
 
-                dataService.saveGameTip(game, Integer.parseInt(homeScore), Integer.parseInt(awayScore), context.getAttribute(Constants.CONNECTEDUSER.value(), User.class));
+                dataService.saveGameTip(game, Integer.parseInt(homeScore), Integer.parseInt(awayScore), context.getAttribute(Constants.CONNECTEDUSER.get(), User.class));
                 keys.add(key);
                 tipped++;
 
@@ -98,10 +104,10 @@ public class TipController extends RootController {
         if (tipped > 0) {
             flashScope.success(i18nService.get("controller.tipps.tippsstored"));
         } else {
-            flashScope.put("warning", i18nService.get("controller.tipps.novalidtipps"));
+            flashScope.put(Constants.FLASHWARNING.get(), i18nService.get("controller.tipps.novalidtipps"));
         }
 
-        return Results.redirect("/tips/playday/" + playday);
+        return Results.redirect(TIPS_PLAYDAY + playday);
     }
 
     public Result storeextratips(FlashScope flashScope, Context context) {
@@ -109,29 +115,29 @@ public class TipController extends RootController {
         for (final Entry<String, String> entry : map.entrySet()) {
             String key = entry.getKey();
 
-            if (StringUtils.isNotBlank(key) && key.contains("bonus_") && key.contains("_teamId")) {
+            if (StringUtils.isNotBlank(key) && key.contains(BONUS) && key.contains(TEAM_ID)) {
                 final String teamdId = context.getParameter(key);
-                key = key.replace("bonus_", "");
-                key = key.replace("_teamId", "");
+                key = key.replace(BONUS, "");
+                key = key.replace(TEAM_ID, "");
                 key = key.trim();
 
                 final String bId = key;
                 final String tId = teamdId;
 
                 if (StringUtils.isNotBlank(bId) || StringUtils.isNotBlank(tId)) {
-                    return Results.redirect("/tips/playday/" + dataService.findCurrentPlayday().getNumber());
+                    return Results.redirect(TIPS_PLAYDAY + dataService.findCurrentPlayday().getNumber());
                 }
 
                 final Extra extra = dataService.findExtaById(bId);
                 if (commonService.extraIsTipable(extra)) {
                     final Team team = dataService.findTeamById(tId);
-                    dataService.saveExtraTip(extra, team, context.getAttribute(Constants.CONNECTEDUSER.value(), User.class));
+                    dataService.saveExtraTip(extra, team, context.getAttribute(Constants.CONNECTEDUSER.get(), User.class));
                     flashScope.success(i18nService.get("controller.tipps.bonussaved"));
                 }
             }
         }
 
-        return Results.redirect("/tips/playday/" + dataService.findCurrentPlayday().getNumber());
+        return Results.redirect(TIPS_PLAYDAY + dataService.findCurrentPlayday().getNumber());
     }
 
     public Result standings() {

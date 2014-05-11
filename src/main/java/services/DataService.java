@@ -240,7 +240,7 @@ public class DataService {
     public Settings findSettings() {
         Settings settings = (Settings) ninjaCache.get(SETTINGS);
         if (settings == null) {
-            settings = this.datastore.find(Settings.class).field("appName").equal(Constants.APPNAME.value()).get();
+            settings = this.datastore.find(Settings.class).field("appName").equal(Constants.APPNAME.get()).get();
             ninjaCache.add(SETTINGS, settings);
         }
 
