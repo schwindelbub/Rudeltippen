@@ -30,6 +30,10 @@ import com.mchange.v1.util.UnexpectedException;
 public class AuthService {
     private static final Logger LOG = LoggerFactory.getLogger(AuthService.class);
     private static final char[] HEX_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    private static final String HMAC_SHA1 = "HmacSHA1";
+    private static final String GRAVATAR_TYPE = "mm";
+    private static final String AES = "AES";
+    private static final String APPLICATION_SECRET = "application.secret";
 
     @Inject
     private NinjaProperties ninjaProperties;
@@ -49,7 +53,7 @@ public class AuthService {
      * @return An hexadecimal encrypted string
      */
     public String encryptAES(String value) {
-        return encryptAES(value, ninjaProperties.get("application.secret").substring(0, 16));
+        return encryptAES(value, ninjaProperties.get(APPLICATION_SECRET).substring(0, 16));
     }
 
     /**
@@ -61,8 +65,8 @@ public class AuthService {
     public String encryptAES(String value, String privateKey) {
         try {
             byte[] raw = privateKey.getBytes(Constants.DEFAULT_ENCODING.value());
-            SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-            Cipher cipher = Cipher.getInstance("AES");
+            SecretKeySpec skeySpec = new SecretKeySpec(raw, AES);
+            Cipher cipher = Cipher.getInstance(AES);
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
             return byteToHexString(cipher.doFinal(value.getBytes(Constants.DEFAULT_ENCODING.value())));
         } catch (Exception ex) {
@@ -76,7 +80,7 @@ public class AuthService {
      * @return The decrypted String
      */
     public String decryptAES(String value) {
-        return decryptAES(value, ninjaProperties.get("application.secret").substring(0, 16));
+        return decryptAES(value, ninjaProperties.get(APPLICATION_SECRET).substring(0, 16));
     }
 
     /**
@@ -88,8 +92,8 @@ public class AuthService {
     public String decryptAES(String value, String privateKey) {
         try {
             byte[] raw = privateKey.getBytes(Constants.DEFAULT_ENCODING.value());
-            SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-            Cipher cipher = Cipher.getInstance("AES");
+            SecretKeySpec skeySpec = new SecretKeySpec(raw, AES);
+            Cipher cipher = Cipher.getInstance(AES);
             cipher.init(Cipher.DECRYPT_MODE, skeySpec);
             return new String(cipher.doFinal(hexStringToByte(value)));
         } catch (Exception ex) {
@@ -110,8 +114,8 @@ public class AuthService {
     }
 
     public void activateAndSetAvatar(final User user) {
-        final String avatar = commonService.getGravatarImage(user.getEmail(), "mm", 256);
-        final String avatarSmall = commonService.getGravatarImage(user.getEmail(), "mm", 64);
+        final String avatar = commonService.getGravatarImage(user.getEmail(), GRAVATAR_TYPE, 256);
+        final String avatarSmall = commonService.getGravatarImage(user.getEmail(), GRAVATAR_TYPE, 64);
         if (StringUtils.isNotBlank(avatar)) {
             user.setPictureLarge(avatar);
         }
@@ -139,7 +143,7 @@ public class AuthService {
      */
     public String sign(String message) {
         try {
-            return sign(message, ninjaProperties.get("application.secret").getBytes(Constants.DEFAULT_ENCODING.value()));
+            return sign(message, ninjaProperties.get(APPLICATION_SECRET).getBytes(Constants.DEFAULT_ENCODING.value()));
         } catch (UnsupportedEncodingException e) {
             LOG.error("Failed to sign message", e);
         }
@@ -159,8 +163,8 @@ public class AuthService {
         }
 
         try {
-            Mac mac = Mac.getInstance("HmacSHA1");
-            SecretKeySpec signingKey = new SecretKeySpec(key, "HmacSHA1");
+            Mac mac = Mac.getInstance(HMAC_SHA1);
+            SecretKeySpec signingKey = new SecretKeySpec(key, HMAC_SHA1);
             mac.init(signingKey);
             byte[] messageBytes = message.getBytes(Constants.DEFAULT_ENCODING.value());
             byte[] result = mac.doFinal(messageBytes);

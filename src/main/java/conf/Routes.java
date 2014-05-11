@@ -18,6 +18,7 @@ import controllers.UserController;
  *
  */
 public class Routes implements ApplicationRoutes {
+    private static final String SERVE_STATIC = "serveStatic";
 
     @Override
     public void init(Router router) {
@@ -42,7 +43,7 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/users/profile").with(UserController.class, "profile");
         router.GET().route("/users/show/{username}").with(UserController.class, "show");
         router.GET().route("/tournament/playday/{number}").with(TournamentController.class, "playday");
-        router.GET().route("/tips/playday/{number}").with(TipController.class, "playday");        
+        router.GET().route("/tips/playday/{number}").with(TipController.class, "playday");
         router.GET().route("/tips/standings").with(TipController.class, "standings");
         router.POST().route("/auth/renew").with(AuthController.class, "renew");
         router.POST().route("/auth/reset").with(AuthController.class, "reset");
@@ -56,7 +57,7 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/setup").with(SystemController.class, "setup");
         router.GET().route("/statistics").with(ApplicationController.class, "statistics");
         router.GET().route("/system/init").with(SystemController.class, "init");
-        router.GET().route("/assets/{fileName: .*}").with(AssetsController.class, "serveStatic");
-        router.GET().route("/robots.txt").with(AssetsController.class, "serveStatic");
+        router.GET().route("/assets/{fileName: .*}").with(AssetsController.class, SERVE_STATIC);
+        router.GET().route("/robots.txt").with(AssetsController.class, SERVE_STATIC);
     }
 }

@@ -28,10 +28,9 @@ public class I18nService {
         Optional<String> language = Optional.of(getDefaultLanguage());
         return messages.getWithDefault(key, "Language: " + language + " - Missing translation for key: " + key, language, paramters);
     }
-    
+
     public String get(String key) {
-        Optional<String> language = Optional.of(getDefaultLanguage());
-        return messages.getWithDefault(key, "Language: " + language + " - Missing translation for key: " + key, language, new Object[]{});
+        return get(key, new Object[]{});
     }
 
     /**
@@ -47,7 +46,7 @@ public class I18nService {
         } else if (pointsDiff > 1) {
             message = get("points.to.top.many", new Object[]{pointsDiff});
         }
-        
+
         return message;
     }
 
@@ -76,7 +75,7 @@ public class I18nService {
         } else {
             language = "en";
         }
-        
+
         return language;
     }
 }

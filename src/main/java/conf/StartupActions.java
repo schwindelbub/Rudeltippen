@@ -108,20 +108,16 @@ public class StartupActions {
     }
 
     private Trigger getTrigger(String identity, String schedule) {
-        Trigger birthDayTrigger = newTrigger()
+        return newTrigger()
                 .withIdentity(identity, TRIGGER_GROUP)
                 .withSchedule(cronSchedule(schedule))
                 .build();
-
-        return birthDayTrigger;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private JobDetail getJobDetail(Class clazz, String identity) {
-        JobDetail birthDayJob = newJob(clazz)
+        return newJob(clazz)
                 .withIdentity(identity, JOB_GROUP)
                 .build();
-
-        return birthDayJob;
     }
 }

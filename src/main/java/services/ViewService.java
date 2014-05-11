@@ -20,6 +20,9 @@ import com.google.inject.Singleton;
  */
 @Singleton
 public class ViewService {
+    private static final String ICON_ARROW_GREEN = "<i class=\"icon-arrow-up icon-green\"></i>";
+    private static final String ICON_ARROW_RED = "<i class=\"icon-arrow-down icon-red\"></i>";
+    private static final String ICON_MINUS = "<i class=\"icon-minus\"></i>";
 
     @Inject
     private DataService dataService;
@@ -197,11 +200,11 @@ public class ViewService {
 
         if (previousPlace > 0) {
             if (currentPlace < previousPlace) {
-                trend = "<i class=\"icon-arrow-up icon-green\"></i>" + " (" + previousPlace + ")";
+                trend = ICON_ARROW_GREEN + " (" + previousPlace + ")";
             } else if (currentPlace > previousPlace) {
-                trend = "<i class=\"icon-arrow-down icon-red\"></i>" + " (" + previousPlace + ")";
+                trend = ICON_ARROW_RED + " (" + previousPlace + ")";
             } else {
-                trend = "<i class=\"icon-minus\"></i>" + " (" + previousPlace + ")";
+                trend = ICON_MINUS + " (" + previousPlace + ")";
             }
         }
 
@@ -215,11 +218,11 @@ public class ViewService {
 
         if (previousPlace > 0) {
             if (currentPlace < previousPlace) {
-                trend = "<i class=\"icon-arrow-up icon-green\"></i>" + " (" + previousPlace + ")";
+                trend = ICON_ARROW_GREEN + " (" + previousPlace + ")";
             } else if (currentPlace > previousPlace) {
-                trend = "<i class=\"icon-arrow-down icon-red\"></i>" + " (" + previousPlace + ")";
+                trend = ICON_ARROW_RED + " (" + previousPlace + ")";
             } else {
-                trend = "<i class=\"icon-minus\"></i>" + " (" + previousPlace + ")";
+                trend = ICON_MINUS + " (" + previousPlace + ")";
             }
         }
 

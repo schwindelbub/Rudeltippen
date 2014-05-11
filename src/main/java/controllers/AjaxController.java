@@ -32,6 +32,7 @@ import filters.AuthorizationFilter;
 @FilterWith(AuthorizationFilter.class)
 public class AjaxController extends RootController {
     private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
+    private static final String VALUE = "value";
 
     @Inject
     private DataService dataService;
@@ -39,7 +40,7 @@ public class AjaxController extends RootController {
     public Result webserviceid(@PathParam("gameId") String gameId, Context context) {
         Game game = dataService.findGameById(gameId);
         if (game != null) {
-            final String webserviceID = context.getParameter("value");
+            final String webserviceID = context.getParameter(VALUE);
             if (StringUtils.isNotBlank(webserviceID)) {
                 game.setWebserviceID(webserviceID);
                 dataService.save(game);
@@ -53,7 +54,7 @@ public class AjaxController extends RootController {
     public Result kickoff(@PathParam("gameId") String gameId, Context context) {
         Game game = dataService.findGameById(gameId);
         if (game != null) {
-            final String kickoff = context.getParameter("value");
+            final String kickoff = context.getParameter(VALUE);
             if (StringUtils.isNotBlank(kickoff)) {
                 try {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy - HH:mm", Locale.ENGLISH);
@@ -73,7 +74,7 @@ public class AjaxController extends RootController {
     public Result place(@PathParam("teamId") String teamId, Context context) {
         Team team = dataService.findTeamById(teamId);
         if (team != null) {
-            final String place = context.getParameter("value");
+            final String place = context.getParameter(VALUE);
             if (StringUtils.isNotBlank(place)) {
                 team.setPlace(Integer.valueOf(place));
                 dataService.save(team);

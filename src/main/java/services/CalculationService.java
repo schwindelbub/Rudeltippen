@@ -143,7 +143,7 @@ public class CalculationService {
                 if (extraTip != null) {
                     final Team bonusAnswer = extra.getAnswer();
                     final Team userAnswer = extraTip.getAnswer();
-                    if ((bonusAnswer != null) && (userAnswer != null) && bonusAnswer.equals(userAnswer)) {
+                    if (bonusAnswer != null && userAnswer != null && bonusAnswer.equals(userAnswer)) {
                         final int bPoints = extra.getPoints();
                         extraTip.setPoints(bPoints);
                         correctExtraTips++;

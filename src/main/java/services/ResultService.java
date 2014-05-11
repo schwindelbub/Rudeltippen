@@ -36,13 +36,14 @@ import com.google.inject.Singleton;
 @Singleton
 public class ResultService {
     private static final Logger LOG = LoggerFactory.getLogger(ResultService.class);
+    private static final String MATCH_IS_FINISHED = "matchIsFinished";
 
     @Inject
     private MailService mailService;
 
     @Inject
     private DataService dataService;
-    
+
     @Inject
     private NinjaProperties ninjaProperties;
 
@@ -52,8 +53,8 @@ public class ResultService {
         final String matchID = game.getWebserviceID();
         if (StringUtils.isNotBlank(matchID)) {
             final Document document = getDocumentFromWebService(matchID);
-            if ((document != null) && (document.getElementsByTagName("matchIsFinished").getLength() > 0)) {
-                final String matchIsFinished = document.getElementsByTagName("matchIsFinished").item(0).getTextContent();
+            if ((document != null) && (document.getElementsByTagName(MATCH_IS_FINISHED).getLength() > 0)) {
+                final String matchIsFinished = document.getElementsByTagName(MATCH_IS_FINISHED).item(0).getTextContent();
                 if (("true").equalsIgnoreCase(matchIsFinished)) {
                     wsResults = getEndResult(wsResults, document);
                     wsResults.setUpdated(true);
@@ -76,13 +77,13 @@ public class ResultService {
         Document document = null;
         try {
             HttpResponse httpResponse = Request
-                .Post(Constants.WS_URL.value())
-                .setHeader("Content-Type", Constants.WS_COTENT_TYPE.value())
-                .setHeader("charset", Constants.DEFAULT_ENCODING.value())
-                .bodyString(buffer.toString(), ContentType.TEXT_XML)
-                .execute()
-                .returnResponse();
-            
+                    .Post(Constants.WS_URL.value())
+                    .setHeader("Content-Type", Constants.WS_COTENT_TYPE.value())
+                    .setHeader("charset", Constants.DEFAULT_ENCODING.value())
+                    .bodyString(buffer.toString(), ContentType.TEXT_XML)
+                    .execute()
+                    .returnResponse();
+
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             document = builder.parse(httpResponse.getEntity().getContent());
         } catch (final Exception e) {
@@ -90,10 +91,10 @@ public class ResultService {
             for (final User user : users) {
                 mailService.error(e.getMessage(), user.getEmail());
             }
-            
+
             LOG.error("Updating of results from WebService failed", e);
         }
-        
+
         return document;
     }
 
@@ -130,7 +131,7 @@ public class ResultService {
 
         return wsResults;
     }
-    
+
 
     public int getTipPoints(final int homeScore, final int awayScore, final int homeScoreTipp, final int awayScoreTipp) {
         final Settings settings = dataService.findSettings();
@@ -196,14 +197,14 @@ public class ResultService {
 
         return points;
     }
-    
+
     public boolean isJobInstance() {
         boolean isInstance = false;
         final String jobInstance = ninjaProperties.get("rudeltippen.jobinstance");
         if (("true").equalsIgnoreCase(jobInstance)) {
             isInstance = true;
         }
-    
+
         return isInstance;
     }
 }

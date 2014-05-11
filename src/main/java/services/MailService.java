@@ -31,6 +31,10 @@ import com.google.inject.Singleton;
 @Singleton
 public class MailService {
     private static final Logger LOG = LoggerFactory.getLogger(MailService.class);
+    private static final String MESSAGE = "message";
+    private static final String SETTINGS = "settings";
+    private static final String GAMES = "games";
+    private static final String I18N = "i18n";
 
     @Inject
     private Provider<Mail> mailProvider;
@@ -62,9 +66,9 @@ public class MailService {
 
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("user", user);
-            content.put("games", games);
-            content.put("i18n", i18nService);
-            content.put("settings", settings);
+            content.put(GAMES, games);
+            content.put(I18N, i18nService);
+            content.put(SETTINGS, settings);
             content.put("extras", extras);
             mail.setBodyHtml(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "reminder.ftl", content));
 
@@ -102,11 +106,11 @@ public class MailService {
             Mail mail = getMailInstance(settings, user.getEmail(), StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + subject));
 
             Map<String, Object> content = new HashMap<String, Object>();
-            content.put("i18n", i18nService);
+            content.put(I18N, i18nService);
             content.put("appUrl", ninjaProperties.get("rudeltippen.url"));
             content.put("user", user);
             content.put("token", token);
-            content.put("message", message);
+            content.put(MESSAGE, message);
             mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "confirm.ftl", content));
 
             try {
@@ -126,8 +130,8 @@ public class MailService {
 
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("user", user);
-            content.put("i18n", i18nService);
-            content.put("settings", settings);
+            content.put(I18N, i18nService);
+            content.put(SETTINGS, settings);
             mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "newuser.ftl", content));
 
             try {
@@ -148,7 +152,7 @@ public class MailService {
 
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("response", response);
-            content.put("i18n", i18nService);
+            content.put(I18N, i18nService);
             mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "error.ftl", content));
 
             try {
@@ -189,8 +193,8 @@ public class MailService {
             Mail mail = getMailInstance(settings, user.getEmail(), StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + i18nService.get("overview")));
 
             Map<String, Object> content = new HashMap<String, Object>();
-            content.put("i18n", i18nService);
-            content.put("games", games);
+            content.put(I18N, i18nService);
+            content.put(GAMES, games);
             content.put("user", user);
             mail.setBodyHtml(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "gametips.ftl", content));
 
@@ -211,7 +215,7 @@ public class MailService {
             Mail mail = getMailInstance(settings, recipient, StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + subject));
 
             Map<String, Object> content = new HashMap<String, Object>();
-            content.put("message", message);
+            content.put(MESSAGE, message);
             mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "rudelmail.ftl", content));
             mail.addBcc(bbcRecipients);
 

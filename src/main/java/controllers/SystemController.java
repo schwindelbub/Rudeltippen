@@ -34,6 +34,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class SystemController {
     private static final Logger LOG = LoggerFactory.getLogger(SystemController.class);
+    private static final String ADMIN = "admin";
 
     @Inject
     private DataService dataService;
@@ -98,8 +99,8 @@ public class SystemController {
             final String salt = DigestUtils.sha512Hex(UUID.randomUUID().toString());
             user.setSalt(salt);
             user.setEmail("admin@foo.bar");
-            user.setUsername("admin");
-            user.setUserpass(authService.hashPassword("admin", salt));
+            user.setUsername(ADMIN);
+            user.setUserpass(authService.hashPassword(ADMIN, salt));
             user.setRegistered(new Date());
             user.setExtraPoints(0);
             user.setTipPoints(0);
