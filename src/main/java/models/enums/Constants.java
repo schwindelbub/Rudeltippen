@@ -19,6 +19,7 @@ public enum Constants {
     USERNAME("username"),
     COOKIENAME("rudelremember"),
     MEDIAFOLDER("src/main/java/assets/media/"),
+    MAILFOLDER("src/main/java/views/mails/"),
     GAMETIPJOB("GameTipJob"),
     KICKOFFJOB("KickoffJob"),
     REMINDERJOB("ReminderJob"),

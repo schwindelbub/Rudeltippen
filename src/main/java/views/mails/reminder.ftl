@@ -4,19 +4,19 @@
     <meta charset="UTF-8" />
 </head>
 <body>
-	<p>&{'hello'} ${user.username}!</p>
-	<p>&{'mail.placetips'}</p>
+	<p>${i18n.get('hello')} ${user.username}!</p>
+	<p>${i18n.get('mail.placetips')}</p>
 	<table>
 		<tr>
-			<td><strong>&{'mail.games'}</strong></td>
+			<td><strong>${i18n.get('mail.games')}</strong></td>
 		</tr>
 		<#if games??>
 			<#list games as game>
 				<tr>
-					<td>${game.homeTeam.name} - ${game.awayTeam.name}</td>
+					<td>${i18n.get(game.homeTeam.name)} - ${i18n.get(game.awayTeam.name)}</td>
 				</tr>
 				<tr>
-					<td>&{'mail.tipto'}: ${game.tippEnding.formatted()}</td>
+					<td>${i18n.get('mail.tipto')}: ${game.tippEnding.formatted()}</td>
 				</tr>
 				<#if game_has_next>
 					<tr>
@@ -26,22 +26,22 @@
 			</#list>
 		<#else>
 			<tr>
-				<td>&{'mail.nogames'}</td>
+				<td>${i18n.get('mail.nogames')}</td>
 			</tr>
 		</#if>
 	</table>
 	<br /><br />
 	<table>
 		<tr>
-			<td><strong>&{'extratips'}</strong></td>
+			<td><strong>${i18n.get('extratips')}</strong></td>
 		</tr>
 		<#if extras??>
 		<#list extras as extra>
 			<tr>
-				<td>${extra.question}</td>
+				<td>${i18n.get('extra.question')}</td>
 			</tr>
 			<tr>
-				<td>&{'mail.tipto'}: ${extra.ending?datetime}</td>
+				<td>${i18n.get('mail.tipto')}: ${extra.ending?datetime}</td>
 			</tr>
 			<#if extra_has_next>
 				<tr>
@@ -51,7 +51,7 @@
 		</#list>
 		<#else>
 			<tr>
-				<td>&{'mail.noextras'}</td>
+				<td>${i18n.get('mail.noextras')}</td>
 			</tr>
 		</#if>
 	</table>

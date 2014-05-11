@@ -1,6 +1,8 @@
 package services;
 
-import java.awt.Graphics2D;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,7 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.FileImageOutputStream;
 
 import models.Bracket;
 import models.Extra;
@@ -174,25 +180,65 @@ public class CommonService extends ViewService {
         return pagination;
     }
 
-    public BufferedImage resizeImage(File file, int width, int height){
-        BufferedImage originalImage = null;
+    public void resizeImage(File originalImage, File to, int w, int h, boolean keepRatio) {
         try {
-            originalImage = ImageIO.read(file);
-        } catch (IOException e) {
-            LOG.error("Failed to read image for resizing", e);
+            BufferedImage source = ImageIO.read(originalImage);
+            int owidth = source.getWidth();
+            int oheight = source.getHeight();
+            double ratio = (double) owidth / oheight;
+
+            int maxWidth = w;
+            int maxHeight = h;
+
+            if (w < 0 && h < 0) {
+                w = owidth;
+                h = oheight;
+            }
+            if (w < 0 && h > 0) {
+                w = (int) (h * ratio);
+            }
+            if (w > 0 && h < 0) {
+                h = (int) (w / ratio);
+            }
+
+            if(keepRatio) {
+                h = (int) (w / ratio);
+                if(h > maxHeight) {
+                    h = maxHeight;
+                    w = (int) (h * ratio);
+                }
+                if(w > maxWidth) {
+                    w = maxWidth;
+                    h = (int) (w / ratio);
+                }
+            }
+
+            String mimeType = "image/jpeg";
+            if (to.getName().endsWith(".png")) {
+                mimeType = "image/png";
+            }
+            if (to.getName().endsWith(".gif")) {
+                mimeType = "image/gif";
+            }
+
+            BufferedImage dest = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+            Image srcSized = source.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+            Graphics graphics = dest.getGraphics();
+            graphics.setColor(Color.WHITE);
+            graphics.fillRect(0, 0, w, h);
+            graphics.drawImage(srcSized, 0, 0, null);
+            ImageWriter writer = ImageIO.getImageWritersByMIMEType(mimeType).next();
+            ImageWriteParam params = writer.getDefaultWriteParam();
+            FileImageOutputStream toFs = new FileImageOutputStream(to);
+            writer.setOutput(toFs);
+            IIOImage image = new IIOImage(dest, null, null);
+            writer.write(null, image, params);
+            toFs.flush();
+            toFs.close();
+            writer.dispose();
+        } catch (Exception e) {
+            LOG.error("Failed to resize image", e);
         }
-
-        BufferedImage resizedImage = null;
-        if (originalImage != null) {
-            int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
-
-            resizedImage = new BufferedImage(width, height, type);
-            Graphics2D graphics2D = resizedImage.createGraphics();
-            graphics2D.drawImage(originalImage, 0, 0, width, height, null);
-            graphics2D.dispose();
-        }
-
-        return resizedImage;
     }
 
     public Map<String, String> convertParamaters(Map<String, String[]> parameters) {

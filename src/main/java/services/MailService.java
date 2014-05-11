@@ -9,6 +9,7 @@ import models.Game;
 import models.Settings;
 import models.User;
 import models.enums.ConfirmationType;
+import models.enums.Constants;
 import ninja.postoffice.Mail;
 import ninja.postoffice.Postoffice;
 import ninja.utils.NinjaProperties;
@@ -62,9 +63,10 @@ public class MailService {
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("user", user);
             content.put("games", games);
+            content.put("i18n", i18nService);
             content.put("settings", settings);
             content.put("extras", extras);
-            mail.setBodyHtml(commonService.getProcessedTemplate("/src/main/java/view/mails/reminder.ftl", content));
+            mail.setBodyHtml(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "reminder.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -100,10 +102,12 @@ public class MailService {
             Mail mail = getMailInstance(settings, user.getEmail(), StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + subject));
 
             Map<String, Object> content = new HashMap<String, Object>();
+            content.put("i18n", i18nService);
+            content.put("appUrl", ninjaProperties.get("rudeltippen.url"));
             content.put("user", user);
             content.put("token", token);
             content.put("message", message);
-            mail.setBodyText(commonService.getProcessedTemplate("/src/main/java/view/mails/confirm.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "confirm.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -122,8 +126,9 @@ public class MailService {
 
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("user", user);
+            content.put("i18n", i18nService);
             content.put("settings", settings);
-            mail.setBodyText(commonService.getProcessedTemplate("/src/main/java/view/mails/newuser.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "newuser.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -143,7 +148,8 @@ public class MailService {
 
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("response", response);
-            mail.setBodyText(commonService.getProcessedTemplate("/src/main/java/view/mails/error.ftl", content));
+            content.put("i18n", i18nService);
+            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "error.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -164,7 +170,7 @@ public class MailService {
 
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("notification", notification);
-            mail.setBodyText(commonService.getProcessedTemplate("/src/main/java/view/mails/notification.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "notification.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -183,9 +189,10 @@ public class MailService {
             Mail mail = getMailInstance(settings, user.getEmail(), StringEscapeUtils.unescapeHtml("[" + settings.getGameName() + "] " + i18nService.get("overview")));
 
             Map<String, Object> content = new HashMap<String, Object>();
+            content.put("i18n", i18nService);
             content.put("games", games);
             content.put("user", user);
-            mail.setBodyHtml(commonService.getProcessedTemplate("/src/main/java/view/mails/gametips.ftl", content));
+            mail.setBodyHtml(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "gametips.ftl", content));
 
             try {
                 postoffice.send(mail);
@@ -205,7 +212,7 @@ public class MailService {
 
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("message", message);
-            mail.setBodyText(commonService.getProcessedTemplate("/src/main/java/view/mails/rudelmail.ftl", content));
+            mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.value() + "rudelmail.ftl", content));
             mail.addBcc(bbcRecipients);
 
             try {

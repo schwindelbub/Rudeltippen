@@ -162,10 +162,15 @@ public class ValidationService {
      * @return true if email is valid, false otherwise
      */
     public boolean isValidEmail(final String email) {
+        boolean valid = false;
         final Pattern p = Pattern.compile(Constants.EMAILPATTERN.value());
         final Matcher m = p.matcher(email);
 
-        return m.matches();
+        if (StringUtils.isNotBlank(email) && m.matches()) {
+            valid = true;
+        }
+
+        return valid;
     }
 
     /**

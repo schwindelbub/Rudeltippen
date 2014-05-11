@@ -1,1 +1,1 @@
-&{'mail.footer'}
+${i18n.get('mail.footer')}

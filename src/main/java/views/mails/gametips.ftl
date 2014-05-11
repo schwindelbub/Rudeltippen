@@ -4,17 +4,17 @@
     <meta charset="UTF-8" />
 </head>
 <body>
-	<p>&{'hello'} ${user.username}!</p>
-	<p>&{'mail.gametips'}</p>
+	<p>${i18n.get('hello')} ${user.username}!</p>
+	<p>${i18n.get('mail.gametips')}</p>
 	<table>
 		<#list games as game>
 			<tr>
-				<td colspan="2"><strong>&{game.homeTeam} - &{game.awayTeam}</strong></td>
+				<td colspan="2"><strong>${i18n.get(game.homeTeam)} - ${i18n.get(game.awayTeam)}</strong></td>
 			</tr>
 			<#list game.gameTips as gameTip>
 				<tr>
 					<td>${gameTip.user.username}</td>
-					<td>${gameTip.homeScore.name} : ${gameTip.awayScore.name}</td>
+					<td>${gameTip.homeScore} : ${gameTip.awayScore}</td>
 				</tr>			
 			</#list>
 		</#list>

@@ -1,4 +1,4 @@
-&{'hello'} ${user.username}!
+${i18n.get('hello')} ${user.username}!
 
 ${message}
 

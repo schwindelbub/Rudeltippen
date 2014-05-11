@@ -55,16 +55,16 @@ public class UserController extends RootController {
 
     @Inject
     private MailService mailService;
-    
+
     @Inject
     private I18nService i18nService;
-    
+
     @Inject
     private AuthService authService;
-    
+
     @Inject
     private ValidationService validationService;
-    
+
     @Inject
     private CommonService commonService;
 
@@ -137,6 +137,8 @@ public class UserController extends RootController {
         String username = context.getParameter("username");
 
         if (!validationService.isValidUsername(username)) {
+            flashScope.error(i18nService.get("controller.users.invalidusername"));
+        } else if (validationService.usernameExists(username)) {
             flashScope.error(i18nService.get("controller.users.usernamexists"));
         } else {
             final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
@@ -156,8 +158,12 @@ public class UserController extends RootController {
         String email = context.getParameter("email");
         String emailConfirmation = context.getParameter("emailConfirmation");
 
-        if (!validationService.isValidEmail(email) || !email.equals(emailConfirmation)) {
-            flashScope.error(i18nService.get("controller.users.invalidemail"));
+        if (!validationService.isValidEmail(email)) {
+            flashScope.error(i18nService.get("validation.email.invalid"));
+        } else if (validationService.emailExists(email)) {
+            flashScope.error(i18nService.get("controller.users.emailexists"));
+        } else if (!email.equalsIgnoreCase(emailConfirmation)) {
+            flashScope.error(i18nService.get("validation.email.notmatch"));
         } else {
             final String token = UUID.randomUUID().toString();
             final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
@@ -182,8 +188,10 @@ public class UserController extends RootController {
         String userpass = context.getParameter("userpass");
         String userpassConfirmation = context.getParameter("userpassConfirmation");
 
-        if (validationService.isValidPassword(userpass) || !userpass.equals(userpassConfirmation)) {
+        if (!validationService.isValidPassword(userpass)) {
             flashScope.error(i18nService.get("controller.users.passwordisinvalid"));
+        } else if (!userpass.equals(userpassConfirmation)) {
+            flashScope.error(i18nService.get("validation.password.notmatch"));
         } else {
             final String token = UUID.randomUUID().toString();
             final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
@@ -207,12 +215,12 @@ public class UserController extends RootController {
 
     public Result updatenotifications(Context context, FlashScope flashScope) {
         final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
-        
+
         String reminder = context.getParameter("reminder");
         String notification = context.getParameter("notification");
         String sendstandings = context.getParameter("sendstandings");
         String sendgametips = context.getParameter("sendgametips");
-        
+
         user.setReminder(("1").equals(reminder));
         user.setNotification(("1").equals(notification));
         user.setSendStandings(("1").equals(sendstandings));
@@ -226,9 +234,7 @@ public class UserController extends RootController {
     }
 
     public Result updatepicture(FlashScope flashScope, Context context) {
-        String pictureLargeFilename = UUID.randomUUID().toString() + ".jpg";
-        String pictureSmallFilename = UUID.randomUUID().toString() + ".jpg";
-
+        File upload = new File(Constants.MEDIAFOLDER.value() + UUID.randomUUID().toString());
         if (context.isMultipart()) {
             FileItemIterator fileItemIterator = context.getFileItemIterator();
             try {
@@ -237,26 +243,31 @@ public class UserController extends RootController {
 
                     InputStream inputStream = item.openStream();
                     if (!item.isFormField()) {
-                        IOUtils.copy(inputStream, new FileOutputStream(new File(Constants.MEDIAFOLDER.value() + pictureLargeFilename)));
-                        IOUtils.copy(inputStream, new FileOutputStream(new File(Constants.MEDIAFOLDER.value() + pictureSmallFilename)));
+                        IOUtils.copy(inputStream, new FileOutputStream(upload));
                     }
                 }
             } catch (Exception e) {
                 LOG.error("Failed to upload user picture", e);
             }
         }
-        
-        final User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
-        
+
+        String pictureLargeFilename = UUID.randomUUID().toString() + ".jpg";
+        String pictureSmallFilename = UUID.randomUUID().toString() + ".jpg";
+
         File pictureSmall = new File(Constants.MEDIAFOLDER.value() + pictureSmallFilename);
         File pictureLarge = new File(Constants.MEDIAFOLDER.value() + pictureLargeFilename);
 
-        commonService.resizeImage(pictureSmall, 64, 64);
-        commonService.resizeImage(pictureLarge, 128, 128);
-        
+        commonService.resizeImage(upload, pictureSmall, 64, 64, true);
+        commonService.resizeImage(upload, pictureLarge, 256, 256, true);
+
+        User user = context.getAttribute(Constants.CONNECTEDUSER.value(), User.class);
         user.setPicture(pictureSmallFilename);
         user.setPictureLarge(pictureLargeFilename);
         dataService.save(user);
+
+        if (!upload.delete()) {
+            LOG.error("Failed to delete uploaded file after upload");
+        }
 
         flashScope.success(i18nService.get("controller.profile.updatepicture"));
         LOG.info("Picture updated: " + user.getEmail());
