@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import services.DataService;
+import services.I18nService;
 
 import com.google.inject.Inject;
 
@@ -40,6 +41,10 @@ import com.google.inject.Inject;
 @Singleton
 public class StartupActions {
     private static final Logger LOG = LoggerFactory.getLogger(StartupActions.class);
+    private static final String RESULTSCRON = "0 */4 * * * ?";
+    private static final String REMINDERCRON = "0 0 */1 * * ?";
+    private static final String KICKOFFCRON = "0 0 4 * * ?";
+    private static final String GAMETIPCRON = "0 */1 * * * ?";
     private static final String TRIGGER_GROUP = "triggerGroup";
     private static final String JOB_GROUP = "jobGroup";
 
@@ -48,6 +53,9 @@ public class StartupActions {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private I18nService i18nService;
 
     @Start(order=100)
     public void startup() {
@@ -60,18 +68,15 @@ public class StartupActions {
     }
 
     private void initJobs() {
-        List<String> jobNames = new ArrayList<String>();
-        jobNames.add(Constants.GAMETIPJOB.get());
-        jobNames.add(Constants.KICKOFFJOB.get());
-        jobNames.add(Constants.REMINDERJOB.get());
-        jobNames.add(Constants.RESULTJOB.get());
+        List<AbstractJob> abstractJobs = new ArrayList<AbstractJob>();
+        abstractJobs.add(new AbstractJob(Constants.GAMETIPJOB.get(), i18nService.get("job.gametipjob.executed"), i18nService.get("job.gametipjob.description")));
+        abstractJobs.add(new AbstractJob(Constants.KICKOFFJOB.get(), i18nService.get("job.playdayjob.executed"), i18nService.get("job.playdayjob.description")));
+        abstractJobs.add(new AbstractJob(Constants.REMINDERJOB.get(), i18nService.get("job.reminderjob.executed"), i18nService.get("job.reminderjob.description")));
+        abstractJobs.add(new AbstractJob(Constants.RESULTJOB.get(), i18nService.get("job.resultsjob.executed"), i18nService.get("job.resultsjob.descrption")));
 
-        for (String jobName : jobNames) {
-            AbstractJob abstractJob = dataService.findAbstractJobByName(jobName);
-            if (abstractJob == null) {
-                abstractJob = new AbstractJob();
-                abstractJob.setActive(true);
-                abstractJob.setName(jobName);
+        for (AbstractJob abstractJob : abstractJobs) {
+            AbstractJob job = dataService.findAbstractJobByName(abstractJob.getName());
+            if (job == null) {
                 dataService.save(abstractJob);
             }
         }
@@ -89,10 +94,10 @@ public class StartupActions {
         if (scheduler != null) {
             try {
                 scheduler.setJobFactory(appJobFactory);
-                scheduler.scheduleJob(getJobDetail(GameTipJob.class, Constants.GAMETIPJOB.get()), getTrigger("gameTipJobTrigger", "0 */1 * * * ?"));
-                scheduler.scheduleJob(getJobDetail(KickoffJob.class, Constants.KICKOFFJOB.get()), getTrigger("kickoffJobTrigger", "0 0 4 * * ?"));
-                scheduler.scheduleJob(getJobDetail(ReminderJob.class, Constants.REMINDERJOB.get()), getTrigger("reminderJobTrigger", "0 0 */1 * * ?"));
-                scheduler.scheduleJob(getJobDetail(ResultJob.class, Constants.RESULTJOB.get()), getTrigger("resultsJobTrigger", "0 */4 * * * ?"));
+                scheduler.scheduleJob(getJobDetail(GameTipJob.class, Constants.GAMETIPJOB.get()), getTrigger("gameTipJobTrigger", GAMETIPCRON));
+                scheduler.scheduleJob(getJobDetail(KickoffJob.class, Constants.KICKOFFJOB.get()), getTrigger("kickoffJobTrigger", KICKOFFCRON));
+                scheduler.scheduleJob(getJobDetail(ReminderJob.class, Constants.REMINDERJOB.get()), getTrigger("reminderJobTrigger", REMINDERCRON));
+                scheduler.scheduleJob(getJobDetail(ResultJob.class, Constants.RESULTJOB.get()), getTrigger("resultsJobTrigger", RESULTSCRON));
 
                 scheduler.start();
 

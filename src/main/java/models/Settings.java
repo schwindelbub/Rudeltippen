@@ -33,7 +33,6 @@ public class Settings implements Serializable {
 
     private boolean informOnNewTipper;
     private boolean playoffs;
-    private boolean countFinalResult;
     private boolean enableRegistration;
     
     public ObjectId getId() {
@@ -134,14 +133,6 @@ public class Settings implements Serializable {
 
     public void setPlayoffs(final boolean playoffs) {
         this.playoffs = playoffs;
-    }
-
-    public boolean isCountFinalResult() {
-        return countFinalResult;
-    }
-
-    public void setCountFinalResult(final boolean countFinalResult) {
-        this.countFinalResult = countFinalResult;
     }
 
     public boolean isEnableRegistration() {

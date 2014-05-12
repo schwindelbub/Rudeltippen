@@ -215,17 +215,20 @@ public class CommonService extends ViewService {
                 }
             }
 
-            String mimeType = "image/jpeg";
-            if (targetImage.getName().endsWith(".png")) {
-                mimeType = "image/png";
-            }
-            if (targetImage.getName().endsWith(".gif")) {
-                mimeType = "image/gif";
-            }
-
             BufferedImage bufferedImage = doResize(width, height, source);
-            writeResizedImage(targetImage, mimeType, bufferedImage);
+            writeResizedImage(targetImage, getMimeType(targetImage), bufferedImage);
         }
+    }
+
+    private String getMimeType(File targetImage) {
+        String mimeType = "image/jpeg";
+        if (targetImage.getName().endsWith(".png")) {
+            mimeType = "image/png";
+        }
+        if (targetImage.getName().endsWith(".gif")) {
+            mimeType = "image/gif";
+        }
+        return mimeType;
     }
 
     private BufferedImage doResize(int width, int height, BufferedImage source) {
@@ -524,7 +527,7 @@ public class CommonService extends ViewService {
             }
 
             if (("G").equals(references[0])) {
-                final Game game = dataService.findGameByNumber(references[1]);
+                final Game game = dataService.findGameByNumber(Integer.valueOf(references[1]));
                 if (game != null && game.isEnded()) {
                     if (("W").equals(references[2])) {
                         team = getWinner(game);

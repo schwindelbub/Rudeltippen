@@ -1,5 +1,6 @@
 package jobs;
 
+import java.util.Date;
 import java.util.List;
 
 import models.AbstractJob;
@@ -51,6 +52,9 @@ public class ResultJob implements Job {
                 for (final Game game : games) {
                     setGameScore(game);
                 }
+                
+                job.setExecuted(new Date());
+                dataService.save(job);
                 LOG.info("Finished Job: " + Constants.RESULTJOB.get());
             }
         }

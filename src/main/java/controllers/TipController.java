@@ -90,8 +90,8 @@ public class TipController extends RootController {
                 final String awayScore = map.get(GAME + key + AWAY_SCORE);
 
                 final Game game = dataService.findGameById(key);
-
-                if (!validationService.isValidScore(homeScore, awayScore) && game != null) {
+                
+                if (validationService.isValidScore(homeScore, awayScore) && game != null) {
                     dataService.saveGameTip(game, Integer.parseInt(homeScore), Integer.parseInt(awayScore), context.getAttribute(Constants.CONNECTEDUSER.get(), User.class));
                     keys.add(key);
                     tipped++;

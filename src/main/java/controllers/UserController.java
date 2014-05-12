@@ -173,7 +173,7 @@ public class UserController extends RootController {
             if (user != null) {
                 final ConfirmationType confirmationType = ConfirmationType.CHANGEUSERNAME;
                 final Confirmation confirmation = new Confirmation();
-                confirmation.setConfirmType(confirmationType);
+                confirmation.setConfirmationType(confirmationType);
                 confirmation.setConfirmValue(authService.encryptAES(email));
                 confirmation.setCreated(new Date());
                 confirmation.setToken(token);
@@ -201,7 +201,7 @@ public class UserController extends RootController {
             if (user != null) {
                 final ConfirmationType confirmationType = ConfirmationType.CHANGEUSERPASS;
                 final Confirmation confirm = new Confirmation();
-                confirm.setConfirmType(confirmationType);
+                confirm.setConfirmationType(confirmationType);
                 confirm.setConfirmValue(authService.encryptAES(authService.hashPassword(userpass, user.getSalt())));
                 confirm.setCreated(new Date());
                 confirm.setToken(token);

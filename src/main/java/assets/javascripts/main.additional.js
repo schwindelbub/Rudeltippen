@@ -30,12 +30,12 @@ $(document).ready(function(){
        					iosOverlay({
 		        			text: "Saved!",
 		        			duration: 2e3,
-		        			icon: "/public/img/check.png"
+		        			icon: "/assets/img/check.png"
 		        		});
         			}	
         		}
         	);
-        	$(".updateable").click(function() {
+        	$(".updatable").click(function() {
         		var url = $(this).attr("data-url");
         		if (url != null) {
         			$.get(url)
@@ -43,14 +43,14 @@ $(document).ready(function(){
         				iosOverlay({
 			        		text: "Saved!",
 			        		duration: 2e3,
-			        		icon: "/public/img/check.png"
+			        		icon: "/assets/img/check.png"
 			        	});
         			})
         			.fail(function() {
         				iosOverlay({
 			        		text: "Error!",
 			        		duration: 2e3,
-			        		icon: "/public/img/cross.png"
+			        		icon: "/assets/img/cross.png"
 			        	});
         			});
         		}

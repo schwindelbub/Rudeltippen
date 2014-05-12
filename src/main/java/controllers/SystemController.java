@@ -69,7 +69,6 @@ public class SystemController {
                 LOG.error("Failed while trying to sleep in system/init", e);
             }
 
-            dataService.dropDatabase();
             importService.loadInitialData();
 
             final List<Game> prePlayoffGames = dataService.findAllNonPlayoffGames();

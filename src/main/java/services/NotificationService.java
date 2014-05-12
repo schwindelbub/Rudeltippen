@@ -36,7 +36,7 @@ public class NotificationService {
      */
     public String getEmailNotificationMessage(final User user, final Game game) {
         final StringBuilder buffer = new StringBuilder();
-        final GameTip gameTip = dataService.findGameTipByGameAndUser(user, game);
+        final GameTip gameTip = dataService.findGameTipByGameAndUser(game, user);
 
         buffer.append(i18nService.get("helper.tweetscore"));
         buffer.append(" ");

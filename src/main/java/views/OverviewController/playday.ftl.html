@@ -47,22 +47,22 @@
 				<tbody>
 					<#list tips as userTips>
 					<tr>
-						<#if (userTips.entrySet())??>
-							<#list userTips.entrySet() as user>
-								<#if user.key.picture == null>
-									<td style="width: 60px;"><a href="/users/show/${user.key.username}"><img src="/assets/img/user_placeholder.gif" width="54" height="54" /></a></td>
-								<#else>
-									<td style="width: 60px;"><a href="/users/show//${user.key.username}"><img src="${user.key.picture}" /></a></td>
-								</#if>
-									<td style="vertical-align: top;"><b><a href="/users/show/${user.key.username}">${user.key.username}</a></b><br /><small>&{'place'} ${user.key.place}, ${user.key.points} &{'points'}</small></td>
-								points = 0
-								<#list user.value as gameTip>
-									<td style="vertical-align: middle;"><div align="center">${gameTip.getGameTipAndPoints()}</div></td>
-									points = points + gameTip.points
+						<#list userTips?keys as user>
+							<#if (user.picture)??>
+								<td style="width: 60px;"><a href="/users/show/${user.username}"><img src="/assets/img/user_placeholder.gif" width="54" height="54" /></a></td>
+							<#else>
+								<td style="width: 60px;"><a href="/users/show//${user.username}"><img src="/assets/media/${user.picture}" /></a></td>
+							</#if>
+								<td style="vertical-align: top;"><b><a href="/users/show/${user.username}">${user.username}</a></b><br /><small>${i18n('place')} ${user.place}, ${user.points} ${i18n('points')}</small></td>
+							<#assign points = 0>
+							<#list userTips?values as gameTips>
+								<#list gameTips as gameTip>
+									<td style="vertical-align: middle;"><div align="center">${ViewService.getGameTipAndPoints(gameTip, user)}</div></td>
+									<#assign points = points + gameTip.points>
 								</#list>
-								<td style="vertical-align: middle;"><div align="center">out.print(points);</div></td>
 							</#list>
-						</#if>
+							<td style="vertical-align: middle;"><div align="center">${points}</div></td>
+						</#list>
 					</tr>
 					</#list>
 				</tbody>

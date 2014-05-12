@@ -83,11 +83,11 @@ public class AdminController extends RootController {
         final Pagination pagination = commonService.getPagination(number, ADMIN_RESULTS, dataService.findAllPlaydaysOrderByNumber().size());
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
 
-        return Results.html().render(playday).render(pagination);
+        return Results.html().render("playday", playday).render("pagination", pagination);
     }
 
     public Result users() {
-        final List<User> users = dataService.findUsersOrderByUsername();
+        final List<User> users = dataService.findAllUsers();
         return Results.html().render("users", users);
     }
 
@@ -107,6 +107,23 @@ public class AdminController extends RootController {
             }
         }
 
+        String gamekey = setGameScore(map, keys);
+        int playday = 1;
+        if (keys != null && !keys.isEmpty() && StringUtils.isNotBlank(gamekey)) {
+            gamekey = gamekey.replace("_et", "");
+            final Game game = dataService.findGameById(gamekey);
+            if (game != null && game.getPlayday() != null) {
+                playday = game.getPlayday().getNumber();
+            }
+        }
+
+        calculationService.calculations();
+        flashScope.success(i18nService.get("controller.games.tippsstored"));
+        
+        return Results.redirect(ADMIN_RESULTS + playday);
+    }
+
+    private String setGameScore(final Map<String, String> map, final Set<String> keys) {
         String gamekey = null;
         for (final String key : keys) {
             gamekey = key;
@@ -117,20 +134,8 @@ public class AdminController extends RootController {
             final String awayScoreExtratime = map.get(GAME + key + AWAY_SCORE_ET);
             calculationService.setGameScore(key, homeScore, awayScore, extratime, homeScoreExtratime, awayScoreExtratime);
         }
-
-        calculationService.calculations();
-        flashScope.put(Constants.FLASHWARNING.get(), i18nService.get("controller.games.tippsstored", null));
-
-        int playday = 1;
-        if (keys != null && !keys.isEmpty() && StringUtils.isNotBlank(gamekey)) {
-            gamekey = gamekey.replace("_et", "");
-            final Game game = dataService.findGameById(gamekey);
-            if ((game != null) && (game.getPlayday() != null)) {
-                playday = game.getPlayday().getNumber();
-            }
-        }
-
-        return Results.redirect(ADMIN_RESULTS + playday);
+        
+        return gamekey;
     }
 
     public Result updatesettings (FlashScope flashScope, @JSR303Validation SettingsDTO settingsDTO, Validation validation) {
@@ -144,14 +149,13 @@ public class AdminController extends RootController {
             settings.setPointsTipTrend(settingsDTO.pointsTipTrend);
             settings.setMinutesBeforeTip(settingsDTO.minutesBeforeTip);
             settings.setInformOnNewTipper(settingsDTO.informOnNewTipper);
-            settings.setCountFinalResult(settingsDTO.countFinalResult);
             settings.setEnableRegistration(settingsDTO.enableRegistration);
             dataService.save(settings);
 
             flashScope.success(i18nService.get("setup.saved"));
         }
 
-        return Results.redirect("/settings");
+        return Results.redirect("/admin/settings");
     }
 
     public Result settings(FlashScope flashScope) {
@@ -163,7 +167,6 @@ public class AdminController extends RootController {
         flashScope.put("pointsTipTrend", settings.getPointsTipTrend());
         flashScope.put("minutesBeforeTip", settings.getMinutesBeforeTip());
         flashScope.put("informOnNewTipper", settings.isInformOnNewTipper());
-        flashScope.put("countFinalResult", settings.isCountFinalResult());
         flashScope.put("enableRegistration", settings.isEnableRegistration());
 
         return Results.html().render(settings);
@@ -234,20 +237,18 @@ public class AdminController extends RootController {
     }
 
     public Result deleteuser(@PathParam("userid") String userId, FlashScope flashScope, Context context) {
-        final User connectedUser = context.getAttribute("conntectedUser", User.class);
+        final User connectedUser = context.getAttribute("connectedUser", User.class);
         final User user = dataService.findUserById(userId);
 
-        if (user != null) {
-            if (!connectedUser.equals(user)) {
-                final String username = user.getEmail();
-                dataService.delete(user);
-                flashScope.success(i18nService.get("info.delete.user", new Object[]{username}));
-                LOG.info("User " + username + " deleted - by " + connectedUser.getEmail());
+        if (user != null && !user.equals(connectedUser)) {
+            final String username = user.getEmail();
+            dataService.deleteConfirmationsByUser(user);
+            dataService.delete(user);
+            
+            flashScope.success(i18nService.get("info.delete.user", new Object[]{username}));
+            LOG.info("User " + username + " deleted - by " + connectedUser.getEmail());
 
-                calculationService.calculations();
-            } else {
-                flashScope.put(Constants.FLASHWARNING.get(), i18nService.get("warning.delete.user"));
-            }
+            calculationService.calculations();
         } else {
             flashScope.error(i18nService.get(ERROR_LOADING_USER));
         }
@@ -290,7 +291,7 @@ public class AdminController extends RootController {
         return Results.redirect("/rudelmail");
     }
 
-    public Result jobstatus(final String name) {
+    public Result jobstatus(@PathParam("name") String name) {
         if (StringUtils.isNotBlank(name)) {
             AbstractJob abstractJob = dataService.findAbstractJobByName(name);
             abstractJob.setActive(!abstractJob.isActive());
@@ -309,6 +310,6 @@ public class AdminController extends RootController {
     public Result calculations() {
         calculationService.calculations();
 
-        return Results.redirect("/tournament");
+        return Results.redirect("/admin/tournament");
     }
 }

@@ -30,7 +30,7 @@ public class Bracket implements Serializable {
 
     private int number;
 
-    private boolean updateble;
+    private boolean updatable;
 
     public ObjectId getId() {
         return id;
@@ -68,11 +68,11 @@ public class Bracket implements Serializable {
         this.games = games;
     }
 
-    public boolean isUpdateble() {
-        return updateble;
+    public boolean isUpdatable() {
+        return updatable;
     }
 
-    public void setUpdateble(boolean updateble) {
-        this.updateble = updateble;
+    public void setUpdatable(boolean updatable) {
+        this.updatable = updatable;
     }
 }

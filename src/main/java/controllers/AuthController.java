@@ -93,7 +93,7 @@ public class AuthController {
                 final Confirmation confirmation = new Confirmation();
                 confirmation.setUser(user);
                 confirmation.setToken(token);
-                confirmation.setConfirmType(confirmType);
+                confirmation.setConfirmationType(confirmType);
                 confirmation.setConfirmValue(authService.encryptAES(UUID.randomUUID().toString()));
                 confirmation.setCreated(new Date());
                 dataService.save(confirmation);
@@ -119,7 +119,7 @@ public class AuthController {
         if (confirmation != null) {
             final User user = confirmation.getUser();
             if (user != null) {
-                final ConfirmationType confirmationType = confirmation.getConfirmType();
+                final ConfirmationType confirmationType = confirmation.getConfirmationType();
                 if (ConfirmationType.NEWUSERPASS.equals(confirmationType)) {
                     return Results.redirect("/auth/password/" + token);
                 } else {
@@ -198,7 +198,7 @@ public class AuthController {
             final String token = UUID.randomUUID().toString();
             final ConfirmationType confirmationType = ConfirmationType.ACTIVATION;
             final Confirmation confirmation = new Confirmation();
-            confirmation.setConfirmType(confirmationType);
+            confirmation.setConfirmationType(confirmationType);
             confirmation.setConfirmValue(authService.encryptAES(UUID.randomUUID().toString()));
             confirmation.setCreated(new Date());
             confirmation.setToken(token);

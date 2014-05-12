@@ -24,7 +24,7 @@
 			    <tbody>
 			        <#list bracket.teams as team>
 			            <tr>
-			                <td>${team_index + 1} ${ViewService.getPlaceTrend(team)}</td>
+			                <td>${team_index + 1} <#noescape>${ViewService.getPlaceTrend(team)}</#noescape></td>
 		                    <td><img class="flag" src="/assets/img/flags/${team.flag}"/>&nbsp;&nbsp;${i18n(team.name)}</td>
 			                <td>${team.gamesPlayed}</td>
 			                <td>${team.gamesWon}</td>

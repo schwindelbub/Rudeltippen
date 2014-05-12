@@ -1,6 +1,7 @@
 package jobs;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import models.AbstractJob;
@@ -60,7 +61,7 @@ public class ReminderJob implements Job {
                     final List<Extra> reminderBonus = new ArrayList<Extra>();
 
                     for (final Game game : nextGames) {
-                        final GameTip gameTip = dataService.findGameTipByGameAndUser(user, game);
+                        final GameTip gameTip = dataService.findGameTipByGameAndUser(game, user);
                         if (gameTip == null) {
                             reminderGames.add(game);
                         }
@@ -77,6 +78,9 @@ public class ReminderJob implements Job {
                 }
 
                 disableReminder(nextExtras, nextGames);
+                
+                job.setExecuted(new Date());
+                dataService.save(job);
                 LOG.info("Finshed Job: " + Constants.REMINDERJOB.get());
             }
         }

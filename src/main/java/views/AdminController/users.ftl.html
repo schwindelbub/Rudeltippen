@@ -24,7 +24,7 @@
 					<#list users as user>
 						<tr>
 							<#if (user.picture)??>
-								<td><img src="${user.picture}" /></td>
+								<td><img src="/assets/media/${user.picture}" /></td>
 							<#else>
 								<td><img src="/assets/img/user_placeholder.gif" width="54" height="54" /></td>
 							</#if>

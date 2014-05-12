@@ -45,7 +45,7 @@ public class AjaxController extends RootController {
                 game.setWebserviceID(webserviceID);
                 dataService.save(game);
 
-                return Results.ok();
+                return Results.noContent();
             }
         }
         return Results.badRequest();
@@ -59,10 +59,10 @@ public class AjaxController extends RootController {
                 try {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy - HH:mm", Locale.ENGLISH);
                     game.setKickoff(simpleDateFormat.parse(kickoff));
-                    game.setUpdateble(false);
+                    game.setUpdatable(false);
                     dataService.save(game);
 
-                    return Results.ok();
+                    return Results.noContent();
                 } catch (Exception e) {
                     LOG.error("Failed to save kickoff", e);
                 }
@@ -74,39 +74,40 @@ public class AjaxController extends RootController {
     public Result place(@PathParam("teamId") String teamId, Context context) {
         Team team = dataService.findTeamById(teamId);
         if (team != null) {
+            System.out.println("foooo");
             final String place = context.getParameter(VALUE);
             if (StringUtils.isNotBlank(place)) {
                 team.setPlace(Integer.valueOf(place));
                 dataService.save(team);
 
                 Bracket bracket = team.getBracket();
-                bracket.setUpdateble(false);
+                bracket.setUpdatable(false);
                 dataService.save(bracket);
 
-                return Results.ok();
+                return Results.noContent();
             }
         }
         return Results.badRequest();
     }
 
-    public Result updateblegame(@PathParam("gameId") String gameId) {
+    public Result updatablegame(@PathParam("gameId") String gameId) {
         Game game = dataService.findGameById(gameId);
         if (game != null) {
-            game.setUpdateble(!game.isUpdateble());
+            game.setUpdatable(!game.isUpdatable());
             dataService.save(game);
 
-            return Results.ok();
+            return Results.noContent();
         }
         return Results.badRequest();
     }
 
-    public Result updateblebracket(@PathParam("bracketId") String bracketId) {
+    public Result updatablebracket(@PathParam("bracketId") String bracketId) {
         Bracket bracket = dataService.findBracketById(bracketId);
         if (bracket != null) {
-            bracket.setUpdateble(!bracket.isUpdateble());
+            bracket.setUpdatable(!bracket.isUpdatable());
             dataService.save(bracket);
 
-            return Results.ok();
+            return Results.noContent();
         }
         return Results.badRequest();
     }

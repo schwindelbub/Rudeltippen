@@ -8,6 +8,7 @@ import ninja.Filter;
 import ninja.FilterChain;
 import ninja.Result;
 import ninja.Results;
+import ninja.utils.NoHttpBody;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -50,9 +51,11 @@ public class AuthenticationFilter implements Filter {
             context.setAttribute(Constants.CONNECTEDUSER.get(), connectedUser);
 
             Result result = filterChain.next(context);
-            result.render(Constants.CONNECTEDUSER.get(), connectedUser);
-            result.render("ViewService", viewService);
-            result.render("currentPlayday", dataService.findCurrentPlayday());
+            if (result.getRenderable() != null && !(result.getRenderable() instanceof NoHttpBody)) {
+                result.render(Constants.CONNECTEDUSER.get(), connectedUser);
+                result.render("ViewService", viewService);
+                result.render("currentPlayday", dataService.findCurrentPlayday());  
+            }
 
             return result;
         }

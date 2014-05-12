@@ -1,5 +1,6 @@
 package jobs;
 
+import java.util.Date;
 import java.util.List;
 
 import models.AbstractJob;
@@ -61,6 +62,8 @@ public class GameTipJob implements Job {
                     }
                 }
 
+                job.setExecuted(new Date());
+                dataService.save(job);
                 LOG.info("Finished Job: " + Constants.GAMETIPJOB.get());
             }
         }

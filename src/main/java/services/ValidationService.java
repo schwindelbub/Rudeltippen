@@ -115,7 +115,25 @@ public class ValidationService {
     }
 
     public void validateSettingsDTO(SettingsDTO settingsDTO, Validation validation) {
-        // TODO Auto-generated method stub
+        if (StringUtils.isEmpty(settingsDTO.name) || settingsDTO.name.length() <= 3 || settingsDTO.name.length() >= 256) {
+            validation.addBeanViolation(createBeanValidation("name", i18nService.get("validation.settings.invalidname")));
+        }
+        
+        if (settingsDTO.pointsTip <= 0 || settingsDTO.pointsTip >= 100) {
+            validation.addBeanViolation(createBeanValidation("pointsTip", i18nService.get("validation.settings.invalidpointstip")));
+        }
+        
+        if (settingsDTO.pointsTipDiff <= 0 || settingsDTO.pointsTipDiff >= 100) {
+            validation.addBeanViolation(createBeanValidation("pointsTipDiff", i18nService.get("validation.settings.invalidpointstipdiff")));
+        }
+        
+        if (settingsDTO.pointsTipTrend <= 0 || settingsDTO.pointsTipTrend >= 100) {
+            validation.addBeanViolation(createBeanValidation("pointsTipTrend", i18nService.get("validation.settings.invalidpointstiptrend")));
+        }
+        
+        if (settingsDTO.minutesBeforeTip <= 0 || settingsDTO.minutesBeforeTip > 1440) {
+            validation.addBeanViolation(createBeanValidation("minutesBeforeTip", i18nService.get("validation.settings.invalidminutes")));
+        }
     }
 
     /**
@@ -148,7 +166,7 @@ public class ValidationService {
                 home = Integer.parseInt(homeScore);
                 away = Integer.parseInt(awayScore);
 
-                if ((home >= 0) && (home <= 99) && (away >= 0) && (away <= 99)) {
+                if ((home >= 0 && home <= 99) && (away >= 0 && away <= 99)) {
                     valid = true;
                 }
             } catch (final Exception e) {

@@ -11,6 +11,7 @@ import ninja.FilterChain;
 import ninja.Result;
 import ninja.Results;
 import ninja.i18n.Lang;
+import ninja.utils.NoHttpBody;
 
 /**
  * 
@@ -31,8 +32,11 @@ public class AppFilter implements Filter {
     @Override
     public Result filter(FilterChain filterChain, Context context) {
         Result result = filterChain.next(context);
-        lang.setLanguage(i18nService.getDefaultLanguage(), result);
-
+        
+        if (result.getRenderable() != null && !(result.getRenderable() instanceof NoHttpBody)) {
+            lang.setLanguage(i18nService.getDefaultLanguage(), result);
+        }
+        
         if (!dataService.appIsInizialized()) {
             return Results.redirect("/setup");
         }

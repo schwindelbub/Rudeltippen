@@ -146,7 +146,7 @@ public class StatisticService {
         final Settings settings = dataService.findSettings();
         final List<Game> games = playday.getGames();
         for (final Game game : games) {
-            final GameTip gameTip = dataService.findGameTipByGameAndUser(user, game);
+            final GameTip gameTip = dataService.findGameTipByGameAndUser(game, user);
             if (gameTip != null) {
                 final int points = gameTip.getPoints();
 
@@ -188,81 +188,22 @@ public class StatisticService {
     }
 
     public List<Object[]> getGameStatistics() {
-        //TODO Refactoring
-        //        List<Object []> results = JPA.em()
-        //                .createQuery(
-        //                        "SELECT " +
-        //                                "SUM(resultCount) AS counts, " +
-        //                                "gameResult AS result " +
-        //                                "FROM GameStatistic g " +
-        //                                "GROUP BY gameResult " +
-        //                        "ORDER BY counts DESC").getResultList();
-        //
-        //        return results;
+        dataService.findGameStatistics();
         return null;
     }
 
     public Object [] getPlaydayStatistics(Playday playday) {
-        //TODO Refactoring
-        //        Object result = null;
-        //        Object [] values = null;
-        //
-        //        result = JPA.em()
-        //                .createQuery("SELECT " +
-        //                        "SUM(playdayPoints) AS points, " +
-        //                        "SUM(playdayCorrectTips) AS tips, " +
-        //                        "SUM(playdayCorrectDiffs) AS diffs," +
-        //                        "SUM(playdayCorrectTrends) AS trends, " +
-        //                        "ROUND(AVG(playdayPoints)) AS avgPoints " +
-        //                        "FROM UserStatistic u WHERE u.playday.id = :playdayID")
-        //                        .setParameter("playdayID", playday.getId())
-        //                        .getSingleResult();
-        //
-        //        if (result != null) {
-        //            values = (Object[]) result;
-        //        }
-        //
-        //        return values;
+        dataService.findPlaydayStatistics();
         return null;
     }
 
     public Object []  getAscendingStatistics(final Playday playday, final User user) {
-        //TODO Refactoring
-        //        Object result = null;
-        //        Object [] values = null;
-        //
-        //        result = JPA.em()
-        //                .createQuery(
-        //                        "SELECT " +
-        //                                "SUM(playdayPoints) AS points, " +
-        //                                "SUM(playdayCorrectTips) AS correctTips, " +
-        //                                "SUM(playdayCorrectDiffs) AS correctDiffs, " +
-        //                                "SUM(playdayCorrectTrends) AS correctTrends " +
-        //                                "FROM UserStatistic u " +
-        //                        "WHERE u.playday.id <= :playdayID AND u.user.id = :userID")
-        //                        .setParameter("playdayID", playday.getId())
-        //                        .setParameter("userID", user.getId())
-        //                        .getSingleResult();
-        //
-        //        if (result != null) {
-        //            values = (Object[]) result;
-        //        }
-        //
-        //        return values;
+        dataService.findAscendingStatistics();
         return null;
     }
 
     public List<Object[]> getResultsStatistic() {
-        //TODO Refactoring
-        //        List<Object []> results = JPA.em()
-        //                .createQuery("SELECT " +
-        //                        "SUM(resultCount) AS counts, " +
-        //                        "gameResult AS result " +
-        //                        "FROM PlaydayStatistic p " +
-        //                        "GROUP BY gameResult " +
-        //                        "ORDER BY counts DESC").getResultList();
-        //
-        //        return results;
+        dataService.findResultsStatistic();
         return null;
     }
 }

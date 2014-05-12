@@ -4,6 +4,7 @@ import ninja.AssetsController;
 import ninja.Router;
 import ninja.application.ApplicationRoutes;
 import controllers.AdminController;
+import controllers.AjaxController;
 import controllers.ApplicationController;
 import controllers.AuthController;
 import controllers.OverviewController;
@@ -37,6 +38,8 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/admin/deleteuser/{userid}").with(AdminController.class, "deleteuser");
         router.GET().route("/admin/results/{number}").with(AdminController.class, "results");
         router.GET().route("/admin/tournament").with(AdminController.class, "tournament");
+        router.GET().route("/admin/calculations").with(AdminController.class, "calculations");
+        router.GET().route("/admin/jobstatus/{name}").with(AdminController.class, "jobstatus");
         router.GET().route("/overview/playday/{number}").with(OverviewController.class, PLAYDAY);
         router.GET().route("/overview/extras").with(OverviewController.class, "extras");
         router.GET().route("/rules").with(ApplicationController.class, "rules");
@@ -46,6 +49,17 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/tournament/playday/{number}").with(TournamentController.class, PLAYDAY);
         router.GET().route("/tips/playday/{number}").with(TipController.class, PLAYDAY);
         router.GET().route("/tips/standings").with(TipController.class, "standings");
+        router.GET().route("/ajax/bracket/updatable/{bracketId}").with(AjaxController.class, "updatablebracket");
+        router.GET().route("/ajax/game/updatable/{gameId}").with(AjaxController.class, "updatablegame");
+        router.GET().route("/setup").with(SystemController.class, "setup");
+        router.GET().route("/statistics").with(ApplicationController.class, "statistics");
+        router.GET().route("/system/init").with(SystemController.class, "init");
+        router.GET().route("/assets/{fileName: .*}").with(AssetsController.class, SERVE_STATIC);
+        router.GET().route("/robots.txt").with(AssetsController.class, SERVE_STATIC);
+        router.POST().route("/ajax/game/kickoff/{gameId}").with(AjaxController.class, "kickoff");
+        router.POST().route("/ajax/game/webserviceid/{gameId}").with(AjaxController.class, "webserviceid");
+        router.POST().route("/admin/updatesettings").with(AdminController.class, "updatesettings");
+        router.POST().route("/admin/storeresults").with(AdminController.class, "storeresults");
         router.POST().route("/tips/storetips").with(TipController.class, "storetips");
         router.POST().route("/auth/renew").with(AuthController.class, "renew");
         router.POST().route("/auth/reset").with(AuthController.class, "reset");
@@ -55,11 +69,6 @@ public class Routes implements ApplicationRoutes {
         router.POST().route("/users/updatepassword").with(UserController.class, "updatepassword");
         router.POST().route("/users/updateemail").with(UserController.class, "updateemail");
         router.POST().route("/users/updatenotifications").with(UserController.class, "updatenotifications");
-        router.POST().route("/users/updatepicture").with(UserController.class, "updatepicture");
-        router.GET().route("/setup").with(SystemController.class, "setup");
-        router.GET().route("/statistics").with(ApplicationController.class, "statistics");
-        router.GET().route("/system/init").with(SystemController.class, "init");
-        router.GET().route("/assets/{fileName: .*}").with(AssetsController.class, SERVE_STATIC);
-        router.GET().route("/robots.txt").with(AssetsController.class, SERVE_STATIC);
+        router.POST().route("/users/updatepicture").with(UserController.class, "updatepicture");        
     }
 }

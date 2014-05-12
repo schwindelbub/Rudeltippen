@@ -38,7 +38,7 @@ public class ImportService {
     private static final Logger LOG = LoggerFactory.getLogger(ImportService.class);
     private static final String BRACKET = "bracket";
     private static final String PLAYOFF = "playoff";
-    private static final String UPDATEBLE = "updateble";
+    private static final String UPDATABLE = "updatable";
     private static final String NUMBER = "number";
 
     @Inject
@@ -83,7 +83,7 @@ public class ImportService {
             Bracket bracket = new Bracket();
             bracket.setName(basicDBObject.getString("name"));
             bracket.setNumber(basicDBObject.getInt(NUMBER));
-            bracket.setUpdateble(basicDBObject.getBoolean(UPDATEBLE));
+            bracket.setUpdatable(basicDBObject.getBoolean(UPDATABLE));
             dataService.save(bracket);
 
             brackets.put(basicDBObject.getString("id"), bracket);
@@ -116,7 +116,7 @@ public class ImportService {
             game.setNumber(basicDBObject.getInt(NUMBER));
             game.setPlayoff(basicDBObject.getBoolean(PLAYOFF));
             game.setEnded(basicDBObject.getBoolean("ended"));
-            game.setUpdateble(basicDBObject.getBoolean(UPDATEBLE));
+            game.setUpdatable(basicDBObject.getBoolean(UPDATABLE));
             game.setWebserviceID(basicDBObject.getString("webserviceID"));
             game.setHomeTeam(teams.get(basicDBObject.getString("homeTeam")));
             game.setHomeReference(basicDBObject.getString("homeReference"));
