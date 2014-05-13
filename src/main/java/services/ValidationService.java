@@ -12,8 +12,6 @@ import ninja.validation.FieldViolation;
 import ninja.validation.Validation;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -29,12 +27,8 @@ import dtos.UserDTO;
 @Singleton
 public class ValidationService {
     private static final String USERPASS = "userpass";
-
     private static final String EMAIL = "email";
-
     private static final String USERNAME = "username";
-
-    private static final Logger LOG = LoggerFactory.getLogger(ValidationService.class);
 
     @Inject
     private DataService dataService;
@@ -161,16 +155,11 @@ public class ValidationService {
     public boolean isValidScore(String homeScore, String awayScore) {
         boolean valid = false;
         if (StringUtils.isNotBlank(homeScore) && StringUtils.isNotBlank(awayScore)) {
-            int home, away;
-            try {
-                home = Integer.parseInt(homeScore);
-                away = Integer.parseInt(awayScore);
+            int home = Integer.parseInt(homeScore);
+            int away = Integer.parseInt(awayScore);
 
-                if ((home >= 0 && home <= 99) && (away >= 0 && away <= 99)) {
-                    valid = true;
-                }
-            } catch (final Exception e) {
-                LOG.error("Invalid score given",  e);
+            if ((home >= 0 && home <= 99) && (away >= 0 && away <= 99)) {
+                valid = true;
             }
         }
 

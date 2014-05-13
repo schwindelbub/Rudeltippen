@@ -135,6 +135,7 @@
 									<fileset dir="${JS_DIR}" includes="jquery.min.js" />
 									<fileset dir="${JS_DIR}" includes="bootstrap.min.js" />
 									<fileset dir="${JS_DIR}" includes="responsive-pagination.min.js" />
+									<fileset dir="${JS_DIR}" includes="spin.min.js" />
 								</concat>
 								<echo message="${JS} built." />
 							</tasks>

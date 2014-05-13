@@ -1,10 +1,5 @@
 <#import "../layout/main.ftl.html" as layout> 
 <@layout.main>
-<style>
-.avatar {
-   border: 3px solid green;
-}
-</style>
 <div class="row">
 	<div class="col-md-12">
 		<legend>${i18n('app.myprofile')}</legend>
@@ -19,7 +14,7 @@
 		  <div class="row">
 	        <div class="col-xs-18 col-sm-6 col-md-3">
 	          <div class="thumbnail<#if user.avatar == "TWITTER"> avatar</#if>">
-	              <a href="/users/changepicture/twitter"><img src="//avatars.io/twitter/${user.username}?size=large" width="128" height="128" /></a>
+	              <a href="/users/changepicture/twitter" class="loading-avatar"><img src="//avatars.io/twitter/${user.username}?size=large" width="128" height="128" /></a>
 	              <div class="caption">
 	                <h4>Twitter</h4>
 	            </div>
@@ -27,7 +22,7 @@
 	        </div>
 	        <div class="col-xs-18 col-sm-6 col-md-3">
 	          <div class="thumbnail<#if user.avatar == "FACEBOOK"> avatar</#if>">
-	              <a href="/users/changepicture/facebook"><img src="//avatars.io/facebook/${user.username}?size=large" width="128" height="128" /></a>
+	              <a href="/users/changepicture/facebook" class="loading-avatar"><img src="//avatars.io/facebook/${user.username}?size=large" width="128" height="128" /></a>
 	              <div class="caption">
 	                <h4>Facebook</h4>
 	            </div>
@@ -35,7 +30,7 @@
 	        </div>
 	        <div class="col-xs-18 col-sm-6 col-md-3">
 	          <div class="thumbnail<#if user.avatar == "INSTAGRAM"> avatar</#if>">
-	              <a href="/users/changepicture/instagram"><img src="//avatars.io/instagram/${user.username}?size=large" width="128" height="128" /></a>
+	              <a href="/users/changepicture/instagram" class="loading-avatar"><img src="//avatars.io/instagram/${user.username}?size=large" width="128" height="128" /></a>
 	              <div class="caption">
 	                <h4>Instagram</h4>
 	            </div>
@@ -43,7 +38,7 @@
 	        </div>
 	        <div class="col-xs-18 col-sm-6 col-md-3">
 	          <div class="thumbnail<#if user.avatar == "GRAVATAR"> avatar</#if>">
-	              <a href="/users/changepicture/email"><img src="//avatars.io/email/${user.email}?size=large" width="128" height="128" /></a>
+	              <a href="/users/changepicture/email" class="loading-avatar"><img src="//avatars.io/email/${user.email}?size=large" width="128" height="128" /></a>
 	              <div class="caption">
 	                <h4>Gravatar</h4>
 	            </div>
