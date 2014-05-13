@@ -1,14 +1,5 @@
 package services;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Date;
@@ -16,13 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.FileImageOutputStream;
 
 import models.Bracket;
 import models.Extra;
@@ -32,15 +16,19 @@ import models.GameTip;
 import models.Playday;
 import models.Team;
 import models.User;
-import models.enums.Constants;
+import models.enums.Avatar;
 import models.pagination.Pagination;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.fluent.Request;
+import org.apache.http.HttpHost;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,70 +69,6 @@ public class CommonService extends ViewService {
     }
 
     /**
-     * Returns the filename from a Gravatar image
-     * 
-     * @param email The email address to check
-     * @param type Return a default image if no email is available
-     * @return The image filename
-     */
-    public String getGravatarImage(final String email, final String type, int size) {
-        HttpResponse response = executeGravatarRequest(email, type, size);
-
-        final String filename = UUID.randomUUID().toString();
-        if (response != null && response.getStatusLine().getStatusCode() == 200) {
-            final File file = new File(filename);
-            InputStream inputStream = null;
-            OutputStream outputStream = null;
-            try {
-                inputStream = response.getEntity().getContent();
-                outputStream = new FileOutputStream(file);
-
-                final byte byteBuffer[] = new byte[1024];
-                int length;
-                while ((length = inputStream.read(byteBuffer)) > 0) {
-                    outputStream.write(byteBuffer, 0, length);
-                }
-
-                FileUtils.copyFile(file, new File(Constants.MEDIAFOLDER.get() + filename));
-                if (!file.delete()) {
-                    LOG.error("Failed to delete image when handling response from gravatar");
-                }
-            } catch (final Exception e) {
-                LOG.error("Failed to get and convert gravatar image", e);
-            } finally {
-                if (inputStream != null) {
-                    try {
-                        inputStream.close();
-                    } catch (IOException e) {
-                        LOG.error("Failed to close inputstream while getting gravatar image", e);
-                    }
-                }
-                if (outputStream != null) {
-                    try {
-                        outputStream.close();
-                    } catch (IOException e) {
-                        LOG.error("Failed to close outputstream while getting gravatar image", e);
-                    }
-                }
-            }
-        }
-
-        return filename;
-    }
-
-    private HttpResponse executeGravatarRequest(final String email, final String type, int size) {
-        String url = "https://secure.gravatar.com/avatar/" + DigestUtils.md5Hex(email) + ".jpg?s=" + size + "&r=pg&d=" + type;
-        HttpResponse response = null;
-        try {
-            response = Request.Get(url).execute().returnResponse();
-        } catch (IOException e) {
-            LOG.error("Failed to get response from gravator", e);
-        }
-
-        return response;
-    }
-
-    /**
      * Calculates the pagination
      * 
      * @param number The number of pages
@@ -174,108 +98,6 @@ public class CommonService extends ViewService {
         pagination.setUrl(url);
 
         return pagination;
-    }
-
-    public void resizeImage(File sourceImage, File targetImage, int width, int height, boolean keepRatio) {
-        BufferedImage source = null;
-        try {
-            source = ImageIO.read(sourceImage);
-        } catch (IOException e) {
-            LOG.error("IOException while trying to create source image for resizing", e);
-        }
-
-        if (source != null) {
-            int originalWidth = source.getWidth();
-            int originalHeight = source.getHeight();
-            double ratio = (double) originalWidth / originalHeight;
-
-            int maxWidth = width;
-            int maxHeight = height;
-
-            if (width < 0 && height < 0) {
-                width = originalWidth;
-                height = originalHeight;
-            }
-            if (width < 0 && height > 0) {
-                width = (int) (height * ratio);
-            }
-            if (width > 0 && height < 0) {
-                height = (int) (width / ratio);
-            }
-
-            if (keepRatio) {
-                height = (int) (width / ratio);
-                if(height > maxHeight) {
-                    height = maxHeight;
-                    width = (int) (height * ratio);
-                }
-                if(width > maxWidth) {
-                    width = maxWidth;
-                    height = (int) (width / ratio);
-                }
-            }
-
-            BufferedImage bufferedImage = doResize(width, height, source);
-            writeResizedImage(targetImage, getMimeType(targetImage), bufferedImage);
-        }
-    }
-
-    private String getMimeType(File targetImage) {
-        String mimeType = "image/jpeg";
-        if (targetImage.getName().endsWith(".png")) {
-            mimeType = "image/png";
-        }
-        if (targetImage.getName().endsWith(".gif")) {
-            mimeType = "image/gif";
-        }
-        return mimeType;
-    }
-
-    private BufferedImage doResize(int width, int height, BufferedImage source) {
-        BufferedImage dest = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Image srcSized = source.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-
-        Graphics graphics = dest.getGraphics();
-        graphics.setColor(Color.WHITE);
-        graphics.fillRect(0, 0, width, height);
-        graphics.drawImage(srcSized, 0, 0, null);
-        return dest;
-    }
-
-    private void writeResizedImage(File targetImage, String mimeType, BufferedImage dest) {
-        ImageWriter writer = ImageIO.getImageWritersByMIMEType(mimeType).next();
-        ImageWriteParam params = writer.getDefaultWriteParam();
-
-        FileImageOutputStream fileImageOutputStream = null;
-        try {
-            fileImageOutputStream = new FileImageOutputStream(targetImage);
-        } catch (IOException e) {
-            LOG.error("Failed to create outputstream for resizing image", e);
-        }
-
-        if (fileImageOutputStream != null) {
-            writer.setOutput(fileImageOutputStream);
-            IIOImage image = new IIOImage(dest, null, null);
-
-            try {
-                writer.write(null, image, params);
-            } catch (IOException e) {
-                LOG.error("Failed to write outputstream for resizing image", e);
-            }
-
-            try {
-                fileImageOutputStream.flush();
-            } catch (IOException e) {
-                LOG.error("Failed to flush outputstream for resizing image", e);
-            }
-
-            try {
-                fileImageOutputStream.close();
-            } catch (IOException e) {
-                LOG.error("Failed to close outputstream for resizing image", e);
-            }
-            writer.dispose();
-        }
     }
 
     public Map<String, String> convertParamaters(Map<String, String[]> parameters) {
@@ -539,5 +361,51 @@ public class CommonService extends ViewService {
         }
 
         return team;
+    }
+
+    public String getUserPictureUrl(Avatar avatar, User user) {
+        String finalUrl = null;
+        try {
+            String param = user.getUsername();
+            if (Avatar.GRAVATAR.equals(avatar)) {
+                param = user.getEmail();
+            }
+            
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpGet httpGet = new HttpGet(avatar.get() + param + "?size=large");
+            HttpContext httpContext = new BasicHttpContext(); 
+            httpClient.execute(httpGet, httpContext); 
+
+            HttpUriRequest currentReq = (HttpUriRequest) httpContext.getAttribute(HttpCoreContext.HTTP_REQUEST);
+            HttpHost currentHost = (HttpHost)  httpContext.getAttribute(HttpCoreContext.HTTP_TARGET_HOST);
+            
+            finalUrl = (currentReq.getURI().isAbsolute()) ? currentReq.getURI().toString() : (currentHost.toURI() + currentReq.getURI()); 
+        } catch (Exception e) {
+            LOG.error("Failed to get user picture url", e);
+        }
+        
+        if (StringUtils.isNotBlank(finalUrl)) {
+            finalUrl = finalUrl.replace("http:", "");
+            finalUrl = finalUrl.replace("https:", "");
+        }
+        
+        return (StringUtils.isNotBlank(finalUrl)) ? finalUrl : avatar.get();
+    }
+    
+    public Avatar getAvatarFromString(String string) {
+        Avatar avatar = null;
+        if (Avatar.FACEBOOK.get().contains(string)) {
+            avatar = Avatar.FACEBOOK;
+        } else if (Avatar.GRAVATAR.get().contains(string)) {
+            avatar = Avatar.GRAVATAR;
+        } else if (Avatar.INSTAGRAM.get().contains(string)) {
+            avatar = Avatar.INSTAGRAM;
+        } else if (Avatar.TWITTER.get().contains(string)) {
+            avatar = Avatar.TWITTER;
+        } else {
+            avatar = Avatar.GRAVATAR;
+        }
+        
+        return avatar;
     }
 }

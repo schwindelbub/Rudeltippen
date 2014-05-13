@@ -1,8 +1,5 @@
 package controllers;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,9 +22,6 @@ import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import ninja.session.Session;
 
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +61,7 @@ public class UserController extends RootController {
 
     @Inject
     private ValidationService validationService;
-
+    
     @Inject
     private CommonService commonService;
 
@@ -128,12 +122,21 @@ public class UserController extends RootController {
             return Results.redirect("/");
         }
     }
-
+    
     public Result profile(Context context) {
         final User user = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
         final Settings settings = dataService.findSettings();
-
+        
         return Results.html().render("user", user).render(settings);
+    }
+
+    public Result changepicture(@PathParam("avatar") String avatar, Context context) {
+        final User user = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
+        user.setPicture(commonService.getUserPictureUrl(commonService.getAvatarFromString(avatar), user));
+        user.setAvatar(commonService.getAvatarFromString(avatar));
+        dataService.save(user);
+        
+        return Results.redirect(USERS_PROFILE);
     }
 
     public Result updateusername(Session session, Context context, FlashScope flashScope) {
@@ -232,59 +235,6 @@ public class UserController extends RootController {
 
         flashScope.success(i18nService.get("controller.profile.notifications"));
         LOG.info("Notifications updated: " + user.getEmail());
-
-        return Results.redirect(USERS_PROFILE);
-    }
-
-    public Result updatepicture(FlashScope flashScope, Context context) {
-        File upload = new File(Constants.MEDIAFOLDER.get() + UUID.randomUUID().toString());
-        if (context.isMultipart()) {
-            FileItemIterator fileItemIterator = context.getFileItemIterator();
-            try {
-                while (fileItemIterator.hasNext()) {
-                    FileItemStream item = fileItemIterator.next();
-
-                    InputStream inputStream = item.openStream();
-                    if (!item.isFormField()) {
-                        IOUtils.copy(inputStream, new FileOutputStream(upload));
-                    }
-                }
-            } catch (Exception e) {
-                LOG.error("Failed to upload user picture", e);
-            }
-        }
-
-        String pictureLargeFilename = UUID.randomUUID().toString() + ".jpg";
-        String pictureSmallFilename = UUID.randomUUID().toString() + ".jpg";
-
-        File pictureSmall = new File(Constants.MEDIAFOLDER.get() + pictureSmallFilename);
-        File pictureLarge = new File(Constants.MEDIAFOLDER.get() + pictureLargeFilename);
-
-        commonService.resizeImage(upload, pictureSmall, 64, 64, true);
-        commonService.resizeImage(upload, pictureLarge, 256, 256, true);
-
-        User user = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
-        user.setPicture(pictureSmallFilename);
-        user.setPictureLarge(pictureLargeFilename);
-        dataService.save(user);
-
-        if (!upload.delete()) {
-            LOG.error("Failed to delete uploaded file after upload");
-        }
-
-        flashScope.success(i18nService.get("controller.profile.updatepicture"));
-        LOG.info("Picture updated: " + user.getEmail());
-
-        return Results.redirect(USERS_PROFILE);
-    }
-
-    public Result deletepicture(Context context, FlashScope flashScope) {
-        User user = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
-        user.setPicture(null);
-        user.setPictureLarge(null);
-        dataService.save(user);
-
-        flashScope.success(i18nService.get("controller.profile.deletedpicture"));
 
         return Results.redirect(USERS_PROFILE);
     }

@@ -7,11 +7,7 @@
 </div>
 <div class="row">
 	<div class="col-md-12">
-		<#if (user.pictureLarge)??>
-		    <p><img src="/assets/media/${user.pictureLarge}" width="256" height="256"/></p>
-		<#else>
-		   <p><img src="/assets/img/user_placeholder_large.gif" width="162" height="162"/></p>
-		</#if>
+		<p><img src="${user.picture}" width="128" height="128"/></p>
 	</div>
 </div>
 <div class="row">

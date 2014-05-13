@@ -7,6 +7,7 @@ import java.util.UUID;
 import models.Game;
 import models.Settings;
 import models.User;
+import models.enums.Avatar;
 import models.enums.Constants;
 import ninja.Context;
 import ninja.Result;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import services.AuthService;
+import services.CommonService;
 import services.DataService;
 import services.ImportService;
 import services.SetupService;
@@ -44,6 +46,9 @@ public class SystemController {
 
     @Inject
     private SetupService setupService;
+    
+    @Inject
+    private CommonService commonService;
 
     @Inject
     private NinjaProperties ninjaProperties;
@@ -114,6 +119,8 @@ public class SystemController {
             user.setCorrectDifferences(0);
             user.setCorrectTrends(0);
             user.setCorrectExtraTips(0);
+            user.setPicture(commonService.getUserPictureUrl(Avatar.GRAVATAR, user));
+            user.setAvatar(Avatar.GRAVATAR);
             dataService.save(user);
 
             return Results.ok().render(Result.NO_HTTP_BODY);

@@ -23,13 +23,9 @@
 				<tbody>
 					<#list users as user>
 						<tr>
-							<#if (user.picture)??>
-								<td><img src="/assets/media/${user.picture}" /></td>
-							<#else>
-								<td><img src="/assets/img/user_placeholder.gif" width="54" height="54" /></td>
-							</#if>
+							<td><img src="${user.picture}" width="64" height="64"/></td>
 							<td>${user.username}</td>
-							<td>${user.username}</td>
+							<td>${user.email}</td>
 							<td>${user.registered?datetime}</td>
 							<td>
 							<#if user.active>

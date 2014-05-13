@@ -13,14 +13,12 @@ import ninja.utils.NinjaProperties;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mchange.v1.util.UnexpectedException;
-
 /**
  * 
  * @author svenkubiak
@@ -31,7 +29,6 @@ public class AuthService {
     private static final Logger LOG = LoggerFactory.getLogger(AuthService.class);
     private static final char[] HEX_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     private static final String HMAC_SHA1 = "HmacSHA1";
-    private static final String GRAVATAR_TYPE = "mm";
     private static final String AES = "AES";
     private static final String APPLICATION_SECRET = "application.secret";
 
@@ -40,9 +37,6 @@ public class AuthService {
 
     @Inject
     private DataService dataService;
-
-    @Inject
-    private CommonService commonService;
 
     @Inject
     private AuthService authService;
@@ -111,20 +105,6 @@ public class AuthService {
 
     public String byteToHexString(byte[] bytes) {
         return String.valueOf(Hex.encodeHex(bytes));
-    }
-
-    public void activateAndSetAvatar(final User user) {
-        final String avatar = commonService.getGravatarImage(user.getEmail(), GRAVATAR_TYPE, 256);
-        final String avatarSmall = commonService.getGravatarImage(user.getEmail(), GRAVATAR_TYPE, 64);
-        if (StringUtils.isNotBlank(avatar)) {
-            user.setPictureLarge(avatar);
-        }
-        if (StringUtils.isNotBlank(avatarSmall)) {
-            user.setPicture(avatarSmall);
-        }
-
-        user.setActive(true);
-        dataService.save(user);
     }
 
     public boolean authenticate(String username, String userpass) {

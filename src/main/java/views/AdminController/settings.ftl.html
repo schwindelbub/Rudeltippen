@@ -40,13 +40,6 @@
 		        </div>
 		    </div>
 		    <div class="form-group">
-		        <label for="input01" class="control-label">${i18n('setup.countfinalresult')}</label>
-		        <div class="controls">
-		            <input type="radio" id="countFinalResult" value="false" name="countFinalResult" <#if !(flash.countFinalResult)??> checked="checked" </#if> class="input-medium"> ${i18n('setup.ninetyminutes')}<br />
-		            <input type="radio" id="countFinalResult" value="true" name="countFinalResult" <#if (flash.countFinalResult)??> checked="checked" </#if> class="input-medium"> ${i18n('setup.finalresult')}
-		        </div>
-		    </div>
-		    <div class="form-group">
 		        <label for="input01" class="control-label">${i18n('setup.informontipper')}</label>
 		        <div class="controls">
 		            <input type="radio" id="informOnNewTipper" value="true" name="informOnNewTipper" <#if (flash.informOnNewTipper)??> checked="checked" </#if> class="input-medium"> ${i18n('yes')}<br />

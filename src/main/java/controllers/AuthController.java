@@ -124,10 +124,11 @@ public class AuthController {
                     return Results.redirect("/auth/password/" + token);
                 } else {
                     if ((ConfirmationType.ACTIVATION).equals(confirmationType)) {
-                        authService.activateAndSetAvatar(user);
-                        flashScope.success(i18nService.get("controller.users.accountactivated"));
+                        user.setActive(true);
+                        dataService.save(user);
                         dataService.delete(confirmation);
-
+                        
+                        flashScope.success(i18nService.get("controller.users.accountactivated"));
                         LOG.info("User activated: " + user.getEmail());
                     } else if ((ConfirmationType.CHANGEUSERNAME).equals(confirmationType)) {
                         final String oldusername = user.getEmail();
@@ -193,6 +194,7 @@ public class AuthController {
             user.setSalt(salt);
             user.setUserpass(authService.hashPassword(userDTO.userpass, salt));
             user.setPoints(0);
+            user.setPicture(DigestUtils.md5Hex(userDTO.email));
             dataService.save(user);
 
             final String token = UUID.randomUUID().toString();

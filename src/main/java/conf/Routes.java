@@ -54,6 +54,7 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/setup").with(SystemController.class, "setup");
         router.GET().route("/statistics").with(ApplicationController.class, "statistics");
         router.GET().route("/system/init").with(SystemController.class, "init");
+        router.GET().route("/users/changepicture/{avatar}").with(UserController.class, "changepicture");
         router.GET().route("/assets/{fileName: .*}").with(AssetsController.class, SERVE_STATIC);
         router.GET().route("/robots.txt").with(AssetsController.class, SERVE_STATIC);
         router.POST().route("/ajax/game/kickoff/{gameId}").with(AjaxController.class, "kickoff");
@@ -69,6 +70,5 @@ public class Routes implements ApplicationRoutes {
         router.POST().route("/users/updatepassword").with(UserController.class, "updatepassword");
         router.POST().route("/users/updateemail").with(UserController.class, "updateemail");
         router.POST().route("/users/updatenotifications").with(UserController.class, "updatenotifications");
-        router.POST().route("/users/updatepicture").with(UserController.class, "updatepicture");        
     }
 }

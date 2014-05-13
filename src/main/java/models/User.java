@@ -4,10 +4,12 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import models.enums.Avatar;
 import models.statistic.ResultStatistic;
 import models.statistic.UserStatistic;
 
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
@@ -38,13 +40,15 @@ public class User implements Serializable {
 
     @Reference(value = "user_resultstatistics", lazy = true)
     private List<ResultStatistic> resultStatistic;
+    
+    @Embedded
+    private Avatar avatar;
 
     private String userpass;
     private String username;
     private String email;
     private String salt;
     private String picture;
-    private String pictureLarge;
 
     private Date registered;
 
@@ -107,14 +111,6 @@ public class User implements Serializable {
 
     public void setPicture(final String picture) {
         this.picture = picture;
-    }
-
-    public String getPictureLarge() {
-        return this.pictureLarge;
-    }
-
-    public void setPictureLarge(final String pictureLarge) {
-        this.pictureLarge = pictureLarge;
     }
 
     public List<GameTip> getGameTips() {
@@ -247,6 +243,14 @@ public class User implements Serializable {
 
     public int getPreviousPlace() {
         return this.previousPlace;
+    }
+
+    public Avatar getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Avatar avatar) {
+        this.avatar = avatar;
     }
 
     public void setPreviousPlace(final int previousPlace) {
