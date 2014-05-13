@@ -126,6 +126,7 @@
 								<replace file="${CSS_DIR}/bootstrap.min.css" token="(min-width:768px)" value="(min-width:1023px)" />
 								<concat destfile="${CSS}">
 									<fileset dir="${CSS_DIR}" includes="bootstrap.min.css" />
+									<fileset dir="${CSS_DIR}" includes="overlay.min.css" />
 									<fileset dir="${CSS_DIR}" includes="additional.min.css" />
 								</concat>
 								<echo message="${CSS} built." />
@@ -136,6 +137,7 @@
 									<fileset dir="${JS_DIR}" includes="bootstrap.min.js" />
 									<fileset dir="${JS_DIR}" includes="responsive-pagination.min.js" />
 									<fileset dir="${JS_DIR}" includes="spin.min.js" />
+									<fileset dir="${JS_DIR}" includes="overlay.min.js" />
 								</concat>
 								<echo message="${JS} built." />
 							</tasks>
