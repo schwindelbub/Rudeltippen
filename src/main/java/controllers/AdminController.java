@@ -257,7 +257,7 @@ public class AdminController extends RootController {
     }
 
     public Result rudelmail() {
-        return Results.html();
+        return Results.html().render("");
     }
 
     public Result tournament() {

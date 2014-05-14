@@ -54,7 +54,8 @@ public class AuthenticationFilter implements Filter {
             if (result.getRenderable() != null && !(result.getRenderable() instanceof NoHttpBody)) {
                 result.render(Constants.CONNECTEDUSER.get(), connectedUser);
                 result.render("ViewService", viewService);
-                result.render("currentPlayday", dataService.findCurrentPlayday());  
+                result.render("currentPlayday", dataService.findCurrentPlayday()); 
+                result.render("location", context.getRequestPath());
             }
 
             return result;
