@@ -9,6 +9,7 @@ import models.Settings;
 import models.User;
 import models.enums.ConfirmationType;
 import models.enums.Constants;
+import ninja.Context;
 import ninja.Cookie;
 import ninja.FilterWith;
 import ninja.Result;
@@ -80,31 +81,35 @@ public class AuthController {
         return Results.html().render(settings);
     }
 
-    public Result reset(@PathParam("email") String email, FlashScope flashScope) {
-        if (validationService.isValidEmail(email)) {
+    public Result reset(Context context, FlashScope flashScope) {
+        final String email = context.getParameter("email");
+        if (!validationService.isValidEmail(email)) {
             flashScope.error(i18nService.get("controller.auth.resenderror"));
 
-            return Results.redirect("/auth/forgotton");
+            return Results.redirect("/auth/forgotten");
+        } 
+        final User user = dataService.findUserByEmailAndActive(email);
+        
+        if (user == null) {
+            flashScope.error(i18nService.get("controller.auth.resenderror"));
+
+            return Results.redirect("/auth/forgotten");
         } else {
-            final User user = dataService.findUserByEmailAndActive(email);
-            if (user != null) {
-                final String token = UUID.randomUUID().toString();
-                final ConfirmationType confirmType = ConfirmationType.NEWUSERPASS;
-                final Confirmation confirmation = new Confirmation();
-                confirmation.setUser(user);
-                confirmation.setToken(token);
-                confirmation.setConfirmationType(confirmType);
-                confirmation.setConfirmValue(authService.encryptAES(UUID.randomUUID().toString()));
-                confirmation.setCreated(new Date());
-                dataService.save(confirmation);
+            final String token = UUID.randomUUID().toString();
+            final ConfirmationType confirmType = ConfirmationType.NEWUSERPASS;
+            final Confirmation confirmation = new Confirmation();
+            confirmation.setUser(user);
+            confirmation.setToken(token);
+            confirmation.setConfirmationType(confirmType);
+            confirmation.setConfirmValue(authService.encryptAES(UUID.randomUUID().toString()));
+            confirmation.setCreated(new Date());
+            dataService.save(confirmation);
 
-                mailService.confirm(user, token, confirmType);
-                flashScope.success(i18nService.get("confirm.message"));
+            mailService.confirm(user, token, confirmType);
+            flashScope.success(i18nService.get("confirm.message"));
 
-                return Results.redirect(AUTH_LOGIN);
-            }
+            return Results.redirect(AUTH_LOGIN);
         }
-        return Results.redirect("/");
     }
 
     public Result confirm(@PathParam("token") String token, FlashScope flashScope, Session session) {

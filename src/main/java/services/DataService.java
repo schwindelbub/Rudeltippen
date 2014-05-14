@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -429,7 +430,7 @@ public class DataService {
     }
 
     public List<Team> findTeamsByBracketOrdered(Bracket bracket) {
-        return this.datastore.find(Team.class).field(BRACKET).equal(bracket).order("points, goalsDiff, goalsFor").asList();
+        return this.datastore.find(Team.class).field(BRACKET).equal(bracket).order("-points, -goalsDiff, -goalsFor").asList();
     }
 
     public List<Team> findTeamsByBracket(Bracket bracket) {
@@ -584,12 +585,22 @@ public class DataService {
         DB db = this.datastore.getDB();
         DBCollection playdayStatistics = db.getCollection("playdaystatistics");
 
-        DBObject groupFields = new BasicDBObject();
+        DBObject groupFields = new BasicDBObject( "_id", "$resultCount");
         groupFields.put("counts", new BasicDBObject( "$sum", "$resultCount"));
         DBObject group = new BasicDBObject("$group", groupFields);
         
-        playdayStatistics.aggregate(group);
+        List<DBObject> pipeline = new ArrayList<DBObject>();
+        pipeline.add(group);
+        
+        AggregationOutput aggregate = playdayStatistics.aggregate(pipeline);
+        DBObject command = aggregate.getCommand();
     
+        System.out.println("command: " + command.toString());
+        
+        Iterable<DBObject> results = aggregate.results();
+        for (DBObject result : results) {
+            System.out.println(result.toString());
+        }
     }
 
     public void findPlaydayStatistics() {
@@ -652,5 +663,15 @@ public class DataService {
         //                        "ORDER BY counts DESC").getResultList();
         //
         //        return results;        
+    }
+
+    public List<Bracket> findAllTournamentBrackets() {
+        List<Bracket> brackets = this.datastore.find(Bracket.class).asList();
+        for (Bracket bracket : brackets) {
+            List<Team> teams = this.datastore.find(Team.class).field("bracket").equal(bracket).order("place").asList();
+            bracket.setTeams(teams);
+        }
+        
+        return brackets;
     }
 }

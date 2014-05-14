@@ -32,7 +32,7 @@ public class TestFactory extends NinjaTest {
     public void init() {
         try {
             mongodExecutable = starter.prepare(new MongodConfigBuilder()
-            .version(Version.Main.V2_5)
+            .version(Version.Main.V2_6)
             .net(new Net(port, false))
             .build());
 

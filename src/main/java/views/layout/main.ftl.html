@@ -36,30 +36,30 @@
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="/"><span class="glyphicon glyphicon-home"></span>&nbsp;&nbsp;Home</a></li>
-            <li class="dropdown"}>
+            <li <#if location == "/">class="active"</#if>><a href="/"><span class="glyphicon glyphicon-home"></span>&nbsp;&nbsp;Home</a></li>
+            <li class="dropdown<#if location?contains("/tournament")> active</#if>">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-tower"></span>&nbsp;&nbsp;${i18n("app.tournament")} <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a href="/tournament/brackets">${i18n("app.tables")}</a></li>
                 <li><a href="/tournament/playday/${currentPlayday.number}">${i18n("app.results")}</a></li>
               </ul>
             </li>
-            <li class="dropdown">
+            <li class="dropdown<#if location?contains("/tips") && !location?contains("/tips/playday")> active</#if>">
                 <a data-toggle="dropdown" class="dropdown-toggle" href="#"><span class="glyphicon glyphicon-tasks"></span>&nbsp;&nbsp;${i18n("app.betting.game")} <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <li><a href="/overview/playday/${currentPlayday.number}">${i18n("app.tipoverview")}</a></li>
-                  <li><a href="/overview/extras">${i18n("extratips")}</a></li>
+                  <li><a href="/tips/overview/${currentPlayday.number}">${i18n("app.tipoverview")}</a></li>
+                  <li><a href="/tips/extras">${i18n("extratips")}</a></li>
                   <li><a href="/tips/standings">${i18n("standings")}</a></li>
-                  <li><a href="/statistics">${i18n("statistics")}</a></li>
-            	  <li><a href="/rules">${i18n("rules")}</a></li>                  
+                  <li><a href="/tips/statistics">${i18n("statistics")}</a></li>
+            	  <li><a href="/tips/rules">${i18n("rules")}</a></li>                  
                 </ul>
-            </li>  
-            <li><a href="/tips/playday/${currentPlayday.number}"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;&nbsp;${i18n("app.place.tipps")}</a></li> 
-            <li><a href="/users/profile"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;${i18n("app.myprofile")}</a></li>
+            </li>
+            <li<#if location?contains("/tips/playday")> class="active"</#if>><a href="/tips/playday/${currentPlayday.number}"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;&nbsp;${i18n("app.place.tipps")}</a></li> 
+            <li<#if location?contains("/users/myprofile")> class="active"</#if>><a href="/users/myprofile"><span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;${i18n("app.myprofile")}</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
             <#if connectedUser.admin>
-            <li class="dropdown">
+            <li class="dropdown<#if location?contains("/admin")> active</#if>">
 	            <a data-toggle="dropdown" class="dropdown-toggle" href="#"><span class="glyphicon glyphicon-cog"></span>&nbsp;&nbsp;${i18n("app.administration")} <b class="caret"></b></a>
 	            <ul class="dropdown-menu">
               		<li><a href="/admin/settings">${i18n("settings")}</a></li>

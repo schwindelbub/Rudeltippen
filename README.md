@@ -12,11 +12,11 @@ Available tournaments
 Features in a Nutshell
 ------------------
 - Mobile first layout based Twitter Bootstrap 3
-- Automatic results updates
-- Automatic tournament management
-- Automatic playing schedule updates
-- User and Tournament statistics
-- Gravatar support
+- Automatic/Manual results updates
+- Automatic/Manual tournament management
+- Automatic/Manual playing schedule updates
+- Lots of statistics
+- Avatar through avatars.io
 - ...and a lot more
 
 Screenshots

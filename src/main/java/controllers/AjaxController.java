@@ -74,7 +74,6 @@ public class AjaxController extends RootController {
     public Result place(@PathParam("teamId") String teamId, Context context) {
         Team team = dataService.findTeamById(teamId);
         if (team != null) {
-            System.out.println("foooo");
             final String place = context.getParameter(VALUE);
             if (StringUtils.isNotBlank(place)) {
                 team.setPlace(Integer.valueOf(place));

@@ -29,7 +29,7 @@ public class TournamentController extends RootController {
     private CommonService commonService;
 
     public Result brackets() {
-        final List<Bracket> brackets = dataService.findAllBrackets();
+        List<Bracket> brackets = dataService.findAllTournamentBrackets();
         return Results.html().render("brackets", brackets);
     }
 
@@ -38,9 +38,5 @@ public class TournamentController extends RootController {
         final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
 
         return Results.html().render("playday", playday).render("pagination", pagination);
-    }
-
-    public Result bracket() {
-        return Results.html();
     }
 }

@@ -140,6 +140,10 @@ public class AdminController extends RootController {
 
     public Result updatesettings (FlashScope flashScope, @JSR303Validation SettingsDTO settingsDTO, Validation validation) {
         validationService.validateSettingsDTO(settingsDTO, validation);
+        
+        if (validation.hasBeanViolations()) {
+            return Results.html().render("settingsDTO", settingsDTO).render("validation", validation).template("/views/AdminController/settings.ftl.html");
+        }
 
         if (!validation.hasBeanViolations()) {
             final Settings settings = dataService.findSettings();
@@ -225,7 +229,7 @@ public class AdminController extends RootController {
                 }
                 dataService.save(user);
                 flashScope.success(message);
-                LOG.info("User " + user.getEmail() + " " + admin + " - by " + connectedUser.getEmail());
+                LOG.info(user.getEmail() + " " + admin + " - " + connectedUser.getEmail());
             } else {
                 flashScope.put(Constants.FLASHWARNING.get(), i18nService.get("warning.change.admin"));
             }
@@ -246,7 +250,7 @@ public class AdminController extends RootController {
             dataService.delete(user);
             
             flashScope.success(i18nService.get("info.delete.user", new Object[]{username}));
-            LOG.info("User " + username + " deleted - by " + connectedUser.getEmail());
+            LOG.info(username + " deleted - " + connectedUser.getEmail());
 
             calculationService.calculations();
         } else {
