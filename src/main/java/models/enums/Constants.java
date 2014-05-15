@@ -24,7 +24,8 @@ public enum Constants {
     REMINDERJOB("ReminderJob"),
     RESULTJOB("ResultJob"),
     CONNECTEDUSER("connectedUser"),
-    FLASHWARNING("warning");
+    FLASHWARNING("warning"),
+    SETTINGS("settings");
 
     private String value;
 

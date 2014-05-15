@@ -47,6 +47,7 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/admin/jobstatus/{name}").with(AdminController.class, "jobstatus");
         router.POST().route("/admin/updatesettings").with(AdminController.class, "updatesettings");
         router.POST().route("/admin/storeresults").with(AdminController.class, "storeresults");
+        router.POST().route("/admin/reset").with(AdminController.class, "reset");
         
         /** Tips Controller **/
         router.GET().route("/tips/overview/{number}").with(TipController.class, "overview");
@@ -77,7 +78,7 @@ public class Routes implements ApplicationRoutes {
         router.POST().route("/ajax/game/webserviceid/{gameId}").with(AjaxController.class, "webserviceid");
 
         /** System Controller **/
-        router.GET().route("/setup").with(SystemController.class, "setup");
+        router.GET().route("/system/setup").with(SystemController.class, "setup");
         router.GET().route("/system/init").with(SystemController.class, "init");
         
         /** Assets Controller **/

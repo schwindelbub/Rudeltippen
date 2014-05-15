@@ -66,7 +66,6 @@ public class DataService {
     private static final String PLACE = "place";
     private static final String BRACKET = "bracket";
     private static final String NUMBER = "number";
-    private static final String SETTINGS = "settings";
     private static final String EMAIL = "email";
     private static final String USER = "user";
     private static final String PLAYDAY = "playday";
@@ -256,10 +255,10 @@ public class DataService {
     }
 
     public Settings findSettings() {
-        Settings settings = (Settings) ninjaCache.get(SETTINGS);
+        Settings settings = (Settings) ninjaCache.get(Constants.SETTINGS.get());
         if (settings == null) {
             settings = this.datastore.find(Settings.class).field("appName").equal(Constants.APPNAME.get()).get();
-            ninjaCache.add(SETTINGS, settings);
+            ninjaCache.add(Constants.SETTINGS.get(), settings);
         }
 
         return settings;

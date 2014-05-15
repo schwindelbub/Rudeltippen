@@ -44,7 +44,7 @@ import com.google.inject.Singleton;
 public class UserController extends RootController {
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
     private static final String CONFIRM_MESSAGE = "confirm.message";
-    private static final String USERS_PROFILE = "/users/profile";
+    private static final String USERS_PROFILE = "/users/myprofile";
     private static final String USERNAME = "username";
 
     @Inject

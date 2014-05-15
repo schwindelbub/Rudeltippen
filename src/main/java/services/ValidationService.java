@@ -79,53 +79,53 @@ public class ValidationService {
     }
 
     public void validateUserDTO(UserDTO userDTO, Validation validation) {
-        if (!isValidUsername(userDTO.username)) {
+        if (!isValidUsername(userDTO.getUsername())) {
             validation.addBeanViolation(createBeanValidation(USERNAME, i18nService.get("validation.username.size")));
         }
 
-        if (usernameExists(userDTO.username)) {
+        if (usernameExists(userDTO.getUsername())) {
             validation.addBeanViolation(createBeanValidation(USERNAME, i18nService.get("validation.username.exists")));
         }
 
-        if (!isValidEmail(userDTO.email)) {
+        if (!isValidEmail(userDTO.getEmail())) {
             validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.invalid")));
         }
 
-        if (emailExists(userDTO.email)) {
+        if (emailExists(userDTO.getEmail())) {
             validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.exsits")));
         }
 
-        if (!match(userDTO.email, userDTO.emailConfirmation)) {
+        if (!match(userDTO.getEmail(), userDTO.getEmailConfirmation())) {
             validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.notmatch")));
         }
 
-        if (!isValidPassword(userDTO.userpass)) {
+        if (!isValidPassword(userDTO.getUserpass())) {
             validation.addBeanViolation(createBeanValidation(USERPASS, i18nService.get("validation.password.invalid")));
         }
 
-        if (!match(userDTO.userpass, userDTO.userpassConfirmation)) {
+        if (!match(userDTO.getUserpass(), userDTO.getUserpassConfirmation())) {
             validation.addBeanViolation(createBeanValidation(USERPASS, i18nService.get("validation.password.notmatch")));
         }
     }
 
     public void validateSettingsDTO(SettingsDTO settingsDTO, Validation validation) {
-        if (StringUtils.isEmpty(settingsDTO.name) || settingsDTO.name.length() <= 3 || settingsDTO.name.length() >= 256) {
+        if (StringUtils.isEmpty(settingsDTO.getName()) || settingsDTO.getName().length() <= 3 || settingsDTO.getName().length() >= 256) {
             validation.addBeanViolation(createBeanValidation("name", i18nService.get("validation.settings.invalidname")));
         }
         
-        if (settingsDTO.pointsTip <= 0 || settingsDTO.pointsTip >= 100) {
+        if (settingsDTO.getPointsTip() <= 0 || settingsDTO.getPointsTip() >= 100) {
             validation.addBeanViolation(createBeanValidation("pointsTip", i18nService.get("validation.settings.invalidpointstip")));
         }
         
-        if (settingsDTO.pointsTipDiff <= 0 || settingsDTO.pointsTipDiff >= 100) {
+        if (settingsDTO.getPointsTipDiff() <= 0 || settingsDTO.getPointsTipDiff() >= 100) {
             validation.addBeanViolation(createBeanValidation("pointsTipDiff", i18nService.get("validation.settings.invalidpointstipdiff")));
         }
         
-        if (settingsDTO.pointsTipTrend <= 0 || settingsDTO.pointsTipTrend >= 100) {
+        if (settingsDTO.getPointsTipTrend() <= 0 || settingsDTO.getPointsTipTrend() >= 100) {
             validation.addBeanViolation(createBeanValidation("pointsTipTrend", i18nService.get("validation.settings.invalidpointstiptrend")));
         }
         
-        if (settingsDTO.minutesBeforeTip <= 0 || settingsDTO.minutesBeforeTip > 1440) {
+        if (settingsDTO.getMinutesBeforeTip() <= 0 || settingsDTO.getMinutesBeforeTip() > 1440) {
             validation.addBeanViolation(createBeanValidation("minutesBeforeTip", i18nService.get("validation.settings.invalidminutes")));
         }
     }

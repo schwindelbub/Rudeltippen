@@ -21,8 +21,10 @@ import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
+import ninja.cache.NinjaCache;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
+import ninja.session.Session;
 import ninja.validation.JSR303Validation;
 import ninja.validation.Validation;
 
@@ -41,7 +43,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import dtos.SettingsDTO;
-import filters.AuthorizationFilter;
+import filters.AdminFilter;
 
 /**
  * 
@@ -49,7 +51,7 @@ import filters.AuthorizationFilter;
  *
  */
 @Singleton
-@FilterWith(AuthorizationFilter.class)
+@FilterWith(AdminFilter.class)
 public class AdminController extends RootController {
     private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
     private static final String ERROR_LOADING_USER = "error.loading.user";
@@ -78,6 +80,9 @@ public class AdminController extends RootController {
 
     @Inject
     private CommonService commonService;
+    
+    @Inject
+    private NinjaCache ninjaCache;
 
     public Result results(@PathParam("number") long number) {
         final Pagination pagination = commonService.getPagination(number, ADMIN_RESULTS, dataService.findAllPlaydaysOrderByNumber().size());
@@ -147,15 +152,16 @@ public class AdminController extends RootController {
 
         if (!validation.hasBeanViolations()) {
             final Settings settings = dataService.findSettings();
-            settings.setGameName(settingsDTO.name);
-            settings.setPointsTip(settingsDTO.pointsTip);
-            settings.setPointsTipDiff(settingsDTO.pointsTipDiff);
-            settings.setPointsTipTrend(settingsDTO.pointsTipTrend);
-            settings.setMinutesBeforeTip(settingsDTO.minutesBeforeTip);
-            settings.setInformOnNewTipper(settingsDTO.informOnNewTipper);
-            settings.setEnableRegistration(settingsDTO.enableRegistration);
+            settings.setGameName(settingsDTO.getName());
+            settings.setPointsTip(settingsDTO.getPointsTip());
+            settings.setPointsTipDiff(settingsDTO.getPointsTipDiff());
+            settings.setPointsTipTrend(settingsDTO.getPointsTipTrend());
+            settings.setMinutesBeforeTip(settingsDTO.getMinutesBeforeTip());
+            settings.setInformOnNewTipper(settingsDTO.isInformOnNewTipper());
+            settings.setEnableRegistration(settingsDTO.isEnableRegistration());
             dataService.save(settings);
 
+            ninjaCache.delete(Constants.SETTINGS.get());
             flashScope.success(i18nService.get("setup.saved"));
         }
 
@@ -315,5 +321,19 @@ public class AdminController extends RootController {
         calculationService.calculations();
 
         return Results.redirect("/admin/tournament");
+    }
+    
+    public Result reset(Context context, Session session) throws InterruptedException {
+        String confirm = context.getParameter("confirm");
+        
+        if (("rudeltippen").equalsIgnoreCase(confirm)) {
+            dataService.dropDatabase();
+            ninjaCache.clear();
+            session.clear();
+            
+            return Results.redirect("/");
+        }
+        
+        return Results.redirect("/admin/settings");
     }
 }

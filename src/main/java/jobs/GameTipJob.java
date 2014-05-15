@@ -43,7 +43,7 @@ public class GameTipJob implements Job {
     }
 
     @Override
-    public void execute(JobExecutionContext arg0) throws JobExecutionException {
+    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         if (resultService.isJobInstance()) {
             AbstractJob job = dataService.findAbstractJobByName(Constants.GAMETIPJOB.get());
             if (job != null && job.isActive()) {

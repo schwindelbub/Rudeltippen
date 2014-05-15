@@ -21,7 +21,7 @@ import services.DataService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import filters.AuthorizationFilter;
+import filters.AdminFilter;
 
 /**
  * 
@@ -29,7 +29,7 @@ import filters.AuthorizationFilter;
  *
  */
 @Singleton
-@FilterWith(AuthorizationFilter.class)
+@FilterWith(AdminFilter.class)
 public class AjaxController extends RootController {
     private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
     private static final String VALUE = "value";

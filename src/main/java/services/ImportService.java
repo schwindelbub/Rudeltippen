@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import models.AbstractJob;
 import models.Bracket;
 import models.Extra;
 import models.Game;
@@ -43,6 +45,9 @@ public class ImportService {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private I18nService i18nService;
 
     public void loadInitialData() {
         Map<String, Bracket> brackets = loadBrackets();
@@ -50,8 +55,24 @@ public class ImportService {
         Map<String, Playday> playdays = loadPlaydays();
         loadGames(playdays, teams, brackets);
         loadExtras(teams);
+        initJobs();
 
         setReferences();
+    }
+
+    private void initJobs() {
+        List<AbstractJob> abstractJobs = new ArrayList<AbstractJob>();
+        abstractJobs.add(new AbstractJob(Constants.GAMETIPJOB.get(), i18nService.get("job.gametipjob.executed"), i18nService.get("job.gametipjob.description")));
+        abstractJobs.add(new AbstractJob(Constants.KICKOFFJOB.get(), i18nService.get("job.playdayjob.executed"), i18nService.get("job.playdayjob.description")));
+        abstractJobs.add(new AbstractJob(Constants.REMINDERJOB.get(), i18nService.get("job.reminderjob.executed"), i18nService.get("job.reminderjob.description")));
+        abstractJobs.add(new AbstractJob(Constants.RESULTJOB.get(), i18nService.get("job.resultsjob.executed"), i18nService.get("job.resultsjob.descrption")));
+
+        for (AbstractJob abstractJob : abstractJobs) {
+            AbstractJob job = dataService.findAbstractJobByName(abstractJob.getName());
+            if (job == null) {
+                dataService.save(abstractJob);
+            }
+        }
     }
 
     private void setReferences() {

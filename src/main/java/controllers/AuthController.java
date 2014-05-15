@@ -188,8 +188,8 @@ public class AuthController {
             final String salt = DigestUtils.sha512Hex(UUID.randomUUID().toString());
             final User user = new User();
             user.setRegistered(new Date());
-            user.setUsername(userDTO.username);
-            user.setEmail(userDTO.email);
+            user.setUsername(userDTO.getUsername());
+            user.setEmail(userDTO.getEmail());
             user.setActive(false);
             user.setReminder(true);
             user.setSendStandings(true);
@@ -197,9 +197,9 @@ public class AuthController {
             user.setNotification(true);
             user.setAdmin(false);
             user.setSalt(salt);
-            user.setUserpass(authService.hashPassword(userDTO.userpass, salt));
+            user.setUserpass(authService.hashPassword(userDTO.getUserpass(), salt));
             user.setPoints(0);
-            user.setPicture(DigestUtils.md5Hex(userDTO.email));
+            user.setPicture(DigestUtils.md5Hex(userDTO.getEmail()));
             dataService.save(user);
 
             final String token = UUID.randomUUID().toString();
@@ -234,14 +234,14 @@ public class AuthController {
             return Results.html().render("passwordDTO", passwordDTO).render(VALIDATION, validation).template("/views/AuthController/rendew.ftl.html");
         }
 
-        final Confirmation confirmation = dataService.findConfirmationByToken(passwordDTO.token);
+        final Confirmation confirmation = dataService.findConfirmationByToken(passwordDTO.getToken());
         if (confirmation == null) {
             flashScope.put(Constants.FLASHWARNING.get(), i18nService.get(INVALIDTOKEN));
             return Results.redirect(AUTH_LOGIN);
         }
 
         final User user = confirmation.getUser();
-        final String password = authService.hashPassword(passwordDTO.userpass, user.getSalt());
+        final String password = authService.hashPassword(passwordDTO.getUserpass(), user.getSalt());
         user.setUserpass(password);
         dataService.delete(user);
 
@@ -255,10 +255,10 @@ public class AuthController {
         if (validation.hasBeanViolations()) {
             return Results.html().render("login", loginDTO).render(VALIDATION, validation).template("/views/AuthController/login.ftl.html");
         } else {
-            if (authService.authenticate(loginDTO.username, loginDTO.userpass)) {
-                session.put(Constants.USERNAME.get(), loginDTO.username);
-                if (loginDTO.remember) {
-                    String signedUsername = authService.sign(loginDTO.username) + "-" + loginDTO.username;
+            if (authService.authenticate(loginDTO.getUsername(), loginDTO.getUserpass())) {
+                session.put(Constants.USERNAME.get(), loginDTO.getUsername());
+                if (loginDTO.isRemember()) {
+                    String signedUsername = authService.sign(loginDTO.getUsername()) + "-" + loginDTO.getUsername();
                     Cookie.builder("rememberme", signedUsername).setSecure(true).setHttpOnly(true).build();
                 }
 

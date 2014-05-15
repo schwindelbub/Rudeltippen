@@ -12,6 +12,7 @@ import models.enums.Constants;
 import ninja.Context;
 import ninja.Result;
 import ninja.Results;
+import ninja.cache.NinjaCache;
 import ninja.session.Session;
 import ninja.utils.NinjaProperties;
 
@@ -52,6 +53,9 @@ public class SystemController {
 
     @Inject
     private NinjaProperties ninjaProperties;
+    
+    @Inject
+    private NinjaCache ninjaCache;
 
     @Inject
     private AuthService authService;
@@ -66,10 +70,11 @@ public class SystemController {
 
     public Result init(Session session, Context context) {
         if (!dataService.appIsInizialized()) {
+            ninjaCache.clear();
             session.clear();
 
             try {
-                Thread.sleep(5000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 LOG.error("Failed while trying to sleep in system/init", e);
             }
