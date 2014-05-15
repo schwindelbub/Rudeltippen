@@ -149,7 +149,7 @@
 					</execution>
 					<execution>
 						<id>zip</id>
-						<phase>verify</phase>
+						<phase>deploy</phase>
 						<configuration>
 							<target name="Create release zip">
 								<move file="target/rudeltippen-${project.version}-jar-with-dependencies.jar" tofile="rudeltippen/rudeltippen.jar" failonerror="false" />
