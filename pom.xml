@@ -111,9 +111,10 @@
 				<version>1.7</version>
 				<executions>
 					<execution>
+						<id>combine</id>
 						<phase>clean</phase>
 						<configuration>
-							<tasks name="Create combined CSS an JS files">
+							<tasks name="Create combined CSS and JS files">
 								<property name="CSS_DIR" value="src/main/java/assets/stylesheets" />
 								<property name="JS_DIR" value="src/main/java/assets/javascripts" />
 								<property name="CSS" value="${CSS_DIR}/combined.min.css" />
@@ -146,6 +147,22 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
+					<execution>
+						<id>zip</id>
+						<phase>verify</phase>
+						<configuration>
+							<target name="Create release zip">
+								<move file="target/rudeltippen-${project.version}-jar-with-dependencies.jar" tofile="rudeltippen/rudeltippen.jar" />
+								<move file="target/rudeltippen-${project.version}.war" tofile="rudeltippen/rudeltippen.war" />
+								<copy file="src/main/java/conf/application.conf.example" todir="rudeltippen/" />
+								<zip destfile="target/rudeltippen.zip" filesonly="true" basedir="." includes="rudeltippen/**" />
+								<delete dir="rudeltippen/" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>					
 				</executions>
 			</plugin>
 		</plugins>
