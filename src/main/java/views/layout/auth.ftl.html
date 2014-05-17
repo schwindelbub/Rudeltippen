@@ -7,6 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
  	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+ 	<meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1" media="(device-height: 568px)" />
     <meta name="description" content="Rudeltippen">
     <meta name="author" content="Sven Kubiak">
     <link href="/assets/img/apple-touch-icon-152x152.png" rel="shortcut icon">
@@ -24,7 +25,7 @@
 		<div class="row" style="margin-top:5px">
 		    <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
 				<div class="alert alert-danger">
-		    		<p><strong>${flash.error}</strong></p>
+		    		<p><strong><#noescape>${flash.error}</#noescape></strong></p>
 				</div>
 			</div>
 		</div>
@@ -32,14 +33,14 @@
 		<#if flash.warning??>
 		<div class="row" style="margin-top:5px">
 		    <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
-				<div class="alert alert-warning"><p><strong>${flash.warning}</strong></p></div>
+				<div class="alert alert-warning"><p><strong><#noescape>${flash.warning}</#noescape></strong></p></div>
 			</div>
 		</div>	
 		</#if>		
 		<#if flash.success??>
 		<div class="row" style="margin-top:5px">
 		    <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
-				<div class="alert alert-success"><p><strong>${flash.success}</strong></p></div>
+				<div class="alert alert-success"><p><strong><#noescape>${flash.success}</#noescape></strong></p></div>
 			</div>
 		</div>	
 		</#if>

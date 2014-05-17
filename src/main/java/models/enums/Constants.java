@@ -16,16 +16,17 @@ public enum Constants {
     CONFIRMATIONPATTERN("\\w{8,8}-\\w{4,4}-\\w{4,4}-\\w{4,4}-\\w{12,12}"),
     EMAILPATTERN(".+@.+\\.[a-z]+"),
     USERNAMEPATTERN("[a-zA-Z0-9-_]+"),
+    OBJECTIDPATTERN("^[0-9a-z]{24}$"),
     USERNAME("username"),
     COOKIENAME("rudelremember"),
-    MEDIAFOLDER("src/main/java/assets/media/"),
     MAILFOLDER("src/main/java/views/mails/"),
     GAMETIPJOB("GameTipJob"),
     KICKOFFJOB("KickoffJob"),
     REMINDERJOB("ReminderJob"),
     RESULTJOB("ResultJob"),
     CONNECTEDUSER("connectedUser"),
-    FLASHWARNING("warning");
+    FLASHWARNING("warning"),
+    SETTINGS("settings");
 
     private String value;
 

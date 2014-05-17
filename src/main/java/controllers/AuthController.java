@@ -9,6 +9,7 @@ import models.Settings;
 import models.User;
 import models.enums.ConfirmationType;
 import models.enums.Constants;
+import ninja.Context;
 import ninja.Cookie;
 import ninja.FilterWith;
 import ninja.Result;
@@ -80,31 +81,35 @@ public class AuthController {
         return Results.html().render(settings);
     }
 
-    public Result reset(@PathParam("email") String email, FlashScope flashScope) {
-        if (validationService.isValidEmail(email)) {
+    public Result reset(Context context, FlashScope flashScope) {
+        final String email = context.getParameter("email");
+        if (!validationService.isValidEmail(email)) {
             flashScope.error(i18nService.get("controller.auth.resenderror"));
 
-            return Results.redirect("/auth/forgotton");
+            return Results.redirect("/auth/forgotten");
+        } 
+        final User user = dataService.findUserByEmailAndActive(email);
+        
+        if (user == null) {
+            flashScope.error(i18nService.get("controller.auth.resenderror"));
+
+            return Results.redirect("/auth/forgotten");
         } else {
-            final User user = dataService.findUserByEmailAndActive(email);
-            if (user != null) {
-                final String token = UUID.randomUUID().toString();
-                final ConfirmationType confirmType = ConfirmationType.NEWUSERPASS;
-                final Confirmation confirmation = new Confirmation();
-                confirmation.setUser(user);
-                confirmation.setToken(token);
-                confirmation.setConfirmType(confirmType);
-                confirmation.setConfirmValue(authService.encryptAES(UUID.randomUUID().toString()));
-                confirmation.setCreated(new Date());
-                dataService.save(confirmation);
+            final String token = UUID.randomUUID().toString();
+            final ConfirmationType confirmType = ConfirmationType.NEWUSERPASS;
+            final Confirmation confirmation = new Confirmation();
+            confirmation.setUser(user);
+            confirmation.setToken(token);
+            confirmation.setConfirmationType(confirmType);
+            confirmation.setConfirmValue(authService.encryptAES(UUID.randomUUID().toString()));
+            confirmation.setCreated(new Date());
+            dataService.save(confirmation);
 
-                mailService.confirm(user, token, confirmType);
-                flashScope.success(i18nService.get("confirm.message"));
+            mailService.confirm(user, token, confirmType);
+            flashScope.success(i18nService.get("confirm.message"));
 
-                return Results.redirect(AUTH_LOGIN);
-            }
+            return Results.redirect(AUTH_LOGIN);
         }
-        return Results.redirect("/");
     }
 
     public Result confirm(@PathParam("token") String token, FlashScope flashScope, Session session) {
@@ -119,15 +124,16 @@ public class AuthController {
         if (confirmation != null) {
             final User user = confirmation.getUser();
             if (user != null) {
-                final ConfirmationType confirmationType = confirmation.getConfirmType();
+                final ConfirmationType confirmationType = confirmation.getConfirmationType();
                 if (ConfirmationType.NEWUSERPASS.equals(confirmationType)) {
                     return Results.redirect("/auth/password/" + token);
                 } else {
                     if ((ConfirmationType.ACTIVATION).equals(confirmationType)) {
-                        authService.activateAndSetAvatar(user);
-                        flashScope.success(i18nService.get("controller.users.accountactivated"));
+                        user.setActive(true);
+                        dataService.save(user);
                         dataService.delete(confirmation);
-
+                        
+                        flashScope.success(i18nService.get("controller.users.accountactivated"));
                         LOG.info("User activated: " + user.getEmail());
                     } else if ((ConfirmationType.CHANGEUSERNAME).equals(confirmationType)) {
                         final String oldusername = user.getEmail();
@@ -182,8 +188,8 @@ public class AuthController {
             final String salt = DigestUtils.sha512Hex(UUID.randomUUID().toString());
             final User user = new User();
             user.setRegistered(new Date());
-            user.setUsername(userDTO.username);
-            user.setEmail(userDTO.email);
+            user.setUsername(userDTO.getUsername());
+            user.setEmail(userDTO.getEmail());
             user.setActive(false);
             user.setReminder(true);
             user.setSendStandings(true);
@@ -191,14 +197,15 @@ public class AuthController {
             user.setNotification(true);
             user.setAdmin(false);
             user.setSalt(salt);
-            user.setUserpass(authService.hashPassword(userDTO.userpass, salt));
+            user.setUserpass(authService.hashPassword(userDTO.getUserpass(), salt));
             user.setPoints(0);
+            user.setPicture(DigestUtils.md5Hex(userDTO.getEmail()));
             dataService.save(user);
 
             final String token = UUID.randomUUID().toString();
             final ConfirmationType confirmationType = ConfirmationType.ACTIVATION;
             final Confirmation confirmation = new Confirmation();
-            confirmation.setConfirmType(confirmationType);
+            confirmation.setConfirmationType(confirmationType);
             confirmation.setConfirmValue(authService.encryptAES(UUID.randomUUID().toString()));
             confirmation.setCreated(new Date());
             confirmation.setToken(token);
@@ -227,14 +234,14 @@ public class AuthController {
             return Results.html().render("passwordDTO", passwordDTO).render(VALIDATION, validation).template("/views/AuthController/rendew.ftl.html");
         }
 
-        final Confirmation confirmation = dataService.findConfirmationByToken(passwordDTO.token);
+        final Confirmation confirmation = dataService.findConfirmationByToken(passwordDTO.getToken());
         if (confirmation == null) {
             flashScope.put(Constants.FLASHWARNING.get(), i18nService.get(INVALIDTOKEN));
             return Results.redirect(AUTH_LOGIN);
         }
 
         final User user = confirmation.getUser();
-        final String password = authService.hashPassword(passwordDTO.userpass, user.getSalt());
+        final String password = authService.hashPassword(passwordDTO.getUserpass(), user.getSalt());
         user.setUserpass(password);
         dataService.delete(user);
 
@@ -248,11 +255,11 @@ public class AuthController {
         if (validation.hasBeanViolations()) {
             return Results.html().render("login", loginDTO).render(VALIDATION, validation).template("/views/AuthController/login.ftl.html");
         } else {
-            if (authService.authenticate(loginDTO.username, loginDTO.userpass)) {
-                session.put(Constants.USERNAME.get(), loginDTO.username);
-                if (loginDTO.remember) {
-                    String signedUsername = authService.sign(loginDTO.username) + "-" + loginDTO.username;
-                    Cookie.builder("rememberme", signedUsername).setSecure(true).setHttpOnly(true).build();
+            if (authService.authenticate(loginDTO.getUsername(), loginDTO.getUserpass())) {
+                session.put(Constants.USERNAME.get(), loginDTO.getUsername());
+                if (loginDTO.isRemember()) {
+                    String signedUsername = authService.sign(loginDTO.getUsername()) + "-" + loginDTO.getUsername();
+                    Cookie.builder(Constants.COOKIENAME.get(), signedUsername).setSecure(true).setHttpOnly(true).build();
                 }
 
                 return Results.redirect("/");

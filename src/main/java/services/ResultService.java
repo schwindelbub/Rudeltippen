@@ -167,14 +167,10 @@ public class ResultService {
         final Settings settings = dataService.findSettings();
         int points = 0;
 
-        if (settings.isCountFinalResult()) {
-            points = getTipPoints(homeScoreOT, awayScoreOT, homeScoreTipp, awayScoreTipp);
-        } else {
-            if ((homeScore == awayScore) && (homeScore == homeScoreTipp) && (awayScore == awayScoreTipp)) {
-                points = settings.getPointsTip();
-            } else if ((homeScore == awayScore) && (homeScoreTipp == awayScoreTipp)) {
-                points = settings.getPointsTipDiff();
-            }
+        if ((homeScore == awayScore) && (homeScore == homeScoreTipp) && (awayScore == awayScoreTipp)) {
+            points = settings.getPointsTip();
+        } else if ((homeScore == awayScore) && (homeScoreTipp == awayScoreTipp)) {
+            points = settings.getPointsTipDiff();
         }
 
         return points;

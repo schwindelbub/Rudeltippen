@@ -34,6 +34,10 @@ import com.google.inject.Singleton;
  */
 @Singleton
 public class SetupService {
+    private static final String BR = "<br />";
+
+    private static final String MATCH_DATE_TIME_UTC = "matchDateTimeUTC";
+
     private static final Logger LOG = LoggerFactory.getLogger(ResultService.class);
 
     @Inject
@@ -66,7 +70,7 @@ public class SetupService {
 
                     if ("matchID".equals(name)) {
                         webserviceID = value;
-                    } else if (("matchDateTimeUTC").equals(name)) {
+                    } else if (MATCH_DATE_TIME_UTC.equals(name)) {
                         value = value.replace("T", " ");
                         value = value.replace("Z", "");
                         kickoff = value;
@@ -78,15 +82,15 @@ public class SetupService {
                 }
 
                 games.add("models.Game(g" + game + "):<br />");
-                games.add("&nbsp;&nbsp;&nbsp;&nbsp;number:        " + game + "<br />");
-                games.add("&nbsp;&nbsp;&nbsp;&nbsp;homeTeam:      " + homeTeam + "<br />");
-                games.add("&nbsp;&nbsp;&nbsp;&nbsp;awayTeam:      " + awayTeam + "<br />");
-                games.add("&nbsp;&nbsp;&nbsp;&nbsp;kickoff:       " + kickoff + "<br />");
-                games.add("&nbsp;&nbsp;&nbsp;&nbsp;playday:       p" + k + "<br />");
+                games.add("&nbsp;&nbsp;&nbsp;&nbsp;number:        " + game + BR);
+                games.add("&nbsp;&nbsp;&nbsp;&nbsp;homeTeam:      " + homeTeam + BR);
+                games.add("&nbsp;&nbsp;&nbsp;&nbsp;awayTeam:      " + awayTeam + BR);
+                games.add("&nbsp;&nbsp;&nbsp;&nbsp;kickoff:       " + kickoff + BR);
+                games.add("&nbsp;&nbsp;&nbsp;&nbsp;playday:       p" + k + BR);
                 games.add("&nbsp;&nbsp;&nbsp;&nbsp;playoff:       false<br />");
                 games.add("&nbsp;&nbsp;&nbsp;&nbsp;ended:         false<br />");
-                games.add("&nbsp;&nbsp;&nbsp;&nbsp;webserviceID:  " + webserviceID + "<br />");
-                games.add("<br />");
+                games.add("&nbsp;&nbsp;&nbsp;&nbsp;webserviceID:  " + webserviceID + BR);
+                games.add(BR);
                 game++;
             }
         }
@@ -158,8 +162,8 @@ public class SetupService {
             playdays.add("&nbsp;&nbsp;&nbsp;&nbsp;name:          " + i + "spieltag<br />");
             playdays.add("&nbsp;&nbsp;&nbsp;&nbsp;current:       false<br />");
             playdays.add("&nbsp;&nbsp;&nbsp;&nbsp;playoff:       false<br />");
-            playdays.add("&nbsp;&nbsp;&nbsp;&nbsp;number:        " + i + "<br />");
-            playdays.add("<br />");
+            playdays.add("&nbsp;&nbsp;&nbsp;&nbsp;number:        " + i + BR);
+            playdays.add(BR);
         }
 
         return playdays;
@@ -168,7 +172,7 @@ public class SetupService {
     public Date getKickoffFromDocument(final Document document) {
         Date date = new Date();
         if (document != null) {
-            final NodeList nodeList = document.getElementsByTagName("matchDateTimeUTC");
+            final NodeList nodeList = document.getElementsByTagName(MATCH_DATE_TIME_UTC);
             if ((nodeList != null) && (nodeList.getLength() > 0)) {
                 String kickoff = nodeList.item(0).getTextContent();
                 kickoff = kickoff.replace("T", " ");

@@ -12,11 +12,11 @@ Available tournaments
 Features in a Nutshell
 ------------------
 - Mobile first layout based Twitter Bootstrap 3
-- Automatic results updates
-- Automatic tournament management
-- Automatic playing schedule updates
-- User and Tournament statistics
-- Gravatar support
+- Automatic/Manual results updates
+- Automatic/Manual tournament management
+- Automatic/Manual playing schedule updates
+- Lots of statistics
+- Avatar through avatars.io
 - ...and a lot more
 
 Screenshots
@@ -191,31 +191,6 @@ Start the application with the following command in your INSTLLATIONFOLDER
 play start
 ```
 
-Advanced configuration
-------------------
-
-### Log4j
-
-If you want log4j Support for your Application you'll find an empty log4j configuration file (log4j.prod.xml.example) in INSTLLATIONFOLDER/conf. Rename the file to log4j.prod.xml and edit this file with your required appenders. Afterwards uncomment the following line in INSTLLATIONFOLDER/application.conf
-
-```bash
-#%prod.application.log.path=/log4j.prod.xml
-```
-
-You need to restart Rudeltippen in order for the changes to take effect.
-
-### Load balancer
-
-As mentioned [in the Play documentation][9] you can use a load balancer with multiple Rudeltippen applications. You need to set a different port for each Rudeltippen application and set these ports in your Front-End HTTP Server configuration.
-The jobs Rudeltippen executes do not know about how many instances you run and will by default run in each instance. To avoid this, you can set the name of the application- and the job-instance. Rudeltippen will only execute Jobs in an instance where the name of the appname and jobinstance matches.
-
-```bash
-application.name=rudeltippen
-app.jobinstance=rudeltippen
-```
-
-You need to restart Rudeltippen in order for the changes to take effect.
-
 Development
 ------------------
 If you work with the master branch or the source code releases you need to run "ant" in the home directory. The ant jobs copies the JavaScript- and CSS-Resources into single files (combined.js and combined.css) and builds a ZIP-File (rudeltippen.zip) ready for testing or deployment.
@@ -228,7 +203,6 @@ Rudeltippen is distributed under [Apache 2 licence][11]
 [1]: http://www.oracle.com/technetwork/java/javase/downloads/index.html
 [2]: http://ami.responsivedesign.is
 [5]: https://flattr.com/thing/1628177/Rudeltippen
-[9]: http://www.playframework.com/documentation/1.2.7/production
 [11]: http://www.apache.org/licenses/LICENSE-2.0.html
 [12]: http://mail.google.com/
 [14]: https://github.com/svenkubiak/Rudeltippen/tags

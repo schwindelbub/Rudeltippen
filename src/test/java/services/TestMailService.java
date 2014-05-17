@@ -3,7 +3,7 @@ package services;
 import java.util.ArrayList;
 import java.util.List;
 
-import main.TestFactory;
+import main.TestBase;
 import models.Extra;
 import models.Game;
 import models.User;
@@ -11,7 +11,7 @@ import models.enums.ConfirmationType;
 
 import org.junit.Test;
 
-public class TestMailService extends TestFactory {
+public class TestMailService extends TestBase {
 
     @Test
     public void testReminder() {

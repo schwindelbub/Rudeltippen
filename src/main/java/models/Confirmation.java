@@ -6,6 +6,7 @@ import java.util.Date;
 import models.enums.ConfirmationType;
 
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
@@ -25,17 +26,26 @@ public class Confirmation implements Serializable {
     @Reference
     private User user;
 
+    @Embedded
+    private ConfirmationType confirmationType;
+
     private String token;
     private String confirmValue;
-
-    private ConfirmationType confirmType;
 
     private Date created;
 
     public ObjectId getId() {
         return id;
     }
+    
+    public ConfirmationType getConfirmationType() {
+        return confirmationType;
+    }
 
+    public void setConfirmationType(ConfirmationType confirmationType) {
+        this.confirmationType = confirmationType;
+    }
+    
     public User getUser() {
         return user;
     }
@@ -50,14 +60,6 @@ public class Confirmation implements Serializable {
 
     public void setToken(String token) {
         this.token = token;
-    }
-
-    public ConfirmationType getConfirmType() {
-        return confirmType;
-    }
-
-    public void setConfirmType(ConfirmationType confirmType) {
-        this.confirmType = confirmType;
     }
 
     public String getConfirmValue() {

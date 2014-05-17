@@ -24,15 +24,11 @@
 					</tr>
 					<tr>
 						<td><b>${i18n('rules.points.playoffs')}</b></td>
-						<#if settings.countFinalResult>
-							<td>${i18n('setup.finalresult')}</td>
-						<#else>
-							<td>${i18n('setup.ninetyminutes')}
-								<ul>
-			                        <li>${i18n('rules.nintyminutesinfo')}</li>
-			                    </ul>
-							</td>
-						</#if>
+						<td>${i18n('setup.ninetyminutes')}
+							<ul>
+		                        <li>${i18n('rules.nintyminutesinfo')}</li>
+		                    </ul>
+						</td>
 					</tr>
 			        <tr>
 			            <td><b>${i18n('rules.points.standings.header')}</b></td>

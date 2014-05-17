@@ -9,7 +9,7 @@
 					<hr class="colorgraph">
 					<div class="form-group <#if validation?? && validation.getFieldViolation('username')>has-error</#if>">
 						<#if validation?? && validation.getFieldViolation("username")><span class="help-block">FOO</span></#if>
-	                    <input type="email" name="email" id="email" class="form-control input-lg" placeholder="${i18n('app.auth.email')}">
+	                    <input type="text" name="email" id="email" class="form-control input-lg" placeholder="${i18n('app.auth.email')}">
 					</div>
 					<hr class="colorgraph">
 					<div class="row">

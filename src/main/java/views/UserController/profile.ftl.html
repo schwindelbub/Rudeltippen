@@ -6,22 +6,46 @@
 		<div class="panel panel-primary">
 		  <div class="panel-heading"><h3 class="panel-title">${i18n('changepicture')}</h3></div>
 		  <div class="panel-body">
-			<form action="/users/updatepicture" role="form" method="post" enctype="multipart/form-data">
-				<div class="form-group<#if validation?? && validation.hasBeanViolation("picture")> has-error</#if>">
-					<#if (user.picture)??>
-						<label for="currentpicture" class="control-label">${i18n('changepicture')}</label>
-						<div class="controls">
-		              		<img src="/assets/media/${user.picture}" border="0"/><br />
-							<a href="/users/deletepicture" onclick="return confirm(${i18n('delete.picture.confirm')})">${i18n('delete')}</a>
-		            	</div>
-					</#if>
-		            <label for="fileInput" class="control-label">${i18n('newprofilepicture')}<br />${i18n('maxprofile', 100)}</label>
-		            <div class="controls">
-		              <input type="file" id="picture" name="picture" class="input-file">
-		            </div>
-		        </div>
-				<input type="submit" data-loading-text="${i18n('save')}..." class="btn btn-success" value="${i18n('save')}">
-			</form>
+		  <div class="row">
+		  	<div class="col-md-12">
+		  		<p><#noescape>${i18n('app.myprofile.avatar', '<a href="http://avatars.io" target="_blank">avatars.io</a>')}</#noescape></p>
+		  	</div>
+		  </div>
+		  <div class="row">
+	        <div class="col-xs-18 col-sm-6 col-md-3">
+	          <div class="thumbnail<#if user.avatar == "TWITTER"> avatar</#if>">
+	              <a href="/users/changepicture/twitter" class="loading-avatar"><img src="//avatars.io/twitter/${user.username}?size=large" width="128" height="128" /></a>
+	              <div class="caption">
+	                <h4>Twitter</h4>
+	            </div>
+	          </div>
+	        </div>
+	        <div class="col-xs-18 col-sm-6 col-md-3">
+	          <div class="thumbnail<#if user.avatar == "FACEBOOK"> avatar</#if>">
+	              <a href="/users/changepicture/facebook" class="loading-avatar"><img src="//avatars.io/facebook/${user.username}?size=large" width="128" height="128" /></a>
+	              <div class="caption">
+	                <h4>Facebook</h4>
+	            </div>
+	          </div>
+	        </div>
+	        <div class="col-xs-18 col-sm-6 col-md-3">
+	          <div class="thumbnail<#if user.avatar == "INSTAGRAM"> avatar</#if>">
+	              <a href="/users/changepicture/instagram" class="loading-avatar"><img src="//avatars.io/instagram/${user.username}?size=large" width="128" height="128" /></a>
+	              <div class="caption">
+	                <h4>Instagram</h4>
+	            </div>
+	          </div>
+	        </div>
+	        <div class="col-xs-18 col-sm-6 col-md-3">
+	          <div class="thumbnail<#if user.avatar == "GRAVATAR"> avatar</#if>">
+	              <a href="/users/changepicture/email" class="loading-avatar"><img src="//avatars.io/email/${user.email}?size=large" width="128" height="128" /></a>
+	              <div class="caption">
+	                <h4>Gravatar</h4>
+	            </div>
+	          </div>
+	        </div>
+	        </form>
+      		</div>
 		  </div>
 		</div>
 	</div>

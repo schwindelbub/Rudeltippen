@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
 </head>
 <body>
-	<p>${i18n.get('hello')} ${user.username}!</p>
+	<p>${i18n.get('hello')} <#if (user.username)??>${user.username}</#if>!</p>
 	<p>${i18n.get('mail.placetips')}</p>
 	<table>
 		<tr>
@@ -57,7 +57,7 @@
 	</table>
 	<p>
 	--- <br>
-	<#include footer.ftl>
+	<#include "footer.ftl">
 	</p>
 <body>
 </html>

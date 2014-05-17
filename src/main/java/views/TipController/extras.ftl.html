@@ -19,7 +19,7 @@
 					<tr>
 						<#if (extraTips.entrySet())??>
 							<#list extraTips.entrySet() as user>
-								<td style="width: 60px;"><a href="/users/show/${user.key.username}"><img src="/assets/img/user_placeholder.gif" /></a></td>
+								<td style="width: 60px;"><a href="/users/show/${user.key.username}"><img src="https://secure.gravatar.com/avatar/${user.key.picture}.jpg?s=64&d=mm" width="64" height="64"/></a></td>
 								<td><br /><b><a href="/users/show/${user.key.username}">${user.key.username}</a></b><br /><small>&{'place'} ${user.key.place}, ${user.key.points} &{'points'}</small></td>
 								<#list user.value as extraTip>
 									<td>&{extraTip.getExtraTipAnswer()}${extraTip.getExtraTipPoints()}</td>

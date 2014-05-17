@@ -52,7 +52,7 @@ public class KickoffJob implements Job {
     }
 
     @Override
-    public void execute(JobExecutionContext arg0) throws JobExecutionException {
+    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         if (resultService.isJobInstance()) {
             AbstractJob job = dataService.findAbstractJobByName(Constants.KICKOFFJOB.get());
             if (job != null && job.isActive()) {
@@ -64,7 +64,7 @@ public class KickoffJob implements Job {
                         final List<Game> games = playday.getGames();
                         for (final Game game : games) {
                             final String matchID = game.getWebserviceID();
-                            if (StringUtils.isNotBlank(matchID) && game.isUpdateble()) {
+                            if (StringUtils.isNotBlank(matchID) && game.isUpdatable()) {
                                 final Document document = resultService.getDocumentFromWebService(matchID);
                                 final Date kickoff = setupService.getKickoffFromDocument(document);
                                 final SimpleDateFormat df = new SimpleDateFormat(KICKOFF_FORMAT);
@@ -79,6 +79,9 @@ public class KickoffJob implements Job {
                     }
                     number++;
                 }
+                
+                job.setExecuted(new Date());
+                dataService.save(job);
                 LOG.info("Finished Job: " + Constants.KICKOFFJOB.get());
             }
         }

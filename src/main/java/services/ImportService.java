@@ -6,18 +6,25 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import models.AbstractJob;
 import models.Bracket;
 import models.Extra;
 import models.Game;
 import models.Playday;
+import models.Settings;
 import models.Team;
+import models.User;
+import models.enums.Avatar;
 import models.enums.Constants;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +43,23 @@ import com.mongodb.util.JSON;
 @Singleton
 public class ImportService {
     private static final Logger LOG = LoggerFactory.getLogger(ImportService.class);
+    private static final String ADMIN = "admin";
     private static final String BRACKET = "bracket";
     private static final String PLAYOFF = "playoff";
-    private static final String UPDATEBLE = "updateble";
+    private static final String UPDATABLE = "updatable";
     private static final String NUMBER = "number";
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private AuthService authService;
+    
+    @Inject
+    private CommonService commonService;
+    
+    @Inject
+    private I18nService i18nService;
 
     public void loadInitialData() {
         Map<String, Bracket> brackets = loadBrackets();
@@ -50,8 +67,74 @@ public class ImportService {
         Map<String, Playday> playdays = loadPlaydays();
         loadGames(playdays, teams, brackets);
         loadExtras(teams);
+        loadSettingsAndAdmin();
+        initJobs();
 
         setReferences();
+    }
+
+    public void loadSettingsAndAdmin() {
+        final List<Game> prePlayoffGames = dataService.findAllNonPlayoffGames();
+        final List<Game> playoffGames = dataService.findAllPlayoffGames();
+        boolean hasPlayoffs = false;
+        if (playoffGames != null && !playoffGames.isEmpty()) {
+            hasPlayoffs = true;
+        }
+        
+        Settings settings = new Settings();
+        settings.setAppName(Constants.APPNAME.get());
+        settings.setPointsGameWin(3);
+        settings.setPointsGameDraw(1);
+        settings.setAppSalt(DigestUtils.sha512Hex(UUID.randomUUID().toString()));
+        settings.setGameName("Rudeltippen");
+        settings.setPointsTip(4);
+        settings.setPointsTipDiff(2);
+        settings.setPointsTipTrend(1);
+        settings.setMinutesBeforeTip(5);
+        settings.setPlayoffs(hasPlayoffs);
+        settings.setNumPrePlayoffGames(prePlayoffGames.size());
+        settings.setInformOnNewTipper(true);
+        settings.setEnableRegistration(true);
+        dataService.save(settings);
+
+        User user = new User();
+        final String salt = DigestUtils.sha512Hex(UUID.randomUUID().toString());
+        user.setSalt(salt);
+        user.setEmail("admin@foo.bar");
+        user.setUsername(ADMIN);
+        user.setUserpass(authService.hashPassword(ADMIN, salt));
+        user.setRegistered(new Date());
+        user.setExtraPoints(0);
+        user.setTipPoints(0);
+        user.setPoints(0);
+        user.setActive(true);
+        user.setAdmin(true);
+        user.setReminder(true);
+        user.setNotification(true);
+        user.setSendGameTips(true);
+        user.setSendStandings(true);
+        user.setCorrectResults(0);
+        user.setCorrectDifferences(0);
+        user.setCorrectTrends(0);
+        user.setCorrectExtraTips(0);
+        user.setPicture(commonService.getUserPictureUrl(Avatar.GRAVATAR, user));
+        user.setAvatar(Avatar.GRAVATAR);
+        dataService.save(user);        
+    }
+
+    private void initJobs() {
+        List<AbstractJob> abstractJobs = new ArrayList<AbstractJob>();
+        abstractJobs.add(new AbstractJob(Constants.GAMETIPJOB.get(), i18nService.get("job.gametipjob.executed"), i18nService.get("job.gametipjob.description")));
+        abstractJobs.add(new AbstractJob(Constants.KICKOFFJOB.get(), i18nService.get("job.playdayjob.executed"), i18nService.get("job.playdayjob.description")));
+        abstractJobs.add(new AbstractJob(Constants.REMINDERJOB.get(), i18nService.get("job.reminderjob.executed"), i18nService.get("job.reminderjob.description")));
+        abstractJobs.add(new AbstractJob(Constants.RESULTJOB.get(), i18nService.get("job.resultsjob.executed"), i18nService.get("job.resultsjob.descrption")));
+
+        for (AbstractJob abstractJob : abstractJobs) {
+            AbstractJob job = dataService.findAbstractJobByName(abstractJob.getName());
+            if (job == null) {
+                dataService.save(abstractJob);
+            }
+        }
     }
 
     private void setReferences() {
@@ -83,7 +166,7 @@ public class ImportService {
             Bracket bracket = new Bracket();
             bracket.setName(basicDBObject.getString("name"));
             bracket.setNumber(basicDBObject.getInt(NUMBER));
-            bracket.setUpdateble(basicDBObject.getBoolean(UPDATEBLE));
+            bracket.setUpdatable(basicDBObject.getBoolean(UPDATABLE));
             dataService.save(bracket);
 
             brackets.put(basicDBObject.getString("id"), bracket);
@@ -116,7 +199,7 @@ public class ImportService {
             game.setNumber(basicDBObject.getInt(NUMBER));
             game.setPlayoff(basicDBObject.getBoolean(PLAYOFF));
             game.setEnded(basicDBObject.getBoolean("ended"));
-            game.setUpdateble(basicDBObject.getBoolean(UPDATEBLE));
+            game.setUpdatable(basicDBObject.getBoolean(UPDATABLE));
             game.setWebserviceID(basicDBObject.getString("webserviceID"));
             game.setHomeTeam(teams.get(basicDBObject.getString("homeTeam")));
             game.setHomeReference(basicDBObject.getString("homeReference"));

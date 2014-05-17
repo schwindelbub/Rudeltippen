@@ -172,6 +172,7 @@ public class MailService {
 
             Map<String, Object> content = new HashMap<String, Object>();
             content.put("notification", notification);
+            content.put(I18N, i18nService);
             mail.setBodyText(commonService.getProcessedTemplate(Constants.MAILFOLDER.get() + "notification.ftl", content));
 
             try {

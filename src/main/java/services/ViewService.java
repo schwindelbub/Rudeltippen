@@ -22,9 +22,9 @@ import com.google.inject.Singleton;
  */
 @Singleton
 public class ViewService {
-    private static final String ICON_ARROW_GREEN = "<i class=\"icon-arrow-up icon-green\"></i>";
-    private static final String ICON_ARROW_RED = "<i class=\"icon-arrow-down icon-red\"></i>";
-    private static final String ICON_MINUS = "<i class=\"icon-minus\"></i>";
+    private static final String ICON_ARROW_GREEN = "<span class=\"glyphicon glyphicon-arrow-up green\"></span>";
+    private static final String ICON_ARROW_RED = "<span class=\"glyphicon glyphicon-arrow-down red\"></span>";
+    private static final String ICON_MINUS = "<span class=\"glyphicon glyphicon-minus black\"></span>";
 
     @Inject
     private DataService dataService;
@@ -47,7 +47,7 @@ public class ViewService {
 
     public String getGameTipAndPoints(final Game game, User user) {
         String tip = "-";
-        final GameTip gameTip = dataService.findGameTipByGameAndUser(user, game);
+        final GameTip gameTip = dataService.findGameTipByGameAndUser(game, user);
 
         if (gameTip != null && gameTip.getGame() != null) {
             if (gameTip.getGame().isEnded()) {
@@ -139,7 +139,7 @@ public class ViewService {
     public String getHomeScoreTip(final Game game, User user) {
         String homeScore = "";
 
-        GameTip gameTip = dataService.findGameTipByGameAndUser(user, game);
+        GameTip gameTip = dataService.findGameTipByGameAndUser(game, user);
         if (gameTip != null) {
             homeScore = String.valueOf(gameTip.getHomeScore());
         }
@@ -150,7 +150,7 @@ public class ViewService {
     public String getAwayScoreTip(final Game game, User user) {
         String awayScore = "";
 
-        GameTip gameTip = dataService.findGameTipByGameAndUser(user, game);
+        GameTip gameTip = dataService.findGameTipByGameAndUser(game, user);
         if (gameTip != null) {
             awayScore = String.valueOf(gameTip.getAwayScore());
         }

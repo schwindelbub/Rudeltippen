@@ -55,7 +55,7 @@ public class Game implements Serializable {
     private boolean playoff;
     private boolean ended;
     private boolean informed;
-    private boolean updateble;
+    private boolean updatable;
     private boolean reminder;
 
     public boolean isReminder() {
@@ -238,11 +238,11 @@ public class Game implements Serializable {
         this.informed = informed;
     }
 
-    public boolean isUpdateble() {
-        return updateble;
+    public boolean isUpdatable() {
+        return updatable;
     }
 
-    public void setUpdateble(boolean updateble) {
-        this.updateble = updateble;
+    public void setUpdatable(boolean updatable) {
+        this.updatable = updatable;
     }
 }

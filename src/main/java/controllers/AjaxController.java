@@ -21,7 +21,7 @@ import services.DataService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import filters.AuthorizationFilter;
+import filters.AdminFilter;
 
 /**
  * 
@@ -29,7 +29,7 @@ import filters.AuthorizationFilter;
  *
  */
 @Singleton
-@FilterWith(AuthorizationFilter.class)
+@FilterWith(AdminFilter.class)
 public class AjaxController extends RootController {
     private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
     private static final String VALUE = "value";
@@ -45,10 +45,11 @@ public class AjaxController extends RootController {
                 game.setWebserviceID(webserviceID);
                 dataService.save(game);
 
-                return Results.ok();
+                return Results.noContent();
             }
         }
-        return Results.badRequest();
+        
+        return Results.badRequest().render(Result.NO_HTTP_BODY);
     }
 
     public Result kickoff(@PathParam("gameId") String gameId, Context context) {
@@ -59,16 +60,17 @@ public class AjaxController extends RootController {
                 try {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy - HH:mm", Locale.ENGLISH);
                     game.setKickoff(simpleDateFormat.parse(kickoff));
-                    game.setUpdateble(false);
+                    game.setUpdatable(false);
                     dataService.save(game);
 
-                    return Results.ok();
+                    return Results.noContent();
                 } catch (Exception e) {
                     LOG.error("Failed to save kickoff", e);
                 }
             }
         }
-        return Results.badRequest();
+        
+        return Results.badRequest().render(Result.NO_HTTP_BODY);
     }
 
     public Result place(@PathParam("teamId") String teamId, Context context) {
@@ -80,34 +82,37 @@ public class AjaxController extends RootController {
                 dataService.save(team);
 
                 Bracket bracket = team.getBracket();
-                bracket.setUpdateble(false);
+                bracket.setUpdatable(false);
                 dataService.save(bracket);
 
-                return Results.ok();
+                return Results.noContent();
             }
         }
-        return Results.badRequest();
+        
+        return Results.badRequest().render(Result.NO_HTTP_BODY);
     }
 
-    public Result updateblegame(@PathParam("gameId") String gameId) {
+    public Result updatablegame(@PathParam("gameId") String gameId) {
         Game game = dataService.findGameById(gameId);
         if (game != null) {
-            game.setUpdateble(!game.isUpdateble());
+            game.setUpdatable(!game.isUpdatable());
             dataService.save(game);
 
-            return Results.ok();
+            return Results.noContent();
         }
-        return Results.badRequest();
+        
+        return Results.badRequest().render(Result.NO_HTTP_BODY);
     }
 
-    public Result updateblebracket(@PathParam("bracketId") String bracketId) {
+    public Result updatablebracket(@PathParam("bracketId") String bracketId) {
         Bracket bracket = dataService.findBracketById(bracketId);
         if (bracket != null) {
-            bracket.setUpdateble(!bracket.isUpdateble());
+            bracket.setUpdatable(!bracket.isUpdatable());
             dataService.save(bracket);
 
-            return Results.ok();
+            return Results.noContent();
         }
-        return Results.badRequest();
+        
+        return Results.badRequest().render(Result.NO_HTTP_BODY);
     }
 }

@@ -21,7 +21,7 @@
 			<#list brackets as bracket>
 			    <thead>
 			        <tr>
-			            <td colspan="9"><legend>${i18n(bracket.name)}</legend>${i18n('app.automatic.calculation')}&nbsp;&nbsp;<input type="checkbox" value="${bracket.updateble?c}" class="updateable" data-url="/ajax/bracket/updateble/${bracket.id}" <#if bracket.updateble>checked</#if> /></td>
+			            <td colspan="9"><legend>${i18n(bracket.name)}</legend>${i18n('app.automatic.calculation')}&nbsp;&nbsp;<input type="checkbox" value="${bracket.updatable?c}" class="updatable" data-url="/ajax/bracket/updatable/${bracket.id}" <#if bracket.updatable>checked</#if> /></td>
 			        </tr>
 			        <tr>
 			            <th>#</th>
@@ -38,7 +38,7 @@
 			    <tbody>
 			        <#list bracket.teams as team>
 			            <tr>
-			                <td><a href="#" class="editable" data-type="text" data-pk="${team.id}" data-url="/ajax/bracket/place/${team.id}" data-title="&{'app.new.place'}">${team.place}</td>
+			                <td><a href="#" class="editable" data-type="text" data-pk="${team.id}" data-url="/ajax/bracket/place/${team.id}" data-title="${i18n('app.new.place')}">${team.place}</td>
 			                <td><img class="flag" src="/assets/img/flags/${team.flag}"/>&nbsp;&nbsp;${i18n(team.name)}</td>
 			                <td>${team.gamesPlayed}</td>
 			                <td>${team.gamesWon}</td>
@@ -80,7 +80,7 @@
 				<tbody>
 				<#list games as game>
 					<tr>
-						<td><input type="checkbox" value="${game.updateble?c}" class="updateable" data-url="/ajax/game/updateble/${game.id}" <#if game.updateble>checked</#if> /></td>
+						<td><input type="checkbox" value="${game.updatable?c}" class="updatable" data-url="/ajax/game/updatable/${game.id}" <#if game.updatable>checked</#if> /></td>
 						<td>${game.number}</td>
 						<td><a href="#" class="editable" data-type="datetime" data-format="dd.mm.yyyy - hh:ii" data-pk="${game.id}" data-url="/ajax/game/kickoff/${game.id}" title="${i18n('app.new.data.time')}">${game.kickoff?datetime}</a></td>
 						<#if (game.homeTeam)??>

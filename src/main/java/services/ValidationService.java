@@ -12,8 +12,6 @@ import ninja.validation.FieldViolation;
 import ninja.validation.Validation;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -29,12 +27,8 @@ import dtos.UserDTO;
 @Singleton
 public class ValidationService {
     private static final String USERPASS = "userpass";
-
     private static final String EMAIL = "email";
-
     private static final String USERNAME = "username";
-
-    private static final Logger LOG = LoggerFactory.getLogger(ValidationService.class);
 
     @Inject
     private DataService dataService;
@@ -85,37 +79,63 @@ public class ValidationService {
     }
 
     public void validateUserDTO(UserDTO userDTO, Validation validation) {
-        if (!isValidUsername(userDTO.username)) {
+        if (userDTO != null) {
+            if (!isValidUsername(userDTO.getUsername())) {
+                validation.addBeanViolation(createBeanValidation(USERNAME, i18nService.get("validation.username.size")));
+            }
+
+            if (usernameExists(userDTO.getUsername())) {
+                validation.addBeanViolation(createBeanValidation(USERNAME, i18nService.get("validation.username.exists")));
+            }
+
+            if (!isValidEmail(userDTO.getEmail())) {
+                validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.invalid")));
+            }
+
+            if (emailExists(userDTO.getEmail())) {
+                validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.exsits")));
+            }
+
+            if (!match(userDTO.getEmail(), userDTO.getEmailConfirmation())) {
+                validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.notmatch")));
+            }
+
+            if (!isValidPassword(userDTO.getUserpass())) {
+                validation.addBeanViolation(createBeanValidation(USERPASS, i18nService.get("validation.password.invalid")));
+            }
+
+            if (!match(userDTO.getUserpass(), userDTO.getUserpassConfirmation())) {
+                validation.addBeanViolation(createBeanValidation(USERPASS, i18nService.get("validation.password.notmatch")));
+            }
+        } else {
             validation.addBeanViolation(createBeanValidation(USERNAME, i18nService.get("validation.username.size")));
-        }
-
-        if (usernameExists(userDTO.username)) {
-            validation.addBeanViolation(createBeanValidation(USERNAME, i18nService.get("validation.username.exists")));
-        }
-
-        if (!isValidEmail(userDTO.email)) {
-            validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.invalid")));
-        }
-
-        if (emailExists(userDTO.email)) {
-            validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.exsits")));
-        }
-
-        if (!match(userDTO.email, userDTO.emailConfirmation)) {
-            validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.notmatch")));
-        }
-
-        if (!isValidPassword(userDTO.userpass)) {
-            validation.addBeanViolation(createBeanValidation(USERPASS, i18nService.get("validation.password.invalid")));
-        }
-
-        if (!match(userDTO.userpass, userDTO.userpassConfirmation)) {
-            validation.addBeanViolation(createBeanValidation(USERPASS, i18nService.get("validation.password.notmatch")));
         }
     }
 
     public void validateSettingsDTO(SettingsDTO settingsDTO, Validation validation) {
-        // TODO Auto-generated method stub
+        if (settingsDTO != null) {
+            if (StringUtils.isEmpty(settingsDTO.getName()) || settingsDTO.getName().length() <= 3 || settingsDTO.getName().length() >= 256) {
+                validation.addBeanViolation(createBeanValidation("name", i18nService.get("validation.settings.invalidname")));
+            }
+            
+            if (settingsDTO.getPointsTip() <= 0 || settingsDTO.getPointsTip() >= 100) {
+                validation.addBeanViolation(createBeanValidation("pointsTip", i18nService.get("validation.settings.invalidpointstip")));
+            }
+            
+            if (settingsDTO.getPointsTipDiff() <= 0 || settingsDTO.getPointsTipDiff() >= 100) {
+                validation.addBeanViolation(createBeanValidation("pointsTipDiff", i18nService.get("validation.settings.invalidpointstipdiff")));
+            }
+            
+            if (settingsDTO.getPointsTipTrend() <= 0 || settingsDTO.getPointsTipTrend() >= 100) {
+                validation.addBeanViolation(createBeanValidation("pointsTipTrend", i18nService.get("validation.settings.invalidpointstiptrend")));
+            }
+            
+            if (settingsDTO.getMinutesBeforeTip() <= 0 || settingsDTO.getMinutesBeforeTip() > 1440) {
+                validation.addBeanViolation(createBeanValidation("minutesBeforeTip", i18nService.get("validation.settings.invalidminutes")));
+            }
+        } else {
+            validation.addBeanViolation(createBeanValidation("name", i18nService.get("validation.settings.invalidname")));
+        }
     }
 
     /**
@@ -142,17 +162,13 @@ public class ValidationService {
      */
     public boolean isValidScore(String homeScore, String awayScore) {
         boolean valid = false;
-        if (StringUtils.isNotBlank(homeScore) && StringUtils.isNotBlank(awayScore)) {
-            int home, away;
-            try {
-                home = Integer.parseInt(homeScore);
-                away = Integer.parseInt(awayScore);
+        
+        if (StringUtils.isNumeric(homeScore) && StringUtils.isNumeric(awayScore)) {
+            int home = Integer.parseInt(homeScore);
+            int away = Integer.parseInt(awayScore);
 
-                if ((home >= 0) && (home <= 99) && (away >= 0) && (away <= 99)) {
-                    valid = true;
-                }
-            } catch (final Exception e) {
-                LOG.error("Invalid score given",  e);
+            if ((home >= 0 && home <= 99) && (away >= 0 && away <= 99)) {
+                valid = true;
             }
         }
 
@@ -167,11 +183,12 @@ public class ValidationService {
      */
     public boolean isValidEmail(final String email) {
         boolean valid = false;
-        final Pattern p = Pattern.compile(Constants.EMAILPATTERN.get());
-        final Matcher m = p.matcher(email);
-
-        if (StringUtils.isNotBlank(email) && m.matches()) {
-            valid = true;
+        if (StringUtils.isNotBlank(email)) {
+            final Pattern p = Pattern.compile(Constants.EMAILPATTERN.get());
+            final Matcher m = p.matcher(email);
+            if (m.matches()) {
+                valid = true;
+            }
         }
 
         return valid;
@@ -198,6 +215,13 @@ public class ValidationService {
     public boolean isValidConfirmationToken(String token) {
         final Pattern p = Pattern.compile(Constants.CONFIRMATIONPATTERN.get());
         final Matcher m = p.matcher(token);
+
+        return m.matches();
+    }
+    
+    public boolean isValidObjectId(String id) {
+        final Pattern p = Pattern.compile(Constants.OBJECTIDPATTERN.get());
+        final Matcher m = p.matcher(id);
 
         return m.matches();
     }

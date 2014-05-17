@@ -38,6 +38,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.mongodb.AggregationOutput;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 /**
@@ -61,7 +66,6 @@ public class DataService {
     private static final String PLACE = "place";
     private static final String BRACKET = "bracket";
     private static final String NUMBER = "number";
-    private static final String SETTINGS = "settings";
     private static final String EMAIL = "email";
     private static final String USER = "user";
     private static final String PLAYDAY = "playday";
@@ -174,7 +178,7 @@ public class DataService {
         return this.datastore.find(User.class).field(REMINDER).equal(true).field(ACTIVE).equal(true).asList();
     }
 
-    public GameTip findGameTipByGameAndUser(User user, Game game) {
+    public GameTip findGameTipByGameAndUser(Game game, User user) {
         return this.datastore.find(GameTip.class).field(GAME).equal(game).field(USER).equal(user).get();
     }
 
@@ -207,7 +211,7 @@ public class DataService {
     }
 
     public ResultStatistic findResultStatisticByUserAndResult(User user, String score) {
-        return this.datastore.find(ResultStatistic.class).field(USER).equal(user).field("score").equal(score).get();
+        return this.datastore.find(ResultStatistic.class).field(USER).equal(user).field("result").equal(score).get();
     }
 
     public GameStatistic findGameStatisticByPlaydayAndResult(Playday playday, Object key) {
@@ -251,10 +255,10 @@ public class DataService {
     }
 
     public Settings findSettings() {
-        Settings settings = (Settings) ninjaCache.get(SETTINGS);
+        Settings settings = (Settings) ninjaCache.get(Constants.SETTINGS.get());
         if (settings == null) {
             settings = this.datastore.find(Settings.class).field("appName").equal(Constants.APPNAME.get()).get();
-            ninjaCache.add(SETTINGS, settings);
+            ninjaCache.add(Constants.SETTINGS.get(), settings);
         }
 
         return settings;
@@ -264,7 +268,7 @@ public class DataService {
         return this.datastore.find(User.class).field(PLACE).equal(place).get();
     }
 
-    public Game findGameByNumber(String number) {
+    public Game findGameByNumber(int number) {
         return this.datastore.find(Game.class).field(NUMBER).equal(number).get();
     }
 
@@ -295,7 +299,7 @@ public class DataService {
     }
 
     public void saveGameTip(final Game game, final int homeScore, final int awayScore, User user) {
-        GameTip gameTip = findGameTipByGameAndUser(user, game);
+        GameTip gameTip = findGameTipByGameAndUser(game, user);
         if (commonService.gameIsTippable(game) && validationService.isValidScore(String.valueOf(homeScore), String.valueOf(awayScore))) {
             if (gameTip == null) {
                 gameTip = new GameTip();
@@ -317,13 +321,13 @@ public class DataService {
             final Map<User, List<GameTip>> userTips = new HashMap<User, List<GameTip>>();
             final List<GameTip> gameTips = new ArrayList<GameTip>();
             for (final Game game : playday.getGames()) {
-                GameTip gameTip = findGameTipByGameAndUser(user, game);
+                GameTip gameTip = findGameTipByGameAndUser(game, user);
                 if (gameTip == null) {
                     gameTip = new GameTip();
                 }
                 gameTips.add(gameTip);
             }
-            userTips.put(user,  gameTips);
+            userTips.put(user, gameTips);
             tips.add(userTips);
         }
 
@@ -417,7 +421,10 @@ public class DataService {
     }
 
     public Game findGameById(String gameId) {
-        return this.datastore.get(Game.class, new ObjectId(gameId));
+        if (validationService.isValidObjectId(gameId)) {
+            return this.datastore.get(Game.class, new ObjectId(gameId));   
+        }
+        return null;
     }
 
     public List<Bracket> findAllUpdatableBrackets() {
@@ -425,7 +432,7 @@ public class DataService {
     }
 
     public List<Team> findTeamsByBracketOrdered(Bracket bracket) {
-        return this.datastore.find(Team.class).field(BRACKET).equal(bracket).order("points, goalsDiff, goalsFor").asList();
+        return this.datastore.find(Team.class).field(BRACKET).equal(bracket).order("-points, -goalsDiff, -goalsFor").asList();
     }
 
     public List<Team> findTeamsByBracket(Bracket bracket) {
@@ -465,15 +472,27 @@ public class DataService {
     }
 
     public Team findTeamById(String teamId) {
-        return this.datastore.get(Team.class, teamId);
+        if (validationService.isValidObjectId(teamId)) {
+            return this.datastore.get(Team.class, new ObjectId(teamId));
+        }
+        
+        return null;
     }
 
-    public Bracket findBracketById(String bracketid) {
-        return this.datastore.get(Bracket.class, bracketid);
+    public Bracket findBracketById(String bracketId) {
+        if (validationService.isValidObjectId(bracketId)) {
+            return this.datastore.get(Bracket.class, new ObjectId(bracketId));
+        }
+        
+        return null;
     }
 
     public Extra findExtaById(String bonusTippId) {
-        return this.datastore.get(Extra.class, bonusTippId);
+        if (validationService.isValidObjectId(bonusTippId)) {
+            this.datastore.get(Extra.class, new ObjectId(bonusTippId));
+        }
+        
+        return null;
     }
 
     public List<User> findUsersOrderByUsername() {
@@ -481,7 +500,11 @@ public class DataService {
     }
 
     public User findUserById(String userId) {
-        return this.datastore.get(User.class, userId);
+        if (validationService.isValidObjectId(userId)) {
+            return this.datastore.get(User.class, new ObjectId(userId));
+        }
+        
+        return null;
     }
 
     public Confirmation findConfirmationByTypeAndUser(ConfirmationType confirmationType, User user) {
@@ -541,7 +564,12 @@ public class DataService {
     }
 
     public void deleteResultsStatisticByUser(User user) {
-        this.datastore.delete(this.datastore.find(ResultStatistic.class).field(USER).equal(user).get());
+        List<ResultStatistic> resultStatistics = this.datastore.find(ResultStatistic.class).field(USER).equal(user).asList();
+        if (!resultStatistics.isEmpty()) {
+            for (ResultStatistic resultStatistic : resultStatistics) {
+                this.datastore.delete(resultStatistic);
+            }
+        }
     }
 
     public List<GameStatistic> findAllGameStatistics() {
@@ -550,5 +578,118 @@ public class DataService {
 
     public List<GameTipStatistic> findGameTipStatisticsOrderByPlayday() {
         return this.datastore.find(GameTipStatistic.class).order(PLAYDAY).asList();
+    }
+
+    public List<User> findAllUsers() {
+        return this.datastore.find(User.class).asList();
+    }
+
+    public void deleteConfirmationsByUser(User user) {
+        this.datastore.delete(this.datastore.find(Confirmation.class).field(USER).equal(user).get());
+    }
+
+    public void findResultsStatistic() {
+        //TODO Refactoring
+        //        List<Object []> results = JPA.em()
+        //                .createQuery("SELECT " +
+        //                        "SUM(resultCount) AS counts, " +
+        //                        "gameResult AS result " +
+        //                        "FROM PlaydayStatistic p " +
+        //                        "GROUP BY gameResult " +
+        //                        "ORDER BY counts DESC").getResultList();
+        //
+        //        return results;
+        
+        DB db = this.datastore.getDB();
+        DBCollection playdayStatistics = db.getCollection("playdaystatistics");
+
+        DBObject groupFields = new BasicDBObject( "_id", "$resultCount");
+        groupFields.put("counts", new BasicDBObject( "$sum", "$resultCount"));
+        DBObject group = new BasicDBObject("$group", groupFields);
+        
+        List<DBObject> pipeline = new ArrayList<DBObject>();
+        pipeline.add(group);
+        
+        AggregationOutput aggregate = playdayStatistics.aggregate(pipeline);
+        DBObject command = aggregate.getCommand();
+    
+        System.out.println("command: " + command.toString());
+        
+        Iterable<DBObject> results = aggregate.results();
+        for (DBObject result : results) {
+            System.out.println(result.toString());
+        }
+    }
+
+    public void findPlaydayStatistics() {
+        //TODO Refactoring
+        //        Object result = null;
+        //        Object [] values = null;
+        //
+        //        result = JPA.em()
+        //                .createQuery("SELECT " +
+        //                        "SUM(playdayPoints) AS points, " +
+        //                        "SUM(playdayCorrectTips) AS tips, " +
+        //                        "SUM(playdayCorrectDiffs) AS diffs," +
+        //                        "SUM(playdayCorrectTrends) AS trends, " +
+        //                        "ROUND(AVG(playdayPoints)) AS avgPoints " +
+        //                        "FROM UserStatistic u WHERE u.playday.id = :playdayID")
+        //                        .setParameter("playdayID", playday.getId())
+        //                        .getSingleResult();
+        //
+        //        if (result != null) {
+        //            values = (Object[]) result;
+        //        }
+        //
+        //        return values;        
+    }
+
+    public void findAscendingStatistics() {
+        //TODO Refactoring
+        //        Object result = null;
+        //        Object [] values = null;
+        //
+        //        result = JPA.em()
+        //                .createQuery(
+        //                        "SELECT " +
+        //                                "SUM(playdayPoints) AS points, " +
+        //                                "SUM(playdayCorrectTips) AS correctTips, " +
+        //                                "SUM(playdayCorrectDiffs) AS correctDiffs, " +
+        //                                "SUM(playdayCorrectTrends) AS correctTrends " +
+        //                                "FROM UserStatistic u " +
+        //                        "WHERE u.playday.id <= :playdayID AND u.user.id = :userID")
+        //                        .setParameter("playdayID", playday.getId())
+        //                        .setParameter("userID", user.getId())
+        //                        .getSingleResult();
+        //
+        //        if (result != null) {
+        //            values = (Object[]) result;
+        //        }
+        //
+        //        return values;        
+    }
+
+    public void findGameStatistics() {
+        //TODO Refactoring
+        //        List<Object []> results = JPA.em()
+        //                .createQuery(
+        //                        "SELECT " +
+        //                                "SUM(resultCount) AS counts, " +
+        //                                "gameResult AS result " +
+        //                                "FROM GameStatistic g " +
+        //                                "GROUP BY gameResult " +
+        //                        "ORDER BY counts DESC").getResultList();
+        //
+        //        return results;        
+    }
+
+    public List<Bracket> findAllTournamentBrackets() {
+        List<Bracket> brackets = this.datastore.find(Bracket.class).asList();
+        for (Bracket bracket : brackets) {
+            List<Team> teams = this.datastore.find(Team.class).field("bracket").equal(bracket).order("place").asList();
+            bracket.setTeams(teams);
+        }
+        
+        return brackets;
     }
 }

@@ -6,12 +6,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import models.Extra;
+import models.ExtraTip;
 import models.Game;
+import models.GameTip;
 import models.Playday;
+import models.Settings;
 import models.Team;
 import models.User;
 import models.enums.Constants;
 import models.pagination.Pagination;
+import models.statistic.GameTipStatistic;
 import ninja.Context;
 import ninja.Result;
 import ninja.Results;
@@ -23,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import services.CommonService;
 import services.DataService;
 import services.I18nService;
+import services.StatisticService;
 import services.ValidationService;
 
 import com.google.inject.Inject;
@@ -53,6 +58,9 @@ public class TipController extends RootController {
 
     @Inject
     private CommonService commonService;
+    
+    @Inject
+    private StatisticService statisticService;
 
     public Result playday(@PathParam("number") long number) {
         final Pagination pagination = commonService.getPagination(number, TIPS_PLAYDAY, dataService.findAllPlaydaysOrderByNumber().size());
@@ -90,8 +98,8 @@ public class TipController extends RootController {
                 final String awayScore = map.get(GAME + key + AWAY_SCORE);
 
                 final Game game = dataService.findGameById(key);
-
-                if (!validationService.isValidScore(homeScore, awayScore) && game != null) {
+                
+                if (validationService.isValidScore(homeScore, awayScore) && game != null) {
                     dataService.saveGameTip(game, Integer.parseInt(homeScore), Integer.parseInt(awayScore), context.getAttribute(Constants.CONNECTEDUSER.get(), User.class));
                     keys.add(key);
                     tipped++;
@@ -143,5 +151,46 @@ public class TipController extends RootController {
     public Result standings() {
         final List<User> users = dataService.findAllActiveUsersOrderedByPlace();
         return Results.html().render("users", users);
+    }
+    
+    public Result overview(@PathParam("number") long number) {
+        final Pagination pagination = commonService.getPagination(number, "/tips/overview/", dataService.findAllPlaydaysOrderByNumber().size());
+
+        final Playday playday = dataService.findPlaydaybByNumber(pagination.getNumberAsInt());
+        final List<User> users = dataService.findActiveUsers(15);
+        final List<Map<User, List<GameTip>>> tips = dataService.findPlaydayTips(playday, users);
+        final long usersCount = dataService.countAllUsers();
+
+        return Results.html()
+                .render("tips", tips)
+                .render("playday", playday)
+                .render("pagination", pagination)
+                .render("usersCount", usersCount);
+    }
+
+    public Result extras() {
+        final List<User> users = dataService.findAllActiveUsersOrderedByPlace();
+        final List<Extra> extras = dataService.findAllExtras();
+        final List<Map<User, List<ExtraTip>>> tips = dataService.findExtraTips(users, extras);
+
+        return Results.html()
+                .render("tips", tips)
+                .render("extras", extras);
+    }
+    
+    public Result rules() {
+        Settings settings = dataService.findSettings();
+        return Results.html().render(settings);
+    }
+
+    public Result statistics() {
+        final List<Object[]> games = statisticService.getGameStatistics();
+        final List<Object[]> results = statisticService.getResultsStatistic();
+        final List<GameTipStatistic> gameTipStatistics = dataService.findGameTipStatisticsOrderByPlayday();
+
+        return Results.html()
+                .render("results", results)
+                .render("gameTipStatistics", gameTipStatistics)
+                .render("games", games);
     }
 }

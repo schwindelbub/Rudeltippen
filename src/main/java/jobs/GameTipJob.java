@@ -1,5 +1,6 @@
 package jobs;
 
+import java.util.Date;
 import java.util.List;
 
 import models.AbstractJob;
@@ -42,7 +43,7 @@ public class GameTipJob implements Job {
     }
 
     @Override
-    public void execute(JobExecutionContext arg0) throws JobExecutionException {
+    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         if (resultService.isJobInstance()) {
             AbstractJob job = dataService.findAbstractJobByName(Constants.GAMETIPJOB.get());
             if (job != null && job.isActive()) {
@@ -61,6 +62,8 @@ public class GameTipJob implements Job {
                     }
                 }
 
+                job.setExecuted(new Date());
+                dataService.save(job);
                 LOG.info("Finished Job: " + Constants.GAMETIPJOB.get());
             }
         }

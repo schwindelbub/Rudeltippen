@@ -2,11 +2,11 @@ package services;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import main.TestFactory;
+import main.TestBase;
 
 import org.junit.Test;
 
-public class TestValidationService extends TestFactory {
+public class TestValidationService extends TestBase {
 
     @Test
     public void testIsValidEmail() {

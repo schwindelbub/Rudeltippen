@@ -15,19 +15,21 @@
 			            <th>${i18n('app.jobs.name')}</th>
 			            <th>${i18n('app.jobs.scheduled')}</th>
 			            <th>${i18n('app.jobs.description')}</th>
+			            <th>${i18n('app.jobs.last')}</th>
 			            <th>${i18n('app.jobs.active')}</th>
 			        </tr>
 			    </thead>
 			    <tbody>
 			        <#list jobs as job>
 			            <tr>
-			                <td>${job.class.simpleName}</td>
-			                <td>job.executed</td>
-			                <td>job.description</td>
+			                <td>${job.name}</td>
+			                <td>${job.scheduled}</td>
+			                <td>${job.description}</td>
+			                <td><#if (job.executed)??>${job.executed?datetime}<#else>-</#if></td>
 			                <#if job.active>
-			                	<td><a href="/admin/jobstatus/${job.class.simpleName}" data-toggle="tooltip" data-placement="top" title="${i18n('app.jobs.is.active')}" class="jobtooltip" onclick="return confirm('Change status of ${job.class.simpleName}?');"><span class="glyphicon glyphicon-ok-circle"></span></a></td>
+			                	<td><a href="/admin/jobstatus/${job.name}" data-toggle="tooltip" data-placement="top" title="${i18n('app.jobs.is.active')}" class="jobtooltip" onclick="return confirm('Change status of ${job.name}?');"><span class="glyphicon glyphicon-ok-circle"></span></a></td>
 			                <#else>
-			               		<td><a href="/admin/jobstatus/${job.class.simpleName}" data-toggle="tooltip" data-placement="top" title="${i18n('app.jobs.isnot.active')}" class="jobtooltip" onclick="return confirm('Change status of ${job.class.simpleName}?');"><span class="glyphicon glyphicon-ban-circle"></span></a></td>
+			               		<td><a href="/admin/jobstatus/${job.name}" data-toggle="tooltip" data-placement="top" title="${i18n('app.jobs.isnot.active')}" class="jobtooltip" onclick="return confirm('Change status of ${job.name}?');"><span class="glyphicon glyphicon-ban-circle"></span></a></td>
 			                </#if>
 			            </tr>
 			         </#list>
