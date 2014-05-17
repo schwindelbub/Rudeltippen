@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
-import main.TestFactory;
+import main.TestBase;
 import models.Game;
 import models.ws.WSResult;
 import models.ws.WSResults;
@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import com.google.inject.Injector;
 
-public class TestResultResultService extends TestFactory {
+public class TestResultResultService extends TestBase {
 
     @Test
     public void testWebServiceUpdate() {

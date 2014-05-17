@@ -421,7 +421,10 @@ public class DataService {
     }
 
     public Game findGameById(String gameId) {
-        return this.datastore.get(Game.class, new ObjectId(gameId));
+        if (validationService.isValidObjectId(gameId)) {
+            return this.datastore.get(Game.class, new ObjectId(gameId));   
+        }
+        return null;
     }
 
     public List<Bracket> findAllUpdatableBrackets() {
@@ -469,15 +472,27 @@ public class DataService {
     }
 
     public Team findTeamById(String teamId) {
-        return this.datastore.get(Team.class, new ObjectId(teamId));
+        if (validationService.isValidObjectId(teamId)) {
+            return this.datastore.get(Team.class, new ObjectId(teamId));
+        }
+        
+        return null;
     }
 
     public Bracket findBracketById(String bracketId) {
-        return this.datastore.get(Bracket.class, new ObjectId(bracketId));
+        if (validationService.isValidObjectId(bracketId)) {
+            return this.datastore.get(Bracket.class, new ObjectId(bracketId));
+        }
+        
+        return null;
     }
 
     public Extra findExtaById(String bonusTippId) {
-        return this.datastore.get(Extra.class, new ObjectId(bonusTippId));
+        if (validationService.isValidObjectId(bonusTippId)) {
+            this.datastore.get(Extra.class, new ObjectId(bonusTippId));
+        }
+        
+        return null;
     }
 
     public List<User> findUsersOrderByUsername() {
@@ -485,7 +500,11 @@ public class DataService {
     }
 
     public User findUserById(String userId) {
-        return this.datastore.get(User.class, new ObjectId(userId));
+        if (validationService.isValidObjectId(userId)) {
+            return this.datastore.get(User.class, new ObjectId(userId));
+        }
+        
+        return null;
     }
 
     public Confirmation findConfirmationByTypeAndUser(ConfirmationType confirmationType, User user) {

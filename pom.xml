@@ -153,8 +153,8 @@
 						<configuration>
 							<target name="Create release zip">
 								<move file="target/rudeltippen-${project.version}-jar-with-dependencies.jar" tofile="rudeltippen/rudeltippen.jar" failonerror="false" />
-								<move file="target/rudeltippen-${project.version}.war" tofile="rudeltippen/rudeltippen.war" failonerror="false" />
 								<copy file="src/main/java/conf/application.conf.example" todir="rudeltippen/" />
+								<copy file="README.md" todir="rudeltippen/" />
 								<zip destfile="target/rudeltippen.zip" filesonly="true" basedir="." includes="rudeltippen/**" />
 								<delete dir="rudeltippen/" />
 							</target>

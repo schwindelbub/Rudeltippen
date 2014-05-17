@@ -48,7 +48,8 @@ public class AjaxController extends RootController {
                 return Results.noContent();
             }
         }
-        return Results.badRequest();
+        
+        return Results.badRequest().render(Result.NO_HTTP_BODY);
     }
 
     public Result kickoff(@PathParam("gameId") String gameId, Context context) {
@@ -68,7 +69,8 @@ public class AjaxController extends RootController {
                 }
             }
         }
-        return Results.badRequest();
+        
+        return Results.badRequest().render(Result.NO_HTTP_BODY);
     }
 
     public Result place(@PathParam("teamId") String teamId, Context context) {
@@ -86,7 +88,8 @@ public class AjaxController extends RootController {
                 return Results.noContent();
             }
         }
-        return Results.badRequest();
+        
+        return Results.badRequest().render(Result.NO_HTTP_BODY);
     }
 
     public Result updatablegame(@PathParam("gameId") String gameId) {
@@ -97,7 +100,8 @@ public class AjaxController extends RootController {
 
             return Results.noContent();
         }
-        return Results.badRequest();
+        
+        return Results.badRequest().render(Result.NO_HTTP_BODY);
     }
 
     public Result updatablebracket(@PathParam("bracketId") String bracketId) {
@@ -108,6 +112,7 @@ public class AjaxController extends RootController {
 
             return Results.noContent();
         }
-        return Results.badRequest();
+        
+        return Results.badRequest().render(Result.NO_HTTP_BODY);
     }
 }

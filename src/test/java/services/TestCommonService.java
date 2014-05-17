@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import main.TestFactory;
+import main.TestBase;
 import models.Extra;
 import models.Game;
 
 import org.junit.Test;
 
-public class TestCommonService extends TestFactory {
+public class TestCommonService extends TestBase {
 
     @Test
     public void testHashPassword() {

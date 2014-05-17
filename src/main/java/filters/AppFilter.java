@@ -38,7 +38,7 @@ public class AppFilter implements Filter {
         }
         
         if (!dataService.appIsInizialized()) {
-            return Results.redirect("/setup");
+            return Results.redirect("/system/setup");
         }
 
         return result;

@@ -14,12 +14,12 @@ import ninja.Results;
  *
  */
 public class AdminFilter implements Filter {
-
+    
     @Override
     public Result filter(FilterChain filterChain, Context context) {
         User connectedUser = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
         if (connectedUser == null || !connectedUser.isAdmin()) {
-            return Results.forbidden();
+            return Results.redirect("/");
         }
 
         return filterChain.next(context);

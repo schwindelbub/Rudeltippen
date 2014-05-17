@@ -5,12 +5,12 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Date;
 
-import main.TestFactory;
+import main.TestBase;
 import models.User;
 
 import org.junit.Test;
 
-public class TestViewService extends TestFactory {
+public class TestViewService extends TestBase {
 
     @Test
     public void testGetPlaceTrend() {

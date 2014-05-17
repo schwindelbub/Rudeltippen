@@ -16,14 +16,6 @@ body {
     background-color: inherit;
 }
 
-.icon-red {
-    background-image: url(/public/img/glyphicons-halflings-red.png);
-}
-
-.icon-green {
-    background-image: url(/public/img/glyphicons-halflings-green.png);
-}
-
 .pagination {
     margin: 0;
 }

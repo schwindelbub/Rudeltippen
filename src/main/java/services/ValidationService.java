@@ -79,54 +79,62 @@ public class ValidationService {
     }
 
     public void validateUserDTO(UserDTO userDTO, Validation validation) {
-        if (!isValidUsername(userDTO.getUsername())) {
+        if (userDTO != null) {
+            if (!isValidUsername(userDTO.getUsername())) {
+                validation.addBeanViolation(createBeanValidation(USERNAME, i18nService.get("validation.username.size")));
+            }
+
+            if (usernameExists(userDTO.getUsername())) {
+                validation.addBeanViolation(createBeanValidation(USERNAME, i18nService.get("validation.username.exists")));
+            }
+
+            if (!isValidEmail(userDTO.getEmail())) {
+                validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.invalid")));
+            }
+
+            if (emailExists(userDTO.getEmail())) {
+                validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.exsits")));
+            }
+
+            if (!match(userDTO.getEmail(), userDTO.getEmailConfirmation())) {
+                validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.notmatch")));
+            }
+
+            if (!isValidPassword(userDTO.getUserpass())) {
+                validation.addBeanViolation(createBeanValidation(USERPASS, i18nService.get("validation.password.invalid")));
+            }
+
+            if (!match(userDTO.getUserpass(), userDTO.getUserpassConfirmation())) {
+                validation.addBeanViolation(createBeanValidation(USERPASS, i18nService.get("validation.password.notmatch")));
+            }
+        } else {
             validation.addBeanViolation(createBeanValidation(USERNAME, i18nService.get("validation.username.size")));
-        }
-
-        if (usernameExists(userDTO.getUsername())) {
-            validation.addBeanViolation(createBeanValidation(USERNAME, i18nService.get("validation.username.exists")));
-        }
-
-        if (!isValidEmail(userDTO.getEmail())) {
-            validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.invalid")));
-        }
-
-        if (emailExists(userDTO.getEmail())) {
-            validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.exsits")));
-        }
-
-        if (!match(userDTO.getEmail(), userDTO.getEmailConfirmation())) {
-            validation.addBeanViolation(createBeanValidation(EMAIL, i18nService.get("validation.email.notmatch")));
-        }
-
-        if (!isValidPassword(userDTO.getUserpass())) {
-            validation.addBeanViolation(createBeanValidation(USERPASS, i18nService.get("validation.password.invalid")));
-        }
-
-        if (!match(userDTO.getUserpass(), userDTO.getUserpassConfirmation())) {
-            validation.addBeanViolation(createBeanValidation(USERPASS, i18nService.get("validation.password.notmatch")));
         }
     }
 
     public void validateSettingsDTO(SettingsDTO settingsDTO, Validation validation) {
-        if (StringUtils.isEmpty(settingsDTO.getName()) || settingsDTO.getName().length() <= 3 || settingsDTO.getName().length() >= 256) {
+        if (settingsDTO != null) {
+            if (StringUtils.isEmpty(settingsDTO.getName()) || settingsDTO.getName().length() <= 3 || settingsDTO.getName().length() >= 256) {
+                validation.addBeanViolation(createBeanValidation("name", i18nService.get("validation.settings.invalidname")));
+            }
+            
+            if (settingsDTO.getPointsTip() <= 0 || settingsDTO.getPointsTip() >= 100) {
+                validation.addBeanViolation(createBeanValidation("pointsTip", i18nService.get("validation.settings.invalidpointstip")));
+            }
+            
+            if (settingsDTO.getPointsTipDiff() <= 0 || settingsDTO.getPointsTipDiff() >= 100) {
+                validation.addBeanViolation(createBeanValidation("pointsTipDiff", i18nService.get("validation.settings.invalidpointstipdiff")));
+            }
+            
+            if (settingsDTO.getPointsTipTrend() <= 0 || settingsDTO.getPointsTipTrend() >= 100) {
+                validation.addBeanViolation(createBeanValidation("pointsTipTrend", i18nService.get("validation.settings.invalidpointstiptrend")));
+            }
+            
+            if (settingsDTO.getMinutesBeforeTip() <= 0 || settingsDTO.getMinutesBeforeTip() > 1440) {
+                validation.addBeanViolation(createBeanValidation("minutesBeforeTip", i18nService.get("validation.settings.invalidminutes")));
+            }
+        } else {
             validation.addBeanViolation(createBeanValidation("name", i18nService.get("validation.settings.invalidname")));
-        }
-        
-        if (settingsDTO.getPointsTip() <= 0 || settingsDTO.getPointsTip() >= 100) {
-            validation.addBeanViolation(createBeanValidation("pointsTip", i18nService.get("validation.settings.invalidpointstip")));
-        }
-        
-        if (settingsDTO.getPointsTipDiff() <= 0 || settingsDTO.getPointsTipDiff() >= 100) {
-            validation.addBeanViolation(createBeanValidation("pointsTipDiff", i18nService.get("validation.settings.invalidpointstipdiff")));
-        }
-        
-        if (settingsDTO.getPointsTipTrend() <= 0 || settingsDTO.getPointsTipTrend() >= 100) {
-            validation.addBeanViolation(createBeanValidation("pointsTipTrend", i18nService.get("validation.settings.invalidpointstiptrend")));
-        }
-        
-        if (settingsDTO.getMinutesBeforeTip() <= 0 || settingsDTO.getMinutesBeforeTip() > 1440) {
-            validation.addBeanViolation(createBeanValidation("minutesBeforeTip", i18nService.get("validation.settings.invalidminutes")));
         }
     }
 
@@ -207,6 +215,13 @@ public class ValidationService {
     public boolean isValidConfirmationToken(String token) {
         final Pattern p = Pattern.compile(Constants.CONFIRMATIONPATTERN.get());
         final Matcher m = p.matcher(token);
+
+        return m.matches();
+    }
+    
+    public boolean isValidObjectId(String id) {
+        final Pattern p = Pattern.compile(Constants.OBJECTIDPATTERN.get());
+        final Matcher m = p.matcher(id);
 
         return m.matches();
     }

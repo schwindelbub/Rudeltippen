@@ -259,7 +259,7 @@ public class AuthController {
                 session.put(Constants.USERNAME.get(), loginDTO.getUsername());
                 if (loginDTO.isRemember()) {
                     String signedUsername = authService.sign(loginDTO.getUsername()) + "-" + loginDTO.getUsername();
-                    Cookie.builder("rememberme", signedUsername).setSecure(true).setHttpOnly(true).build();
+                    Cookie.builder(Constants.COOKIENAME.get(), signedUsername).setSecure(true).setHttpOnly(true).build();
                 }
 
                 return Results.redirect("/");

@@ -28,6 +28,7 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/auth/logout").with(AuthController.class, "logout");
         router.GET().route("/auth/register").with(AuthController.class, "register");
         router.GET().route("/auth/forgotten").with(AuthController.class, "forgotten");
+        router.GET().route("/auth/password/{token}").with(AuthController.class, "password");
         router.POST().route("/auth/renew").with(AuthController.class, "renew");
         router.POST().route("/auth/reset").with(AuthController.class, "reset");
         router.POST().route("/auth/authenticate").with(AuthController.class, "authenticate");
@@ -74,6 +75,7 @@ public class Routes implements ApplicationRoutes {
         /** Ajax Controller **/
         router.GET().route("/ajax/bracket/updatable/{bracketId}").with(AjaxController.class, "updatablebracket");
         router.GET().route("/ajax/game/updatable/{gameId}").with(AjaxController.class, "updatablegame");
+        router.POST().route("/ajax/bracket/place/{teamId}").with(AjaxController.class, "place");
         router.POST().route("/ajax/game/kickoff/{gameId}").with(AjaxController.class, "kickoff");
         router.POST().route("/ajax/game/webserviceid/{gameId}").with(AjaxController.class, "webserviceid");
 
@@ -81,11 +83,11 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/system/setup").with(SystemController.class, "setup");
         router.GET().route("/system/init").with(SystemController.class, "init");
         
+        /** Application Controller **/
+        router.GET().route("/").with(ApplicationController.class, "index");
+        
         /** Assets Controller **/
         router.GET().route("/assets/{fileName: .*}").with(AssetsController.class, SERVE_STATIC);
         router.GET().route("/robots.txt").with(AssetsController.class, SERVE_STATIC);
-
-        /** Application Controller **/
-        router.GET().route("/").with(ApplicationController.class, "index");
     }
 }

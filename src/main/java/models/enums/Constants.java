@@ -16,6 +16,7 @@ public enum Constants {
     CONFIRMATIONPATTERN("\\w{8,8}-\\w{4,4}-\\w{4,4}-\\w{4,4}-\\w{12,12}"),
     EMAILPATTERN(".+@.+\\.[a-z]+"),
     USERNAMEPATTERN("[a-zA-Z0-9-_]+"),
+    OBJECTIDPATTERN("^[0-9a-z]{24}$"),
     USERNAME("username"),
     COOKIENAME("rudelremember"),
     MAILFOLDER("src/main/java/views/mails/"),

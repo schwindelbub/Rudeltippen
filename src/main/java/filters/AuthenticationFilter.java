@@ -57,7 +57,7 @@ public class AuthenticationFilter implements Filter {
                 result.render("currentPlayday", dataService.findCurrentPlayday()); 
                 result.render("location", context.getRequestPath());
             }
-
+            
             return result;
         }
 
