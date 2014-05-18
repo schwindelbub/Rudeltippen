@@ -22,10 +22,10 @@ import org.mongodb.morphia.annotations.Reference;
 @Entity(value = "users", noClassnameStored = true)
 public class User implements Serializable {
     private static final long serialVersionUID = 5381913315282528298L;
-
+    
     @Id
     private ObjectId id;
-
+    
     @Reference(value = "user_gametips", lazy = true)
     private List<GameTip> gameTips;
 
