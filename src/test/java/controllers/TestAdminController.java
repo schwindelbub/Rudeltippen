@@ -34,7 +34,7 @@ public class TestAdminController extends TestBase {
         doLogout();
         doLogin(ADMIN, ADMIN);
         
-        response = makeGetRequest("/admin/users", true);
+        response = makeGetRequest("/admin/users", false);
         
         assertNotNull(response);
         assertEquals(Result.SC_200_OK, response.getStatusLine().getStatusCode());
@@ -59,7 +59,7 @@ public class TestAdminController extends TestBase {
         doLogout();
         doLogin(ADMIN, ADMIN);
         
-        response =  makeGetRequest("/admin/results/1", true);
+        response =  makeGetRequest("/admin/results/1", false);
         
         assertNotNull(response);
         assertEquals(Result.SC_200_OK, response.getStatusLine().getStatusCode());
@@ -69,14 +69,14 @@ public class TestAdminController extends TestBase {
     
     @Test
     public void testStoreResults() throws ClientProtocolException, IOException {
-        HttpResponse response = makePostRequest("/admin/storeresults", true);
+        HttpResponse response = makePostRequest("/admin/storeresults", false);
 
         assertNotNull(response);
         assertEquals(Result.SC_303_SEE_OTHER, response.getStatusLine().getStatusCode());
         
         doLogin(USER, USER);
         
-        response = makePostRequest("/admin/storeresults", true);
+        response = makePostRequest("/admin/storeresults", false);
         
         assertNotNull(response);
         assertEquals(Result.SC_303_SEE_OTHER, response.getStatusLine().getStatusCode());

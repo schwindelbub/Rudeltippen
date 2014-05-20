@@ -1,28 +1,15 @@
 package conf;
 
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.TriggerBuilder.newTrigger;
-
 import javax.inject.Singleton;
 
-import jobs.AppJobFactory;
 import jobs.GameTipJob;
 import jobs.KickoffJob;
 import jobs.ReminderJob;
 import jobs.ResultJob;
 import models.enums.Constants;
+import ninja.NinjaScheduler;
 import ninja.lifecycle.Start;
 import ninja.utils.NinjaConstant;
-
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
-import org.quartz.Trigger;
-import org.quartz.impl.StdSchedulerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -33,7 +20,6 @@ import com.google.inject.Inject;
  */
 @Singleton
 public class StartupActions {
-    private static final Logger LOG = LoggerFactory.getLogger(StartupActions.class);
     private static final String RESULTSCRON = "0 */4 * * * ?";
     private static final String REMINDERCRON = "0 0 */1 * * ?";
     private static final String KICKOFFCRON = "0 0 4 * * ?";
@@ -42,7 +28,7 @@ public class StartupActions {
     private static final String JOB_GROUP = "jobGroup";
 
     @Inject
-    private AppJobFactory appJobFactory;
+    private NinjaScheduler ninjaScheduler;
     
     @Start(order=100)
     public void startup() {
@@ -50,50 +36,10 @@ public class StartupActions {
             return;
         }
 
-        scheduleJobs();
-    }
-
-    private void scheduleJobs() {
-        SchedulerFactory sf = new StdSchedulerFactory();
-        Scheduler scheduler = null;
-        try {
-            scheduler = sf.getScheduler();
-        } catch (SchedulerException e) {
-            LOG.error("Failed to get scheduler", e);
-        }
-
-        if (scheduler != null) {
-            try {
-                scheduler.setJobFactory(appJobFactory);
-                scheduler.scheduleJob(getJobDetail(GameTipJob.class, Constants.GAMETIPJOB.get()), getTrigger("gameTipJobTrigger", GAMETIPCRON));
-                scheduler.scheduleJob(getJobDetail(KickoffJob.class, Constants.KICKOFFJOB.get()), getTrigger("kickoffJobTrigger", KICKOFFCRON));
-                scheduler.scheduleJob(getJobDetail(ReminderJob.class, Constants.REMINDERJOB.get()), getTrigger("reminderJobTrigger", REMINDERCRON));
-                scheduler.scheduleJob(getJobDetail(ResultJob.class, Constants.RESULTJOB.get()), getTrigger("resultsJobTrigger", RESULTSCRON));
-
-                scheduler.start();
-
-                if (scheduler.isStarted()) {
-                    LOG.info("Successfully started quartz scheduler");
-                } else {
-                    LOG.error("Scheduler is not started!");
-                }
-            } catch (SchedulerException e) {
-                LOG.error("Failed to start scheduler", e);
-            }
-        }
-    }
-
-    private Trigger getTrigger(String identity, String schedule) {
-        return newTrigger()
-                .withIdentity(identity, TRIGGER_GROUP)
-                .withSchedule(cronSchedule(schedule))
-                .build();
-    }
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private JobDetail getJobDetail(Class clazz, String identity) {
-        return newJob(clazz)
-                .withIdentity(identity, JOB_GROUP)
-                .build();
+        ninjaScheduler.schedule(ninjaScheduler.getJobDetail(GameTipJob.class, Constants.GAMETIPJOB.get(), JOB_GROUP), ninjaScheduler.getTrigger("gameTipJobTrigger", GAMETIPCRON, TRIGGER_GROUP));
+        ninjaScheduler.schedule(ninjaScheduler.getJobDetail(KickoffJob.class, Constants.KICKOFFJOB.get(), JOB_GROUP), ninjaScheduler.getTrigger("kickoffJobTrigger", KICKOFFCRON, TRIGGER_GROUP));
+        ninjaScheduler.schedule(ninjaScheduler.getJobDetail(ReminderJob.class, Constants.REMINDERJOB.get(), JOB_GROUP), ninjaScheduler.getTrigger("reminderJobTrigger", REMINDERCRON, TRIGGER_GROUP));
+        ninjaScheduler.schedule(ninjaScheduler.getJobDetail(ResultJob.class, Constants.RESULTJOB.get(), JOB_GROUP), ninjaScheduler.getTrigger("resultsJobTrigger", RESULTSCRON, TRIGGER_GROUP));
+        ninjaScheduler.start();
     }
 }

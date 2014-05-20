@@ -11,6 +11,7 @@ import models.Game;
 import models.GameTip;
 import models.User;
 import models.enums.Constants;
+import ninja.morphia.NinjaMorphia;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -36,6 +37,9 @@ public class ReminderJob implements Job {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private NinjaMorphia ninjaMorphia;
 
     @Inject
     private MailService mailService;
@@ -80,7 +84,7 @@ public class ReminderJob implements Job {
                 disableReminder(nextExtras, nextGames);
                 
                 job.setExecuted(new Date());
-                dataService.save(job);
+                ninjaMorphia.save(job);
                 LOG.info("Finshed Job: " + Constants.REMINDERJOB.get());
             }
         }
@@ -96,12 +100,12 @@ public class ReminderJob implements Job {
     private void disableReminder(final List<Extra> nextExtras, final List<Game> nextGames) {
         for (final Game game : nextGames) {
             game.setReminder(true);
-            dataService.save(game);
+            ninjaMorphia.save(game);
         }
 
         for (final Extra extra : nextExtras) {
             extra.setReminder(true);
-            dataService.save(extra);
+            ninjaMorphia.save(extra);
         }
     }
 }

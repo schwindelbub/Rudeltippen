@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import ninja.morphia.NinjaMorphia;
 import models.Game;
 import models.GameTip;
 import models.Playday;
@@ -29,6 +30,9 @@ public class StatisticService {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private NinjaMorphia ninjaMorphia;
 
     public void setResultStatistic(final User user) {
         dataService.deleteResultsStatisticByUser(user);
@@ -55,7 +59,7 @@ public class StatisticService {
                     resultStatistic.setCorrectTrends( resultStatistic.getCorrectTrends() + 1 );
                 }
 
-                dataService.save(resultStatistic);
+                ninjaMorphia.save(resultStatistic);
             }
         }
     }
@@ -83,7 +87,7 @@ public class StatisticService {
 
             gameStatistic.setGameResult(entry.getKey());
             gameStatistic.setResultCount(entry.getValue());
-            dataService.save(gameStatistic);
+            ninjaMorphia.save(gameStatistic);
         }
     }
 
@@ -103,7 +107,7 @@ public class StatisticService {
             gameTipStatistic.setAvgPoints(((Double) statistics [4]).intValue());
         }
 
-        dataService.save(gameTipStatistic);
+        ninjaMorphia.save(gameTipStatistic);
     }
 
     public void setAscendingPlaydayPoints(final Playday playday, final User user) {
@@ -116,7 +120,7 @@ public class StatisticService {
             userStatistic.setCorrectDiffs(((Long) statistics [2]).intValue());
             userStatistic.setCorrectTrends(((Long) statistics [3]).intValue());
         }
-        dataService.save(userStatistic);
+        ninjaMorphia.save(userStatistic);
     }
 
     public void setPlaydayPlaces(final Playday playday) {
@@ -124,7 +128,7 @@ public class StatisticService {
         int place = 1;
         for (final UserStatistic userStatistic : userStatistics) {
             userStatistic.setPlaydayPlace(place);
-            dataService.save(userStatistic);
+            ninjaMorphia.save(userStatistic);
             place++;
         }
 
@@ -132,7 +136,7 @@ public class StatisticService {
         place = 1;
         for (final UserStatistic userStatistic : userStatistics) {
             userStatistic.setPlace(place);
-            dataService.save(userStatistic);
+            ninjaMorphia.save(userStatistic);
             place++;
         }
     }
@@ -171,7 +175,7 @@ public class StatisticService {
         userStatistic.setPlaydayCorrectTips(correctTips);
         userStatistic.setPlaydayCorrectDiffs(correctDiffs);
         userStatistic.setPlaydayCorrectTrends(correctTrends);
-        dataService.save(userStatistic);
+        ninjaMorphia.save(userStatistic);
     }
 
     public void setPlaydayStatistics(final Playday playday, final Map<String, Integer> scores) {
@@ -183,7 +187,7 @@ public class StatisticService {
             }
             playdayStatistic.setGameResult(entry.getKey());
             playdayStatistic.setResultCount(entry.getValue());
-            dataService.save(playdayStatistic);
+            ninjaMorphia.save(playdayStatistic);
         }
     }
 

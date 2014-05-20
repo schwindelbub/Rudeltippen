@@ -6,10 +6,9 @@ import java.util.List;
 import models.statistic.GameStatistic;
 import models.statistic.GameTipStatistic;
 import models.statistic.UserStatistic;
+import ninja.morphia.NinjaMorphiaModel;
 
-import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 /**
@@ -18,11 +17,8 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "playdays", noClassnameStored = true)
-public class Playday implements Serializable {
+public class Playday extends NinjaMorphiaModel implements Serializable {
     private static final long serialVersionUID = -7329808092314093714L;
-
-    @Id
-    private ObjectId id;
 
     @Reference(value = "playday_games")
     private List<Game> games;
@@ -43,10 +39,6 @@ public class Playday implements Serializable {
     private boolean playoff;
     private boolean current;
     
-    public ObjectId getId() {
-        return id;
-    }
-
     public boolean isCurrent() {
         return this.current;
     }

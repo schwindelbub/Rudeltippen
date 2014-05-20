@@ -7,6 +7,7 @@ import models.AbstractJob;
 import models.Game;
 import models.User;
 import models.enums.Constants;
+import ninja.morphia.NinjaMorphia;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -32,6 +33,9 @@ public class GameTipJob implements Job {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private NinjaMorphia ninjaMorphia;
 
     @Inject
     private MailService mailService;
@@ -58,12 +62,12 @@ public class GameTipJob implements Job {
 
                     for (final Game game : games) {
                         game.setInformed(true);
-                        dataService.save(game);
+                        ninjaMorphia.save(game);
                     }
                 }
 
                 job.setExecuted(new Date());
-                dataService.save(job);
+                ninjaMorphia.save(job);
                 LOG.info("Finished Job: " + Constants.GAMETIPJOB.get());
             }
         }

@@ -9,6 +9,7 @@ import models.AbstractJob;
 import models.Game;
 import models.Playday;
 import models.enums.Constants;
+import ninja.morphia.NinjaMorphia;
 
 import org.apache.commons.lang.StringUtils;
 import org.quartz.Job;
@@ -38,6 +39,9 @@ public class KickoffJob implements Job {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private NinjaMorphia ninjaMorphia;
 
     @Inject
     private SetupService setupService;
@@ -71,7 +75,7 @@ public class KickoffJob implements Job {
                                 df.setTimeZone(TimeZone.getTimeZone(i18nService.getCurrentTimeZone()));
 
                                 game.setKickoff(kickoff);
-                                dataService.save(game);
+                                ninjaMorphia.save(game);
 
                                 LOG.info("Updated Kickoff and MatchID of Playday: " + playday.getName());
                             }
@@ -81,7 +85,7 @@ public class KickoffJob implements Job {
                 }
                 
                 job.setExecuted(new Date());
-                dataService.save(job);
+                ninjaMorphia.save(job);
                 LOG.info("Finished Job: " + Constants.KICKOFFJOB.get());
             }
         }
