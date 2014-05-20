@@ -7,11 +7,10 @@ import java.util.List;
 import models.enums.Avatar;
 import models.statistic.ResultStatistic;
 import models.statistic.UserStatistic;
+import ninja.morphia.NinjaMorphiaModel;
 
-import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 /**
@@ -20,11 +19,8 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "users", noClassnameStored = true)
-public class User implements Serializable {
+public class User extends NinjaMorphiaModel implements Serializable {
     private static final long serialVersionUID = 5381913315282528298L;
-    
-    @Id
-    private ObjectId id;
     
     @Reference(value = "user_gametips", lazy = true)
     private List<GameTip> gameTips;
@@ -68,10 +64,6 @@ public class User implements Serializable {
     private int correctDifferences;
     private int correctTrends;
     private int correctExtraTips;
-
-    public ObjectId getId() {
-        return id;
-    }
 
     public String getEmail() {
         return this.email;

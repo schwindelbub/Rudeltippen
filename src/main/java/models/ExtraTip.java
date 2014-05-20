@@ -2,9 +2,9 @@ package models;
 
 import java.io.Serializable;
 
-import org.bson.types.ObjectId;
+import ninja.morphia.NinjaMorphiaModel;
+
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 /**
@@ -13,11 +13,8 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "extratips", noClassnameStored = true)
-public class ExtraTip implements Serializable {
+public class ExtraTip extends NinjaMorphiaModel implements Serializable {
     private static final long serialVersionUID = -2648500340981679571L;
-
-    @Id
-    private ObjectId id;
 
     @Reference
     private User user;
@@ -29,10 +26,6 @@ public class ExtraTip implements Serializable {
     public Team answer;
 
     private int points;
-
-    public ObjectId getId() {
-        return id;
-    }
 
     public User getUser() {
         return user;

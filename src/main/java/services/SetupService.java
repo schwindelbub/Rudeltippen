@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import models.User;
 import models.enums.Constants;
+import ninja.morphia.NinjaMorphia;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Request;
@@ -41,7 +42,7 @@ public class SetupService {
     private static final Logger LOG = LoggerFactory.getLogger(ResultService.class);
 
     @Inject
-    private DataService dataService;
+    private NinjaMorphia ninjaMorphia;
     
     @Inject
     private AuthService authService;
@@ -201,7 +202,7 @@ public class SetupService {
             user.setActive(true);
             user.setSalt(salt);
             user.setUserpass(authService.hashPassword("user" + i, salt));
-            dataService.save(user);
+            ninjaMorphia.save(user);
         }
     }
 }

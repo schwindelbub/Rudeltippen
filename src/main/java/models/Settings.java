@@ -2,9 +2,9 @@ package models;
 
 import java.io.Serializable;
 
-import org.bson.types.ObjectId;
+import ninja.morphia.NinjaMorphiaModel;
+
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
 
 /**
  * 
@@ -12,11 +12,8 @@ import org.mongodb.morphia.annotations.Id;
  *
  */
 @Entity(value = "settings", noClassnameStored = true)
-public class Settings implements Serializable {
+public class Settings extends NinjaMorphiaModel implements Serializable {
     private static final long serialVersionUID = 864836696835606862L;
-
-    @Id
-    private ObjectId id;
 
     private String appSalt;
     private String appName;
@@ -35,10 +32,6 @@ public class Settings implements Serializable {
     private boolean playoffs;
     private boolean enableRegistration;
     
-    public ObjectId getId() {
-        return id;
-    }
-
     public String getAppSalt() {
         return appSalt;
     }

@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import models.Confirmation;
+import models.Extra;
 import models.ExtraTip;
+import models.Game;
 import models.GameTip;
 import models.Settings;
 import models.User;
@@ -18,6 +20,7 @@ import models.statistic.UserStatistic;
 import ninja.Context;
 import ninja.Result;
 import ninja.Results;
+import ninja.morphia.NinjaMorphia;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import ninja.session.Session;
@@ -51,6 +54,9 @@ public class UserController extends RootController {
     private DataService dataService;
 
     @Inject
+    private NinjaMorphia ninjaMorphia;
+    
+    @Inject
     private MailService mailService;
 
     @Inject
@@ -72,14 +78,14 @@ public class UserController extends RootController {
             final Map<String, Integer> statistics = new HashMap<String, Integer>();
             final List<ExtraTip> extraTips = dataService.findExtraTipsByUser(user);
             final List<GameTip> tips = dataService.findGameTipsByUser(user);
-            final long extra = dataService.countAllExtras();
+            final long extra = ninjaMorphia.countAll(Extra.class);
             final int sumAllTipps = tips.size();
             final int correctTipps = user.getCorrectResults();
             final int correctTrend = user.getCorrectTrends();
             final int correctDifference = user.getCorrectDifferences();
             final DecimalFormat df = new DecimalFormat( "0.00" );
 
-            statistics.put("sumGames", (int) dataService.countAllGames());
+            statistics.put("sumGames", (int) ninjaMorphia.countAll(Game.class));
             statistics.put("sumTipps", sumAllTipps);
             statistics.put("correctTipps", correctTipps);
             statistics.put("correctTrend", correctTrend);
@@ -134,7 +140,7 @@ public class UserController extends RootController {
         final User user = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
         user.setPicture(commonService.getUserPictureUrl(commonService.getAvatarFromString(avatar), user));
         user.setAvatar(commonService.getAvatarFromString(avatar));
-        dataService.save(user);
+        ninjaMorphia.save(user);
         
         return Results.redirect(USERS_PROFILE);
     }
@@ -149,7 +155,7 @@ public class UserController extends RootController {
         } else {
             final User user = context.getAttribute(Constants.CONNECTEDUSER.get(), User.class);
             user.setUsername(username);
-            dataService.save(user);
+            ninjaMorphia.save(user);
 
             flashScope.success(i18nService.get("controller.profile.updateusername"));
             LOG.info("username updated: " + user.getEmail() + " / " + username);
@@ -181,7 +187,7 @@ public class UserController extends RootController {
                 confirmation.setCreated(new Date());
                 confirmation.setToken(token);
                 confirmation.setUser(user);
-                dataService.save(confirmation);
+                ninjaMorphia.save(confirmation);
                 mailService.confirm(user, token, confirmationType);
                 flashScope.success(i18nService.get(CONFIRM_MESSAGE));
             }
@@ -209,7 +215,7 @@ public class UserController extends RootController {
                 confirm.setCreated(new Date());
                 confirm.setToken(token);
                 confirm.setUser(user);
-                dataService.save(confirm);
+                ninjaMorphia.save(confirm);
                 mailService.confirm(user, token, confirmationType);
                 flashScope.success(i18nService.get(CONFIRM_MESSAGE));
                 LOG.info("Password updated: " + user.getEmail());
@@ -231,7 +237,7 @@ public class UserController extends RootController {
         user.setNotification(("1").equals(notification));
         user.setSendStandings(("1").equals(sendstandings));
         user.setSendGameTips(("1").equals(sendgametips));
-        dataService.save(user);
+        ninjaMorphia.save(user);
 
         flashScope.success(i18nService.get("controller.profile.notifications"));
         LOG.info("Notifications updated: " + user.getEmail());

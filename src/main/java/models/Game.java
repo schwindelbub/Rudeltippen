@@ -4,9 +4,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import org.bson.types.ObjectId;
+import ninja.morphia.NinjaMorphiaModel;
+
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 /**
@@ -15,11 +15,8 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "games", noClassnameStored = true)
-public class Game implements Serializable {
+public class Game extends NinjaMorphiaModel implements Serializable {
     private static final long serialVersionUID = -8249455429423822352L;
-
-    @Id
-    private ObjectId id;
 
     @Reference
     private Team homeTeam;
@@ -64,10 +61,6 @@ public class Game implements Serializable {
 
     public void setReminder(boolean reminder) {
         this.reminder = reminder;
-    }
-
-    public ObjectId getId() {
-        return id;
     }
 
     public Playday getPlayday() {

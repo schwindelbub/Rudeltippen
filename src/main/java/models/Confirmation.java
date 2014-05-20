@@ -4,11 +4,10 @@ import java.io.Serializable;
 import java.util.Date;
 
 import models.enums.ConfirmationType;
+import ninja.morphia.NinjaMorphiaModel;
 
-import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 /**
@@ -17,11 +16,8 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "confirmations", noClassnameStored = true)
-public class Confirmation implements Serializable {
+public class Confirmation extends NinjaMorphiaModel implements Serializable {
     private static final long serialVersionUID = -5965149177345129285L;
-
-    @Id
-    private ObjectId id;
 
     @Reference
     private User user;
@@ -33,10 +29,6 @@ public class Confirmation implements Serializable {
     private String confirmValue;
 
     private Date created;
-
-    public ObjectId getId() {
-        return id;
-    }
     
     public ConfirmationType getConfirmationType() {
         return confirmationType;

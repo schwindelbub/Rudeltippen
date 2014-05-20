@@ -23,6 +23,7 @@ import models.Team;
 import models.User;
 import models.enums.Avatar;
 import models.enums.Constants;
+import ninja.morphia.NinjaMorphia;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -51,6 +52,9 @@ public class ImportService {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private NinjaMorphia ninjaMorphia;
     
     @Inject
     private AuthService authService;
@@ -95,7 +99,7 @@ public class ImportService {
         settings.setNumPrePlayoffGames(prePlayoffGames.size());
         settings.setInformOnNewTipper(true);
         settings.setEnableRegistration(true);
-        dataService.save(settings);
+        ninjaMorphia.save(settings);
 
         User user = new User();
         final String salt = DigestUtils.sha512Hex(UUID.randomUUID().toString());
@@ -119,7 +123,7 @@ public class ImportService {
         user.setCorrectExtraTips(0);
         user.setPicture(commonService.getUserPictureUrl(Avatar.GRAVATAR, user));
         user.setAvatar(Avatar.GRAVATAR);
-        dataService.save(user);        
+        ninjaMorphia.save(user);        
     }
 
     private void initJobs() {
@@ -132,20 +136,20 @@ public class ImportService {
         for (AbstractJob abstractJob : abstractJobs) {
             AbstractJob job = dataService.findAbstractJobByName(abstractJob.getName());
             if (job == null) {
-                dataService.save(abstractJob);
+                ninjaMorphia.save(abstractJob);
             }
         }
     }
 
     private void setReferences() {
-        List<Bracket> brackets = dataService.findAllBrackets();
+        List<Bracket> brackets = ninjaMorphia.findAll(Bracket.class);
         for (Bracket bracket : brackets) {
             List<Game> games = dataService.findGamesByBracket(bracket);
             List<Team> teams = dataService.findTeamsByBracket(bracket);
 
             bracket.setGames(games);
             bracket.setTeams(teams);
-            dataService.save(bracket);
+            ninjaMorphia.save(bracket);
         }
 
         List<Playday> playdays = dataService.findAllPlaydaysOrderByNumber();
@@ -153,7 +157,7 @@ public class ImportService {
             List<Game> games = dataService.findGamesByPlayday(playday);
 
             playday.setGames(games);
-            dataService.save(playday);
+            ninjaMorphia.save(playday);
         }
     }
 
@@ -167,7 +171,7 @@ public class ImportService {
             bracket.setName(basicDBObject.getString("name"));
             bracket.setNumber(basicDBObject.getInt(NUMBER));
             bracket.setUpdatable(basicDBObject.getBoolean(UPDATABLE));
-            dataService.save(bracket);
+            ninjaMorphia.save(bracket);
 
             brackets.put(basicDBObject.getString("id"), bracket);
         }
@@ -185,7 +189,7 @@ public class ImportService {
             extra.setQuestion(basicDBObject.getString("question"));
             extra.setExtraReference(basicDBObject.getString("extraReference"));
             extra.setQuestionShort(basicDBObject.getString("questionShort"));
-            dataService.save(extra);
+            ninjaMorphia.save(extra);
         }
     }
 
@@ -207,7 +211,7 @@ public class ImportService {
             game.setAwayTeam(teams.get(basicDBObject.getString("awayTeam")));
             game.setPlayday(playdays.get(basicDBObject.getString("playday")));
             game.setKickoff(parseDate(basicDBObject.getString("kickoff"), "yyyy-MM-dd hh:mm:ss"));
-            dataService.save(game);
+            ninjaMorphia.save(game);
         }
     }
 
@@ -234,7 +238,7 @@ public class ImportService {
             playday.setCurrent(basicDBObject.getBoolean("current"));
             playday.setCurrent(basicDBObject.getBoolean(PLAYOFF));
             playday.setNumber(basicDBObject.getInt(NUMBER));
-            dataService.save(playday);
+            ninjaMorphia.save(playday);
 
             playdays.put(basicDBObject.getString("id"), playday);
         }
@@ -256,7 +260,7 @@ public class ImportService {
             team.setGamesDraw(basicDBObject.getInt("gamesDraw"));
             team.setGamesLost(basicDBObject.getInt("gamesLost"));
             team.setBracket(brackets.get(basicDBObject.getString(BRACKET)));
-            dataService.save(team);
+            ninjaMorphia.save(team);
 
             teams.put(basicDBObject.getString("id"), team);
         }

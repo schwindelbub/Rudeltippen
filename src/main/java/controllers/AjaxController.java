@@ -10,13 +10,12 @@ import ninja.Context;
 import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
+import ninja.morphia.NinjaMorphia;
 import ninja.params.PathParam;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import services.DataService;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -35,15 +34,15 @@ public class AjaxController extends RootController {
     private static final String VALUE = "value";
 
     @Inject
-    private DataService dataService;
+    private NinjaMorphia ninjaMorphia;
 
     public Result webserviceid(@PathParam("gameId") String gameId, Context context) {
-        Game game = dataService.findGameById(gameId);
+        Game game = ninjaMorphia.findById(gameId, Game.class);
         if (game != null) {
             final String webserviceID = context.getParameter(VALUE);
             if (StringUtils.isNotBlank(webserviceID)) {
                 game.setWebserviceID(webserviceID);
-                dataService.save(game);
+                ninjaMorphia.save(game);
 
                 return Results.noContent();
             }
@@ -53,7 +52,7 @@ public class AjaxController extends RootController {
     }
 
     public Result kickoff(@PathParam("gameId") String gameId, Context context) {
-        Game game = dataService.findGameById(gameId);
+        Game game = ninjaMorphia.findById(gameId, Game.class);
         if (game != null) {
             final String kickoff = context.getParameter(VALUE);
             if (StringUtils.isNotBlank(kickoff)) {
@@ -61,7 +60,7 @@ public class AjaxController extends RootController {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy - HH:mm", Locale.ENGLISH);
                     game.setKickoff(simpleDateFormat.parse(kickoff));
                     game.setUpdatable(false);
-                    dataService.save(game);
+                    ninjaMorphia.save(game);
 
                     return Results.noContent();
                 } catch (Exception e) {
@@ -74,16 +73,16 @@ public class AjaxController extends RootController {
     }
 
     public Result place(@PathParam("teamId") String teamId, Context context) {
-        Team team = dataService.findTeamById(teamId);
+        Team team = ninjaMorphia.findById(teamId, Team.class);
         if (team != null) {
             final String place = context.getParameter(VALUE);
             if (StringUtils.isNotBlank(place)) {
                 team.setPlace(Integer.valueOf(place));
-                dataService.save(team);
+                ninjaMorphia.save(team);
 
                 Bracket bracket = team.getBracket();
                 bracket.setUpdatable(false);
-                dataService.save(bracket);
+                ninjaMorphia.save(bracket);
 
                 return Results.noContent();
             }
@@ -93,10 +92,10 @@ public class AjaxController extends RootController {
     }
 
     public Result updatablegame(@PathParam("gameId") String gameId) {
-        Game game = dataService.findGameById(gameId);
+        Game game = ninjaMorphia.findById(gameId, Game.class);
         if (game != null) {
             game.setUpdatable(!game.isUpdatable());
-            dataService.save(game);
+            ninjaMorphia.save(game);
 
             return Results.noContent();
         }
@@ -105,10 +104,10 @@ public class AjaxController extends RootController {
     }
 
     public Result updatablebracket(@PathParam("bracketId") String bracketId) {
-        Bracket bracket = dataService.findBracketById(bracketId);
+        Bracket bracket = ninjaMorphia.findById(bracketId, Bracket.class);
         if (bracket != null) {
             bracket.setUpdatable(!bracket.isUpdatable());
-            dataService.save(bracket);
+            ninjaMorphia.save(bracket);
 
             return Results.noContent();
         }

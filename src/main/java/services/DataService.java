@@ -1,6 +1,5 @@
 package services;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,11 +26,10 @@ import models.statistic.PlaydayStatistic;
 import models.statistic.ResultStatistic;
 import models.statistic.UserStatistic;
 import ninja.cache.NinjaCache;
+import ninja.morphia.NinjaMorphia;
 
-import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +41,6 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
 
 /**
  * 
@@ -70,13 +67,11 @@ public class DataService {
     private static final String USER = "user";
     private static final String PLAYDAY = "playday";
     private static final String ACTIVE = "active";
-    private static final String PACKAGE = "models";
-    private static final String DB = "rudeltippen";
     private Datastore datastore;
 
     @Inject
     private NinjaCache ninjaCache;
-
+    
     @Inject
     private ResultService resultService;
 
@@ -89,36 +84,9 @@ public class DataService {
     @Inject
     private CommonService commonService;
 
-    public DataService() {
-        MongoClient mongoClient = null;
-        try {
-            mongoClient = new MongoClient();
-        } catch (UnknownHostException e) {
-            LOG.error("Failed to connect to mongo db", e);
-        }
-
-        if (mongoClient != null) {
-            this.datastore = new Morphia().mapPackage(PACKAGE).createDatastore(mongoClient, DB);
-            LOG.info("Created DataStore for MongoDB: " + DB);
-        } else {
-            LOG.error("Failed to created morphia instance");
-        }
-    }
-
-    public void setMongoClient(MongoClient mongoClient) {
-        this.datastore = new Morphia().mapPackage(PACKAGE).createDatastore(mongoClient, DB);
-    }
-
-    public void save(Object object) {
-        this.datastore.save(object);
-    }
-
-    public void delete(Object object) {
-        this.datastore.delete(object);
-    }
-
-    public void deleteCollection(final Class<?> clazz) {
-        this.datastore.delete(this.datastore.createQuery(clazz));
+    @Inject
+    public DataService(NinjaMorphia ninjaMorphia) {
+        this.datastore = ninjaMorphia.getDatastore();
     }
 
     public AbstractJob findAbstractJobByName(String jobName) {
@@ -295,7 +263,8 @@ public class DataService {
             notificationService.sendNotfications(game);
             game.setEnded(true);
         }
-        save(game);
+        
+        this.datastore.save(game);
     }
 
     public void saveGameTip(final Game game, final int homeScore, final int awayScore, User user) {
@@ -309,7 +278,7 @@ public class DataService {
             gameTip.setPlaced(new Date());
             gameTip.setHomeScore(homeScore);
             gameTip.setAwayScore(awayScore);
-            save(gameTip);
+            this.datastore.save(gameTip);
             LOG.info("Tipp placed - " + user.getEmail() + " - " + gameTip);
         }
     }
@@ -376,7 +345,7 @@ public class DataService {
             extraTip.setUser(user);
             extraTip.setExtra(extra);
             extraTip.setAnswer(team);
-            save(extraTip);
+            this.datastore.save(extraTip);
             LOG.info("Stored extratip - " + user.getEmail() + " - " + extraTip);
         }
     }
@@ -393,14 +362,6 @@ public class DataService {
         return this.datastore.find(Playday.class).order(NUMBER).asList();
     }
 
-    public List<Extra> findAllExtras() {
-        return this.datastore.find(Extra.class).asList();
-    }
-
-    public List<Team> findAllTeams() {
-        return this.datastore.find(Team.class).asList();
-    }
-
     public List<Game> findGamesByHomeTeam(Team team) {
         return this.datastore.find(Game.class).field("homeTeam").equal(team).asList();
     }
@@ -414,17 +375,6 @@ public class DataService {
                 .field(ACTIVE).equal(true)
                 .order("points, correctResults, correctDifferences, correctTrends, correctExtraTips")
                 .asList();
-    }
-
-    public List<Bracket> findAllBrackets() {
-        return this.datastore.find(Bracket.class).asList();
-    }
-
-    public Game findGameById(String gameId) {
-        if (validationService.isValidObjectId(gameId)) {
-            return this.datastore.get(Game.class, new ObjectId(gameId));   
-        }
-        return null;
     }
 
     public List<Bracket> findAllUpdatableBrackets() {
@@ -459,10 +409,6 @@ public class DataService {
         return this.datastore.find(Game.class).field(PLAYOFF).equal(true).asList();
     }
 
-    public long countAllUsers() {
-        return this.datastore.find(User.class).countAll();
-    }
-
     public List<User> findActiveUsers(int limit) {
         return this.datastore.find(User.class).field(ACTIVE).equal(true).order(PLACE).limit(limit).asList();
     }
@@ -471,48 +417,12 @@ public class DataService {
         return this.datastore.find(User.class).field(ACTIVE).equal(true).order(PLACE).asList();
     }
 
-    public Team findTeamById(String teamId) {
-        if (validationService.isValidObjectId(teamId)) {
-            return this.datastore.get(Team.class, new ObjectId(teamId));
-        }
-        
-        return null;
-    }
-
-    public Bracket findBracketById(String bracketId) {
-        if (validationService.isValidObjectId(bracketId)) {
-            return this.datastore.get(Bracket.class, new ObjectId(bracketId));
-        }
-        
-        return null;
-    }
-
-    public Extra findExtaById(String bonusTippId) {
-        if (validationService.isValidObjectId(bonusTippId)) {
-            this.datastore.get(Extra.class, new ObjectId(bonusTippId));
-        }
-        
-        return null;
-    }
-
     public List<User> findUsersOrderByUsername() {
         return this.datastore.find(User.class).field(ACTIVE).equal(true).order(USERNAME).asList();
     }
 
-    public User findUserById(String userId) {
-        if (validationService.isValidObjectId(userId)) {
-            return this.datastore.get(User.class, new ObjectId(userId));
-        }
-        
-        return null;
-    }
-
     public Confirmation findConfirmationByTypeAndUser(ConfirmationType confirmationType, User user) {
         return this.datastore.find(Confirmation.class).field("confirmationType").equal(confirmationType).field(USER).equal(user).get();
-    }
-
-    public List<Game> findAllGames() {
-        return this.datastore.find(Game.class).asList();
     }
 
     public Confirmation findConfirmationByToken(String token) {
@@ -531,18 +441,6 @@ public class DataService {
         return query.get();
     }
 
-    public long countAllGames() {
-        return this.datastore.find(Game.class).countAll();
-    }
-
-    public long countAllExtras() {
-        return this.datastore.find(Extra.class).countAll();
-    }
-
-    public void dropDatabase() {
-        this.datastore.getDB().dropDatabase();
-    }
-
     public List<Game> findGamesByBracket(Bracket bracket) {
         return this.datastore.find(Game.class).field(BRACKET).equal(bracket).asList();
     }
@@ -557,10 +455,6 @@ public class DataService {
 
     public List<UserStatistic> findUserStatisticByUser(User user) {
         return this.datastore.find(UserStatistic.class).field(USER).equal(user).order(PLAYDAY).asList();
-    }
-
-    public List<AbstractJob> findAllAbstractJobs() {
-        return this.datastore.find(AbstractJob.class).asList();
     }
 
     public void deleteResultsStatisticByUser(User user) {
@@ -578,10 +472,6 @@ public class DataService {
 
     public List<GameTipStatistic> findGameTipStatisticsOrderByPlayday() {
         return this.datastore.find(GameTipStatistic.class).order(PLAYDAY).asList();
-    }
-
-    public List<User> findAllUsers() {
-        return this.datastore.find(User.class).asList();
     }
 
     public void deleteConfirmationsByUser(User user) {

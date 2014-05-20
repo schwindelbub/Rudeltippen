@@ -3,9 +3,9 @@ package models;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.bson.types.ObjectId;
+import ninja.morphia.NinjaMorphiaModel;
+
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 /**
@@ -14,11 +14,8 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "gametips", noClassnameStored = true)
-public class GameTip implements Serializable {
+public class GameTip extends NinjaMorphiaModel implements Serializable {
     private static final long serialVersionUID = -8038881739647141796L;
-
-    @Id
-    private ObjectId id;
 
     @Reference
     private User user;
@@ -31,10 +28,6 @@ public class GameTip implements Serializable {
     private int points;
 
     private Date placed;
-
-    public ObjectId getId() {
-        return id;
-    }
 
     public User getUser() {
         return user;

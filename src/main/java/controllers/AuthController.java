@@ -14,6 +14,7 @@ import ninja.Cookie;
 import ninja.FilterWith;
 import ninja.Result;
 import ninja.Results;
+import ninja.morphia.NinjaMorphia;
 import ninja.params.PathParam;
 import ninja.session.FlashScope;
 import ninja.session.Session;
@@ -53,6 +54,9 @@ public class AuthController {
 
     @Inject
     private DataService dataService;
+    
+    @Inject
+    private NinjaMorphia ninjaMorphia;
 
     @Inject
     private ValidationService validationService;
@@ -103,7 +107,7 @@ public class AuthController {
             confirmation.setConfirmationType(confirmType);
             confirmation.setConfirmValue(authService.encryptAES(UUID.randomUUID().toString()));
             confirmation.setCreated(new Date());
-            dataService.save(confirmation);
+            ninjaMorphia.save(confirmation);
 
             mailService.confirm(user, token, confirmType);
             flashScope.success(i18nService.get("confirm.message"));
@@ -130,8 +134,8 @@ public class AuthController {
                 } else {
                     if ((ConfirmationType.ACTIVATION).equals(confirmationType)) {
                         user.setActive(true);
-                        dataService.save(user);
-                        dataService.delete(confirmation);
+                        ninjaMorphia.save(user);
+                        ninjaMorphia.delete(confirmation);
                         
                         flashScope.success(i18nService.get("controller.users.accountactivated"));
                         LOG.info("User activated: " + user.getEmail());
@@ -139,18 +143,18 @@ public class AuthController {
                         final String oldusername = user.getEmail();
                         final String newusername = authService.decryptAES(confirmation.getConfirmValue());
                         user.setEmail(newusername);
-                        dataService.save(user);
+                        ninjaMorphia.save(user);
                         session.remove(Constants.USERNAME.get());
                         flashScope.success(i18nService.get("controller.users.changedusername"));
-                        dataService.delete(confirmation);
+                        ninjaMorphia.delete(confirmation);
 
                         LOG.info("User changed username... old username: " + oldusername + " - " + "new username: " + newusername);
                     } else if ((ConfirmationType.CHANGEUSERPASS).equals(confirmationType)) {
                         user.setUserpass(authService.decryptAES(confirmation.getConfirmValue()));
-                        dataService.save(user);
+                        ninjaMorphia.save(user);
                         session.remove("username");
                         flashScope.success(i18nService.get("controller.users.changeduserpass"));
-                        dataService.delete(confirmation);
+                        ninjaMorphia.delete(confirmation);
 
                         LOG.info(user.getEmail() + " changed his password");
                     }
@@ -200,7 +204,7 @@ public class AuthController {
             user.setUserpass(authService.hashPassword(userDTO.getUserpass(), salt));
             user.setPoints(0);
             user.setPicture(DigestUtils.md5Hex(userDTO.getEmail()));
-            dataService.save(user);
+            ninjaMorphia.save(user);
 
             final String token = UUID.randomUUID().toString();
             final ConfirmationType confirmationType = ConfirmationType.ACTIVATION;
@@ -210,7 +214,7 @@ public class AuthController {
             confirmation.setCreated(new Date());
             confirmation.setToken(token);
             confirmation.setUser(user);
-            dataService.save(confirmation);
+            ninjaMorphia.save(confirmation);
 
             mailService.confirm(user, token, confirmationType);
             if (settings.isInformOnNewTipper()) {
@@ -243,9 +247,9 @@ public class AuthController {
         final User user = confirmation.getUser();
         final String password = authService.hashPassword(passwordDTO.getUserpass(), user.getSalt());
         user.setUserpass(password);
-        dataService.delete(user);
+        ninjaMorphia.delete(user);
 
-        dataService.delete(confirmation);
+        ninjaMorphia.delete(confirmation);
         flashScope.success(i18nService.get("controller.auth.passwordreset"));
 
         return Results.redirect(AUTH_LOGIN);

@@ -3,9 +3,9 @@ package models;
 import java.io.Serializable;
 import java.util.List;
 
-import org.bson.types.ObjectId;
+import ninja.morphia.NinjaMorphiaModel;
+
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 /**
@@ -14,11 +14,8 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "brackets", noClassnameStored = true)
-public class Bracket implements Serializable {
+public class Bracket extends NinjaMorphiaModel implements Serializable {
     private static final long serialVersionUID = -7837267515132967024L;
-
-    @Id
-    private ObjectId id;
 
     private String name;
 
@@ -31,10 +28,6 @@ public class Bracket implements Serializable {
     private int number;
 
     private boolean updatable;
-
-    public ObjectId getId() {
-        return id;
-    }
 
     public String getName() {
         return name;

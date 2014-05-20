@@ -3,9 +3,9 @@ package models;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.bson.types.ObjectId;
+import ninja.morphia.NinjaMorphiaModel;
+
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
 
 /**
  * 
@@ -13,11 +13,8 @@ import org.mongodb.morphia.annotations.Id;
  *
  */
 @Entity(value = "jobs", noClassnameStored = true)
-public class AbstractJob implements Serializable {
+public class AbstractJob extends NinjaMorphiaModel implements Serializable {
     private static final long serialVersionUID = -181239072023766955L;
-
-    @Id
-    private ObjectId id;
 
     private String name;
     private String scheduled;
@@ -37,10 +34,6 @@ public class AbstractJob implements Serializable {
         this.active = true;
     }
 
-    public ObjectId getId() {
-        return id;
-    }
-    
     public String getScheduled() {
         return scheduled;
     }

@@ -2,9 +2,9 @@ package models;
 
 import java.io.Serializable;
 
-import org.bson.types.ObjectId;
+import ninja.morphia.NinjaMorphiaModel;
+
 import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Reference;
 
 /**
@@ -13,11 +13,8 @@ import org.mongodb.morphia.annotations.Reference;
  *
  */
 @Entity(value = "teams", noClassnameStored = true)
-public class Team implements Serializable {
+public class Team extends NinjaMorphiaModel implements Serializable {
     private static final long serialVersionUID = -4180104576028390547L;
-
-    @Id
-    private ObjectId id;
 
     @Reference
     private Bracket bracket;
@@ -35,10 +32,6 @@ public class Team implements Serializable {
     private int gamesLost;
     private int place;
     private int previousPlace;
-
-    public ObjectId getId() {
-        return id;
-    }
 
     public String getName() {
         return this.name;

@@ -10,6 +10,7 @@ import java.util.UUID;
 import models.User;
 import models.enums.Avatar;
 import ninja.NinjaTest;
+import ninja.morphia.NinjaMorphia;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpResponse;
@@ -27,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import services.AuthService;
 import services.CommonService;
-import services.DataService;
 import services.ImportService;
 
 import com.mongodb.MongoClient;
@@ -57,9 +57,9 @@ public class TestBase extends NinjaTest {
 
             mongodExecutable.start();
 
-            DataService dataService = getInjector().getInstance(DataService.class);
-            dataService.setMongoClient(new MongoClient("localhost", port));
-            dataService.dropDatabase();
+            NinjaMorphia ninjaMorphia = getInjector().getInstance(NinjaMorphia.class);
+            ninjaMorphia.setMongoClient(new MongoClient("localhost", port));
+            ninjaMorphia.dropDatabase();
             
             getInjector().getInstance(ImportService.class).loadInitialData();
 
@@ -85,7 +85,7 @@ public class TestBase extends NinjaTest {
             user.setCorrectExtraTips(0);
             user.setPicture(getInjector().getInstance(CommonService.class).getUserPictureUrl(Avatar.GRAVATAR, user));
             user.setAvatar(Avatar.GRAVATAR);
-            dataService.save(user);  
+            ninjaMorphia.save(user);  
         } catch (Exception e) {
             LOG.error("Failed to start in memory mongodb for testing", e);
         }
