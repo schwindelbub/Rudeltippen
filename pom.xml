@@ -113,7 +113,7 @@
 						<id>combine</id>
 						<phase>clean</phase>
 						<configuration>
-							<tasks name="Create combined CSS and JS files">
+							<target name="Create combined CSS and JS files">
 								<property name="CSS_DIR" value="src/main/java/assets/stylesheets" />
 								<property name="JS_DIR" value="src/main/java/assets/javascripts" />
 								<property name="CSS" value="${CSS_DIR}/combined.min.css" />
@@ -141,7 +141,7 @@
 									<fileset dir="${JS_DIR}" includes="overlay.min.js" />
 								</concat>
 								<echo message="${JS} built." />
-							</tasks>
+							</target>
 						</configuration>
 						<goals>
 							<goal>run</goal>
@@ -207,14 +207,14 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.ninjaframework</groupId>
+			<groupId>de.svenkubiak</groupId>
 			<artifactId>ninja-quartz-scheduler-module</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.ninjaframework</groupId>
+			<groupId>de.svenkubiak</groupId>
 			<artifactId>ninja-morphia-module</artifactId>
-			<version>1.0.3</version>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
