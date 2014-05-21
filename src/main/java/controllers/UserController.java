@@ -36,14 +36,12 @@ import services.MailService;
 import services.ValidationService;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * 
  * @author svenkubiak
  *
  */
-@Singleton
 public class UserController extends RootController {
     private static final Logger LOG = LoggerFactory.getLogger(UserController.class);
     private static final String CONFIRM_MESSAGE = "confirm.message";

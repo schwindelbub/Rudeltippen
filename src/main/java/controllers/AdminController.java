@@ -41,7 +41,6 @@ import services.MailService;
 import services.ValidationService;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 import dtos.SettingsDTO;
 import filters.AdminFilter;
@@ -51,7 +50,6 @@ import filters.AdminFilter;
  * @author svenkubiak
  *
  */
-@Singleton
 @FilterWith(AdminFilter.class)
 public class AdminController extends RootController {
     private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);

@@ -14,14 +14,12 @@ import services.DataService;
 import services.I18nService;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * 
  * @author svenkubiak
  *
  */
-@Singleton
 public class ApplicationController extends RootController {
 
     @Inject

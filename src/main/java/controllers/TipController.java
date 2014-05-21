@@ -32,14 +32,12 @@ import services.StatisticService;
 import services.ValidationService;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * 
  * @author svenkubiak
  *
  */
-@Singleton
 public class TipController extends RootController {
     private static final String TEAM_ID = "_teamId";
     private static final String BONUS = "bonus_";

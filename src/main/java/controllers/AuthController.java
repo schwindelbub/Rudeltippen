@@ -12,6 +12,7 @@ import models.enums.Constants;
 import ninja.Context;
 import ninja.Cookie;
 import ninja.FilterWith;
+import ninja.NinjaValidator;
 import ninja.Result;
 import ninja.Results;
 import ninja.morphia.NinjaMorphia;
@@ -32,7 +33,6 @@ import services.MailService;
 import services.ValidationService;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 import dtos.LoginDTO;
 import dtos.PasswordDTO;
@@ -44,11 +44,10 @@ import filters.AppFilter;
  * @author svenkubiak
  *
  */
-@Singleton
 @FilterWith(AppFilter.class)
 public class AuthController {
     private static final Logger LOG = LoggerFactory.getLogger(AuthController.class);
-    private static final String VALIDATION = "validation";
+    private static final String VALIDATION = "validations";
     private static final String AUTH_LOGIN = "/auth/login";
     private static final String INVALIDTOKEN = "controller.users.invalidtoken";
 
@@ -69,6 +68,9 @@ public class AuthController {
 
     @Inject
     private I18nService i18nService;
+    
+    @Inject
+    private NinjaValidator validations;
 
     public Result password(@PathParam("token") String token, FlashScope flashScope) {
         final Confirmation confirmation = dataService.findConfirmationByToken(token);
@@ -255,14 +257,17 @@ public class AuthController {
         return Results.redirect(AUTH_LOGIN);
     }
 
-    public Result authenticate(Session session, @JSR303Validation LoginDTO loginDTO, Validation validation, FlashScope flashScope) {
-        if (validation.hasBeanViolations()) {
-            return Results.html().render("login", loginDTO).render(VALIDATION, validation).template("/views/AuthController/login.ftl.html");
+    public Result authenticate(Session session, LoginDTO login, FlashScope flashScope) {
+        validations.required("username", login.getUsername());
+        validations.required("userpass", login.getUserpass());
+        
+        if (validations.hasErrors()) {
+            return Results.html().render(VALIDATION, validations).render("settings", dataService.findSettings()).template("/views/AuthController/login.ftl.html");
         } else {
-            if (authService.authenticate(loginDTO.getUsername(), loginDTO.getUserpass())) {
-                session.put(Constants.USERNAME.get(), loginDTO.getUsername());
-                if (loginDTO.isRemember()) {
-                    String signedUsername = authService.sign(loginDTO.getUsername()) + "-" + loginDTO.getUsername();
+            if (authService.authenticate(login.getUsername(), login.getUserpass())) {
+                session.put(Constants.USERNAME.get(), login.getUsername());
+                if (login.isRemember()) {
+                    String signedUsername = authService.sign(login.getUsername()) + "-" + login.getUsername();
                     Cookie.builder(Constants.COOKIENAME.get(), signedUsername).setSecure(true).setHttpOnly(true).build();
                 }
 

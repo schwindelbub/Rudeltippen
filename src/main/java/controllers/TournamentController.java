@@ -12,14 +12,12 @@ import services.CommonService;
 import services.DataService;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * 
  * @author svenkubiak
  *
  */
-@Singleton
 public class TournamentController extends RootController {
 
     @Inject

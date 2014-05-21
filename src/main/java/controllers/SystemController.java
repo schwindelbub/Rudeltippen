@@ -17,14 +17,12 @@ import services.ImportService;
 import services.SetupService;
 
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * 
  * @author svenkubiak
  *
  */
-@Singleton
 public class SystemController {
     private static final Logger LOG = LoggerFactory.getLogger(SystemController.class);
 
