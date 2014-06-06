@@ -30,10 +30,10 @@ Screenshots made with some awesomeness from [Am I Responsive][2].
 Requirements
 ------------------
 
-- [Java SDK 1.7+][1]
+- [Java SDK 1.7][1]
 - Nginx, Apache, Lighttpd or any other HTTP-Server with Proxy-Support
 - SMTP-Account (with SSL/non-SSL, e.g. [Gmail][12])
-- MySQL 5+
+- MySQL 5.5+
 
 Available Languages
 ------------------
@@ -45,7 +45,7 @@ Available Languages
 Installation guide
 ------------------
 
-This installation guide assumes that you already have JDK 1.7+ installed and that you have your database- and SMTP-credentials ready.
+This installation guide assumes that you already have JDK 1.7 installed and that you have your database- and SMTP-credentials ready.
 
 ### Step 0
 
@@ -101,7 +101,7 @@ application.secret=yoursecretcryptographicskey
 Set you MySQL database connection.
 
 ```bash
-%prod.db=mysql://user:pwd@host/database
+%prod.db=mysql://user:password@host/database
 ```
 
 Set your SMTP credentials (uncomment %prod.mail.smtp.channel if you want to use SSL)
@@ -204,12 +204,12 @@ Start the application with the following command in your INSTLLATIONFOLDER
 play start
 ```
 
-Advanced configuration
+Advanced configuration (optional)
 ------------------
 
 ### Log4j
 
-If you want log4j Support for your Application you'll find an empty log4j configuration file (log4j.prod.xml.example) in INSTLLATIONFOLDER/conf. Rename the file to log4j.prod.xml and edit this file with your required appenders. Afterwards uncomment the following line in INSTLLATIONFOLDER/application.conf
+If you want custom log4j support for your Rudeltippen installation you'll find an empty log4j configuration file (log4j.prod.xml.example) in INSTLLATIONFOLDER/conf. Rename the file to log4j.prod.xml and edit this file with your required appenders. Afterwards uncomment the following line in INSTLLATIONFOLDER/application.conf
 
 ```bash
 #%prod.application.log.path=/log4j.prod.xml
