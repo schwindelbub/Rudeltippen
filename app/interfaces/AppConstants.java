@@ -4,7 +4,7 @@ public interface AppConstants {
 	public static final String APPNAME = "rudeltippen";
 	public static final String YAMLFILE = "wm2014.yml";
 	public static final String DEFAULT_DATEFORMAT = "dd.MM.yyyy";
-	public static final String DEFAULT_TIMEFORMAT = "kk:mm";
+	public static final String DEFAULT_TIMEFORMAT = "HH:mm";
 	public static final String DEFAULT_TIMEZONE = "Europe/Berlin";
 	public static final String WS_ENCODING = "UTF-8";
 	public static final String WS_CONTENT_TYPE = "application/soap+xml";

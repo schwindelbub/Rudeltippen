@@ -26,7 +26,7 @@ public class ReminderJob extends AppJob {
     @Override
     public void doJob() {
         if (AppUtils.isJobInstance()) {
-            AbstractJob job = AbstractJob.find("byName", "PlaydayJob").first();
+            AbstractJob job = AbstractJob.find("byName", "ReminderJob").first();
             if (job != null && job.isActive()) {
                 Logger.info("Started Job: ReminderJob");
                 final List<Extra> nextExtras = Extra.find("SELECT e FROM Extra e WHERE reminder = ? AND ( TIMESTAMPDIFF(HOUR,ending,now()) > -23 )", false).fetch();
