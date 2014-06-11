@@ -46,7 +46,7 @@ public class PlaydayJob extends AppJob{
 
                                 if (document != null && StringUtils.isNotBlank(kickoff)) {
                                     final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
-                                    df.setTimeZone(TimeZone.getTimeZone(AppUtils.getCurrentTimeZone()));
+                                    df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
                                     try {
                                         game.setKickoff(df.parse(kickoff));
