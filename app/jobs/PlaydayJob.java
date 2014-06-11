@@ -11,12 +11,12 @@ import models.Playday;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 import play.Logger;
 import play.i18n.Messages;
 import play.jobs.On;
 import utils.AppUtils;
-import utils.SetupUtils;
 import utils.WSUtils;
 
 @On("0 0 5 * * ?")
@@ -42,14 +42,21 @@ public class PlaydayJob extends AppJob{
                             final String matchID = game.getWebserviceID();
                             if (StringUtils.isNotBlank(matchID) && game.isUpdateble()) {
                                 final Document document = WSUtils.getDocumentFromWebService(matchID);
-                                final Date kickoff = SetupUtils.getKickoffFromDocument(document);
-                                final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
-                                df.setTimeZone(TimeZone.getTimeZone(AppUtils.getCurrentTimeZone()));
+                                final String kickoff = getKickoffFromDocument(document);
 
-                                game.setKickoff(kickoff);
-                                game._save();
+                                if (document != null && StringUtils.isNotBlank(kickoff)) {
+                                    final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+                                    df.setTimeZone(TimeZone.getTimeZone(AppUtils.getCurrentTimeZone()));
 
-                                Logger.info("Updated Kickoff and MatchID of Playday: " + playday.getName());
+                                    try {
+                                        game.setKickoff(df.parse(kickoff));
+                                        game._save();
+
+                                        Logger.info("Updated Kickoff of game number: " + game.getNumber());
+                                    } catch (Exception e) {
+                                        Logger.error("Failed to parse date from openligadb for kickoff update");
+                                    }
+                                }
                             }
                         }
                     }
@@ -58,5 +65,19 @@ public class PlaydayJob extends AppJob{
                 Logger.info("Finished Job: PlaydayJob");
             }
         }
+    }
+
+    public static String getKickoffFromDocument(final Document document) {
+        String kickoff = null;
+        if (document != null) {
+            final NodeList nodeList = document.getElementsByTagName("matchDateTimeUTC");
+            if ((nodeList != null) && (nodeList.getLength() > 0)) {
+                kickoff = nodeList.item(0).getTextContent();
+                kickoff = kickoff.replace("T", " ");
+                kickoff = kickoff.replace("Z", "");
+            }
+        }
+
+        return kickoff;
     }
 }
