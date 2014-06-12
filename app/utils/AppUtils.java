@@ -36,6 +36,7 @@ import play.libs.Codec;
 import play.libs.Images;
 import play.libs.WS;
 import play.libs.WS.HttpResponse;
+import play.test.Fixtures;
 import controllers.Auth.Security;
 
 public class AppUtils implements AppConstants {
@@ -908,5 +909,14 @@ public class AppUtils implements AppConstants {
     public static void flushAndClear() {
         JPA.em().flush();
         JPA.em().clear();
+    }
+
+    public static void updates() {
+        Game game = Game.find("byNumber", 1).first();
+        if (game != null) {
+            File v1 = new File(Play.applicationPath + "/conf/v1.sql");
+            Fixtures.executeSQL(v1);
+            Logger.info("Executed update v1");
+        }
     }
 }

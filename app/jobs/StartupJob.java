@@ -1,10 +1,15 @@
 package jobs;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import models.AbstractJob;
+import models.Game;
+import play.Play;
 import play.jobs.OnApplicationStart;
+import play.test.Fixtures;
+import utils.AppUtils;
 
 @OnApplicationStart
 public class StartupJob extends AppJob{
@@ -32,5 +37,7 @@ public class StartupJob extends AppJob{
                 abstractJob._save();
             }
         }
+
+        AppUtils.updates();
     }
 }
